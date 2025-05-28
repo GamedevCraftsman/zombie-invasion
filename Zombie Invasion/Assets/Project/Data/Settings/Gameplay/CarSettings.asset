@@ -9,10 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b694dcc2517ce94996313f982d7dd5c, type: 3}
-  m_Name: GameSettings
+  m_Script: {fileID: 11500000, guid: 07d3d54f02a7b48439447ef17df2ce5c, type: 3}
+  m_Name: CarSettings
   m_EditorClassIdentifier: 
-  mapTilePrefab: {fileID: 3525867083758726857, guid: 236665f03a54a7f44a6b566f3cf17d5b,
-    type: 3}
-  mapLength: 10
-  distanceBetweenTiles: 4.2
+  carSpeed: 5
+  carMaxHealth: 100

@@ -9,10 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b694dcc2517ce94996313f982d7dd5c, type: 3}
-  m_Name: GameSettings
+  m_Script: {fileID: 11500000, guid: 1fd33a6fde65f5243977ecc63c936b80, type: 3}
+  m_Name: CameraSettings
   m_EditorClassIdentifier: 
-  mapTilePrefab: {fileID: 3525867083758726857, guid: 236665f03a54a7f44a6b566f3cf17d5b,
-    type: 3}
-  mapLength: 10
-  distanceBetweenTiles: 4.2
+  cameraFollowSpeed: 0
+  cameraOffset: {x: 0, y: 5, z: -10}

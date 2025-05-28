@@ -3,11 +3,14 @@ using System.Threading.Tasks;
 public class GameManager : BaseManager, IGameManager
 {
     public GameState CurrentState { get; }
+
     protected override Task Initialize()
     {
-        throw new System.NotImplementedException();
+        
+        
+        return Task.CompletedTask;
     }
-    
+
     public void StartGame()
     {
         throw new System.NotImplementedException();

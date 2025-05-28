@@ -63,26 +63,6 @@ public class EventBus : IEventBus
         _eventHandlers.Clear();
     }
     
-    // /// Перевіряє, чи є підписники на конкретний тип події
-    // public bool HasSubscribers<T>() where T : struct
-    // {
-    //     var eventType = typeof(T);
-    //     return _eventHandlers.ContainsKey(eventType) && _eventHandlers[eventType] != null;
-    // }
-    
-    /*/// Повертає кількість підписників для конкретного типу події
-    public int GetSubscriberCount<T>() where T : struct
-    {
-        var eventType = typeof(T);
-        if (_eventHandlers.TryGetValue(eventType, out var handler) && handler != null)
-        {
-            // Delegate.GetInvocationList() повертає масив всіх методів у multicast delegate
-            return handler.GetInvocationList().Length;
-        }
-
-        return 0;
-    }*/
-    
     /// Debug метод для виведення інформації про всі активні підписки
     public void LogActiveSubscriptions()
     {

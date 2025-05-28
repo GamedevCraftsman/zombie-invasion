@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class GameBootstrap : MonoBehaviour
@@ -5,27 +6,41 @@ public class GameBootstrap : MonoBehaviour
     [SerializeField] private BaseManager[] managersInOrder;
     [SerializeField] private BaseController[] controllersInOrder;
     
-    private async void Await()
+    private async void Awake()
     {
-        foreach (var manager in managersInOrder)
+        try
         {
-            await manager.InitializeAsync();
-        }
+            foreach (var manager in managersInOrder)
+            {
+                await manager.InitializeAsync();
+            }
         
-        OnAllManagersInitialized();
+            OnAllManagersInitialized();
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
     }
 
     private async void Start()
     {
-        foreach (var controller in controllersInOrder)
+        try
         {
-            await controller.InitializeAsync();
-        }
+            foreach (var controller in controllersInOrder)
+            {
+                await controller.InitializeAsync();
+            }
 
-        OnAllControllersinitialized();
+            OnAllControllersInitialized();
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
     }
 
-    private void OnAllControllersinitialized()
+    private void OnAllControllersInitialized()
     {
         Debug.Log("All controllers initialized");
     }
