@@ -16,5 +16,6 @@ MonoBehaviour:
   bulletSpeed: 20
   bulletDamage: 25
   bulletLifetime: 5
-  turretRotationSpeed: 90
   maxRotationAngle: 45
+  rotationSpeed: 200
+  inputSensitivity: 20

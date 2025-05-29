@@ -9,7 +9,14 @@ public class WeaponSettings : ScriptableObject
     public float bulletDamage = 25f;
     public float bulletLifetime = 5f;
     
-    [Header("Turret")]
-    public float turretRotationSpeed = 90f;
-    public float maxRotationAngle = 45f;
+    [Header("Turret Rotation")]
+    [Range(30f, 180f)]
+    public float maxRotationAngle = 90f;
+    
+    [Range(150, 250)]
+    public float rotationSpeed = 50f;
+    
+    [Header("Input Sensitivity")]
+    [Range(10, 30)]
+    public float inputSensitivity = 1f;
 }

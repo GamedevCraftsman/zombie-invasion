@@ -17,9 +17,6 @@ public class CarControllerTester : MonoBehaviour
     
     private void Start()
     {
-        // Ініціалізуємо CarController
-        //await carController.InitializeAsync();
-        
         // Підписуємося на події для логування
         eventBus.Subscribe<StartGameEvent>(OnStartGame);
         eventBus.Subscribe<CarReachedEndEvent>(OnCarReachedEnd);
