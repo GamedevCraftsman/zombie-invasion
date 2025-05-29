@@ -8,7 +8,7 @@ public class CameraController : BaseController
     
     protected override async Task Initialize()
     {
-        Debug.Log("CameraController initialized");
+        SwitchToCamera(CameraType.Start);
         await Task.CompletedTask;
     }
     

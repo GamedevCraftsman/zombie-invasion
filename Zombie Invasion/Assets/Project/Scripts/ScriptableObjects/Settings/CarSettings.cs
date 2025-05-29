@@ -3,9 +3,16 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CarSettings", menuName = "Game/CarSettings")]
 public class CarSettings : ScriptableObject
 {
-    [SerializeField] float carSpeed = 5f;
-    [SerializeField] float carMaxHealth = 100f;
+    [Header("Movement")]
+    [SerializeField] private float speed = 10f;
+    [SerializeField] private float acceleration = 5f;
+    [SerializeField] private float deceleration = 8f;
     
-    public float CarSpeed => carSpeed;
-    public float CarMaxHealth => carMaxHealth;
+    [Header("Health")]
+    [SerializeField] private int maxHP = 100;
+    
+    public float Speed => speed;
+    public float Acceleration => acceleration;
+    public float Deceleration => deceleration;
+    public int MaxHP => maxHP;
 }

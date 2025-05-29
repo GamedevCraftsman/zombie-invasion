@@ -8,9 +8,9 @@ public class CameraManager : BaseManager, ICameraManager
     [SerializeField] private int basePriority = 10;
     [SerializeField] private int activePriority = 20;
     
-    private ICameraRepository cameraRepository;
-    private ICameraPriorityManager priorityManager;
-    private CameraSwitchingService switchingService;
+    private ICameraRepository _cameraRepository;
+    private ICameraPriorityManager _priorityManager;
+    private CameraSwitchingService _switchingService;
     
     protected override async Task Initialize()
     {
@@ -23,11 +23,11 @@ public class CameraManager : BaseManager, ICameraManager
     
     private void InitializeServices()
     {
-        cameraRepository = new CameraRepository();
-        cameraRepository.InitializeCameras(cameraConfigs);
+        _cameraRepository = new CameraRepository();
+        _cameraRepository.InitializeCameras(cameraConfigs);
         
-        priorityManager = new CameraPriorityService(cameraRepository, basePriority);
-        switchingService = new CameraSwitchingService(cameraRepository, priorityManager, activePriority);
+        _priorityManager = new CameraPriorityService(_cameraRepository, basePriority);
+        _switchingService = new CameraSwitchingService(_cameraRepository, _priorityManager, activePriority);
     }
     
     private void SetInitialCamera()
@@ -53,7 +53,7 @@ public class CameraManager : BaseManager, ICameraManager
     // ICameraStateProvider Implementation
     public CinemachineVirtualCamera GetCurrentCamera()
     {
-        if (cameraRepository.TryGetCameraByType(GetCurrentCameraType(), out var config))
+        if (_cameraRepository.TryGetCameraByType(GetCurrentCameraType(), out var config))
         {
             return config.Camera;
         }
@@ -62,28 +62,28 @@ public class CameraManager : BaseManager, ICameraManager
     
     public CameraType GetCurrentCameraType()
     {
-        return switchingService.CurrentCameraType;
+        return _switchingService.CurrentCameraType;
     }
     
     public CameraConfig GetCameraConfig(CameraType cameraType)
     {
-        cameraRepository.TryGetCameraByType(cameraType, out var config);
+        _cameraRepository.TryGetCameraByType(cameraType, out var config);
         return config;
     }
     
     public CameraConfig GetCameraConfig(string cameraName)
     {
-        cameraRepository.TryGetCameraByName(cameraName, out var config);
+        _cameraRepository.TryGetCameraByName(cameraName, out var config);
         return config;
     }
     
     // ICameraSwitcher Implementation
-    public bool CanSwitchToCamera(CameraType targetType) => switchingService.CanSwitchToCamera(targetType);
-    public bool CanSwitchToCamera(string cameraName) => switchingService.CanSwitchToCamera(cameraName);
-    public void SwitchToCamera(CameraType targetType) => switchingService.SwitchToCamera(targetType);
-    public void SwitchToCamera(string cameraName) => switchingService.SwitchToCamera(cameraName);
+    public bool CanSwitchToCamera(CameraType targetType) => _switchingService.CanSwitchToCamera(targetType);
+    public bool CanSwitchToCamera(string cameraName) => _switchingService.CanSwitchToCamera(cameraName);
+    public void SwitchToCamera(CameraType targetType) => _switchingService.SwitchToCamera(targetType);
+    public void SwitchToCamera(string cameraName) => _switchingService.SwitchToCamera(cameraName);
     
     // ICameraPriorityManager Implementation
-    public void SetCameraPriority(CameraType cameraType, int priority) => priorityManager.SetCameraPriority(cameraType, priority);
-    public void ResetAllCameraPriorities() => priorityManager.ResetAllCameraPriorities();
+    public void SetCameraPriority(CameraType cameraType, int priority) => _priorityManager.SetCameraPriority(cameraType, priority);
+    public void ResetAllCameraPriorities() => _priorityManager.ResetAllCameraPriorities();
 }

@@ -1,3 +1,4 @@
+/*
 using UnityEngine;
 using Zenject;
 
@@ -51,8 +52,8 @@ public class EventBusTestScript : MonoBehaviour
     {
         Debug.Log("Subscribing to events...");
         
-        eventBus.Subscribe<GameStartEvent>(OnGameStarted);
-        eventBus.Subscribe<GameEndedEvent>(OnGameEnded);
+        eventBus.Subscribe<StartGameEvent>(OnGameStarted);
+        eventBus.Subscribe<CarReachedEndEvent>(OnGameEnded);
         eventBus.Subscribe<EnemyDestroyedEvent>(OnEnemyDestroyed);
         eventBus.Subscribe<PlayerDamagedEvent>(OnPlayerDamaged);
         
@@ -65,7 +66,7 @@ public class EventBusTestScript : MonoBehaviour
         
         // Test 1: Simple event without data
         Debug.Log("Test 1: Game Start");
-        eventBus.Fire(new GameStartEvent());
+        eventBus.Fire(new StartGameEvent());
         
         // Short delay between tests
         Invoke(nameof(Test2), 0.5f);
@@ -75,7 +76,7 @@ public class EventBusTestScript : MonoBehaviour
     {
         // Test 2: Event with boolean parameter
         Debug.Log("Test 2: Game End (Defeat)");
-        eventBus.Fire(new GameEndedEvent { Victory = false });
+        eventBus.Fire(new CarReachedEndEvent ());
         
         Invoke(nameof(Test3), 0.5f);
     }
@@ -90,19 +91,18 @@ public class EventBusTestScript : MonoBehaviour
             EnemiesLeft = 7 
         });
         
-        Invoke(nameof(Test4), 0.5f);
+        //Invoke(nameof(Test4), 0.5f);
     }
     
-    private void Test4()
-    {
-        // Test 4: Event with float parameters
-        Debug.Log("Test 4: Player Damaged");
-        eventBus.Fire(new PlayerDamagedEvent 
-        { 
-            CurrentHealth = 65f,
-            MaxHealth = 100f 
-        });
-    }
+    // private void Test4()
+    // {
+    //     // Test 4: Event with float parameters
+    //     Debug.Log("Test 4: Player Damaged");
+    //     eventBus.Fire(new PlayerDamagedEvent 
+    //     { 
+    //         DamageAmount = 65
+    //     });
+    // }
 
     private void RunPeriodicTest()
     {
@@ -114,10 +114,10 @@ public class EventBusTestScript : MonoBehaviour
         switch (randomTest)
         {
             case 1:
-                eventBus.Fire(new GameStartEvent());
+                eventBus.Fire(new StartGameEvent());
                 break;
             case 2:
-                eventBus.Fire(new GameEndedEvent { Victory = Random.value > 0.5f });
+                eventBus.Fire(new CarReachedEndEvent());
                 break;
             case 3:
                 eventBus.Fire(new EnemyDestroyedEvent 
@@ -126,13 +126,13 @@ public class EventBusTestScript : MonoBehaviour
                     EnemiesLeft = Random.Range(0, 10) 
                 });
                 break;
-            case 4:
-                eventBus.Fire(new PlayerDamagedEvent 
-                { 
-                    CurrentHealth = Random.Range(10f, 100f),
-                    MaxHealth = 100f 
-                });
-                break;
+            // case 4:
+            //     eventBus.Fire(new PlayerDamagedEvent 
+            //     { 
+            //         CurrentHealth = Random.Range(10f, 100f),
+            //         MaxHealth = 100f 
+            //     });
+            //     break;
         }
     }
 
@@ -141,13 +141,13 @@ public class EventBusTestScript : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             Debug.Log("Key 1: GameStarted");
-            eventBus.Fire(new GameStartEvent());
+            eventBus.Fire(new StartGameEvent());
         }
         
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             Debug.Log("Key 2: GameEnded (Victory)");
-            eventBus.Fire(new GameEndedEvent { Victory = true });
+            eventBus.Fire(new CarReachedEndEvent());
         }
         
         if (Input.GetKeyDown(KeyCode.Alpha3))
@@ -160,15 +160,15 @@ public class EventBusTestScript : MonoBehaviour
             });
         }
         
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            Debug.Log("Key 4: PlayerDamaged");
-            eventBus.Fire(new PlayerDamagedEvent 
-            { 
-                CurrentHealth = 50f,
-                MaxHealth = 100f 
-            });
-        }
+        // if (Input.GetKeyDown(KeyCode.Alpha4))
+        // {
+        //     Debug.Log("Key 4: PlayerDamaged");
+        //     eventBus.Fire(new PlayerDamagedEvent 
+        //     { 
+        //         CurrentHealth = 50f,
+        //         MaxHealth = 100f 
+        //     });
+        // }
         
         if (Input.GetKeyDown(KeyCode.I))
         {
@@ -185,12 +185,12 @@ public class EventBusTestScript : MonoBehaviour
 
     // === EVENT HANDLERS ===
     
-    private void OnGameStarted(GameStartEvent eventData)
+    private void OnGameStarted(StartGameEvent eventData)
     {
         Debug.Log("RECEIVED: GameStarted - Game has started!");
     }
     
-    private void OnGameEnded(GameEndedEvent eventData)
+    private void OnGameEnded(CarReachedEndEvent eventData)
     {
         string result = eventData.Victory ? "VICTORY! 🎉" : "DEFEAT 😞";
         Debug.Log($"RECEIVED: GameEnded - {result}");
@@ -218,8 +218,8 @@ public class EventBusTestScript : MonoBehaviour
         
         if (eventBus != null)
         {
-            eventBus.Unsubscribe<GameStartEvent>(OnGameStarted);
-            eventBus.Unsubscribe<GameEndedEvent>(OnGameEnded);
+            eventBus.Unsubscribe<StartGameEvent>(OnGameStarted);
+            eventBus.Unsubscribe<CarReachedEndEvent>(OnGameEnded);
             eventBus.Unsubscribe<EnemyDestroyedEvent>(OnEnemyDestroyed);
             eventBus.Unsubscribe<PlayerDamagedEvent>(OnPlayerDamaged);
             
@@ -231,13 +231,13 @@ public class EventBusTestScript : MonoBehaviour
     [ContextMenu("Test GameStarted")]
     private void TestGameStarted()
     {
-        eventBus.Fire(new GameStartEvent());
+        eventBus.Fire(new StartGameEvent());
     }
     
     [ContextMenu("Test GameEnded Victory")]
     private void TestGameEndedVictory()
     {
-        eventBus.Fire(new GameEndedEvent { Victory = true });
+        eventBus.Fire(new CarReachedEndEvent { Victory = true });
     }
     
     [ContextMenu("Test Enemy Destroyed")]
@@ -250,3 +250,4 @@ public class EventBusTestScript : MonoBehaviour
         });
     }
 }
+*/

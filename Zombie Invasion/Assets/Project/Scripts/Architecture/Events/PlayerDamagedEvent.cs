@@ -1,5 +1,9 @@
 public class PlayerDamagedEvent
 {
-    public float CurrentHealth { get; set; } 
-    public float MaxHealth { get; set; }
+    public int DamageAmount { get; }
+
+    public PlayerDamagedEvent(int damageAmount)
+    {
+        DamageAmount = damageAmount;
+    }
 }
