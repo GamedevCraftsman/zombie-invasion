@@ -12,10 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf07ceb56d184f94e9b49e2ee6224e9d, type: 3}
   m_Name: EnemySettings
   m_EditorClassIdentifier: 
-  maxEnemiesOnField: 5
-  spawnInterval: 2
-  spawnDistance: 20
+  aggroRadius: 0.5
   moveSpeed: 3
-  attackRange: 2
+  rotationSpeed: 5
   damage: 10
-  health: 50
+  maxHealth: 100

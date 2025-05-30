@@ -15,7 +15,7 @@ public class GameInstaller : MonoInstaller
         
         Container.Bind<ICameraManager>().FromInstance(cameraManager).AsSingle();
         Container.Bind<CameraController>().FromComponentInHierarchy().AsSingle();
-        
+        Container.Bind<IEventBus>().To<EventBus>().AsSingle();
         Container.Bind<IGameManager>().FromComponentInHierarchy().AsSingle();
         Container.Bind<HPManager>().FromComponentInHierarchy().AsSingle();
         
