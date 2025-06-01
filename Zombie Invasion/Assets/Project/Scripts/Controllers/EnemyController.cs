@@ -1,18 +1,19 @@
+using System;
+using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
-public class EnemyController : MonoBehaviour
+public class EnemyController : BaseController
 {
-    [Header("Data")]
-    [SerializeField] private EnemySettings data;
+    [Header("Components")] [SerializeField]
+    private Rigidbody rb;
 
-    [Header("Components")]
-    [SerializeField] private Rigidbody rb;
     [SerializeField] private Canvas healthBarCanvas;
     [SerializeField] private UnityEngine.UI.Image healthBarFill;
 
-    [Header("Debug")]
-    [SerializeField, ReadOnly] private bool isChasing;
+    [Header("Debug")] [SerializeField, ReadOnly]
+    private bool isChasing;
+
     [SerializeField, ReadOnly] private bool isDead;
     [SerializeField, ReadOnly] private bool hasAttacked;
     [SerializeField, ReadOnly] private int currentHealth;
@@ -21,13 +22,24 @@ public class EnemyController : MonoBehaviour
     private float distanceToPlayer;
 
     [Inject] private IEventBus eventBus;
+    [Inject] private EnemySettings data;
+    public event Action<EnemyController> OnEnemyDied;
 
-    private void Start()
+    protected override Task Initialize()
     {
-        Initialize();
+        try
+        {
+            Initialized();
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
+
+        return Task.CompletedTask;
     }
 
-    private void Initialize()
+    private void Initialized()
     {
         // Assign player
         var player = GameObject.FindGameObjectWithTag("Player");
@@ -162,13 +174,40 @@ public class EnemyController : MonoBehaviour
             healthBarCanvas.gameObject.SetActive(false);
 
         Debug.Log("Enemy died");
-        gameObject.SetActive(false);
+
+        // Викликаємо event для системи пулінгу
+        OnEnemyDied?.Invoke(this);
+
+        // Не деактивуємо об'єкт тут - це зробить пул
+    }
+
+    public void ResetForPooling()
+    {
+        // Скидаємо всі стани
+        isChasing = false;
+        isDead = false;
+        hasAttacked = false;
+        currentHealth = data.maxHealth;
+
+        // Скидаємо фізику
+        if (rb != null)
+        {
+            rb.velocity = Vector3.zero;
+            rb.isKinematic = false;
+        }
+
+        // Ховаємо UI
+        if (healthBarCanvas != null)
+            healthBarCanvas.gameObject.SetActive(false);
+
+        // Відновлюємо анімацію
+        PlayIdleAnimation();
     }
 
     // Animation placeholders
-    private void PlayIdleAnimation()    => Debug.Log("Idle animation ON");
-    private void PlayRunAnimation()     => Debug.Log("Run animation ON");
-    private void PlayAttackAnimation()  => Debug.Log("Attack animation ON");
+    private void PlayIdleAnimation() => Debug.Log("Idle animation ON");
+    private void PlayRunAnimation() => Debug.Log("Run animation ON");
+    private void PlayAttackAnimation() => Debug.Log("Attack animation ON");
 
     private void OnDrawGizmosSelected()
     {
@@ -183,4 +222,6 @@ public class EnemyController : MonoBehaviour
 }
 
 // ReadOnly attribute for Inspector display
-public class ReadOnlyAttribute : PropertyAttribute { }
+public class ReadOnlyAttribute : PropertyAttribute
+{
+}

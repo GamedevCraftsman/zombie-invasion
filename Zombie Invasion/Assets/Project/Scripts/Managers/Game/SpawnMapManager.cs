@@ -10,16 +10,18 @@ public class SpawnMapManager : BaseManager
     private List<GameObject> groundTiles = new List<GameObject>();
     private Vector3 startPosition = Vector3.zero;
 
+    // Public access to ground tiles for enemy spawn system
+    public List<GameObject> GroundTiles => groundTiles;
+
     protected override Task Initialize()
     {
         ManageGroundTiles(gameSettings.MapLength);
-
         return Task.CompletedTask;
     }
 
     private void Update()
     {
-        if (Input.GetKeyUp(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log("Spawning map");
             ManageGroundTiles(gameSettings.MapLength);
@@ -39,7 +41,7 @@ public class SpawnMapManager : BaseManager
         RepositionAllTiles();
     }
 
-//Спавнить недостатні тайли (якщо їх не вистачає)
+    //Спавнить недостатні тайли (якщо їх не вистачає)
     private void SpawnMissingTiles(int requiredCount)
     {
         int currentCount = groundTiles.Count;
@@ -56,7 +58,7 @@ public class SpawnMapManager : BaseManager
         }
     }
 
-//Переносить всі існуючі тайли на нові позиції від останнього тайла
+    //Переносить всі існуючі тайли на нові позиції від останнього тайла
     private void RepositionAllTiles()
     {
         // Знаходимо стартову позицію для переносу тайлів
@@ -73,23 +75,8 @@ public class SpawnMapManager : BaseManager
             }
         }
     }
-
-/*//Визначає стартову позицію для переносу тайлів
-    private Vector3 GetRepositionStartPosition()
-    {
-        // Варіант 1: Від останнього існуючого тайла на сцені
-        if (groundTiles.Count > 0 && groundTiles[groundTiles.Count - 1] != null)
-        {
-            // Беремо позицію останнього тайла і додаємо один крок
-            Vector3 lastTilePosition = groundTiles[groundTiles.Count - 1].transform.position;
-            return lastTilePosition + Vector3.forward * gameSettings.DistanceBetweenTiles;
-        }
-
-        // Варіант 2: Якщо немає тайлів, використовуємо стартову позицію
-        return startPosition;
-    }*/
-
-//Альтернативний метод для більш складного перенесення
+    
+    //Альтернативний метод для більш складного перенесення
     private Vector3 GetRepositionStartPositionAdvanced()
     {
         // Знаходимо найдальший тайл по Z координаті
@@ -111,7 +98,7 @@ public class SpawnMapManager : BaseManager
         if (foundAnyTile)
         {
             // Повертаємо позицію після найдальшого тайла
-            return new Vector3(startPosition.x, startPosition.y, maxZ );
+            return new Vector3(startPosition.x, startPosition.y, maxZ);
         }
         else
         {
