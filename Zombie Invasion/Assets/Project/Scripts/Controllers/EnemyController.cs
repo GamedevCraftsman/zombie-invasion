@@ -1,13 +1,23 @@
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
+using System.Linq;
+
+public enum EnemieAnimations
+{
+    Run,
+    Idle,
+    Death
+}
 
 public class EnemyController : BaseController
 {
     [Header("Components")] [SerializeField]
     private Rigidbody rb;
 
+    [SerializeField] private Animator enemyAnimator;
     [SerializeField] private Canvas healthBarCanvas;
     [SerializeField] private UnityEngine.UI.Image healthBarFill;
 
@@ -18,8 +28,9 @@ public class EnemyController : BaseController
     [SerializeField, ReadOnly] private bool hasAttacked;
     [SerializeField, ReadOnly] private int currentHealth;
 
-    private Transform playerTransform;
-    private float distanceToPlayer;
+    private Transform _playerTransform;
+    private float _distanceToPlayer;
+    private EnemieAnimations _enemieAnimation;
 
     [Inject] private IEventBus eventBus;
     [Inject] private EnemySettings data;
@@ -44,7 +55,7 @@ public class EnemyController : BaseController
         // Assign player
         var player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
-            playerTransform = player.transform;
+            _playerTransform = player.transform;
 
         // Ensure Rigidbody
         if (rb == null)
@@ -65,10 +76,10 @@ public class EnemyController : BaseController
 
     private void Update()
     {
-        if (isDead || playerTransform == null) return;
+        if (isDead || _playerTransform == null) return;
 
-        distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
-        if (distanceToPlayer <= data.aggroRadius)
+        _distanceToPlayer = Vector3.Distance(transform.position, _playerTransform.position);
+        if (_distanceToPlayer <= data.aggroRadius)
         {
             if (!isChasing)
                 StartChasing();
@@ -87,10 +98,11 @@ public class EnemyController : BaseController
         Debug.Log("Enemy started chasing");
     }
 
-    private void StopChasing()
+    private async void StopChasing()
     {
         isChasing = false;
-        PlayIdleAnimation();
+        //PlayIdleAnimation();
+        await PlayDeathAnimationAndDie();
         Debug.Log("Enemy stopped chasing");
     }
 
@@ -98,7 +110,7 @@ public class EnemyController : BaseController
     {
         if (rb == null) return;
 
-        Vector3 direction = (playerTransform.position - transform.position).normalized;
+        Vector3 direction = (_playerTransform.position - transform.position).normalized;
         direction.y = 0;
 
         Vector3 movement = direction * data.moveSpeed * Time.deltaTime;
@@ -119,19 +131,20 @@ public class EnemyController : BaseController
             AttackPlayer();
     }
 
-    private void AttackPlayer()
+    private async void AttackPlayer()
     {
         hasAttacked = true;
-        PlayAttackAnimation();
 
         if (eventBus != null)
             eventBus.Fire(new PlayerDamagedEvent(data.damage));
 
         Debug.Log($"Enemy attacked player for {data.damage} damage");
-        Die();
+        
+        // Граємо анімацію смерті і чекаємо її завершення
+        await PlayDeathAnimationAndDie();
     }
-
-    public void TakeDamage(int damageAmount)
+    
+    public async void TakeDamage(int damageAmount)
     {
         if (isDead) return;
 
@@ -144,9 +157,54 @@ public class EnemyController : BaseController
         Debug.Log($"Enemy took {damageAmount} damage. Health: {currentHealth}/{data.maxHealth}");
 
         if (currentHealth <= 0)
-            Die();
+        {
+            await PlayDeathAnimationAndDie();
+        }
     }
 
+    // Новий асинхронний метод для програвання анімації смерті та виконання Die()
+    private async Task PlayDeathAnimationAndDie()
+    {
+        if (isDead) return; // Запобігаємо повторному виклику
+        
+        // Граємо анімацію смерті
+        PlayDeathAnimation();
+        
+        // Чекаємо завершення анімації
+        await WaitForDeathAnimationAsync();
+        
+        // Виконуємо Die() після завершення анімації
+        Die();
+    }
+
+    // Асинхронний метод очікування завершення анімації смерті
+    private async Task WaitForDeathAnimationAsync()
+    {
+        string deathAnimationName = EnemieAnimations.Death.ToString();
+        
+        // Чекаємо один кадр для початку анімації
+        await Task.Yield();
+        
+        // Чекаємо поки анімація повністю не завершиться
+        while (true)
+        {
+            if (enemyAnimator == null) break;
+            
+            var stateInfo = enemyAnimator.GetCurrentAnimatorStateInfo(0);
+            
+            // Перевіряємо чи грається анімація смерті і чи вона завершена
+            if (stateInfo.IsName(deathAnimationName) && stateInfo.normalizedTime >= 1.0f)
+            {
+                break;
+            }
+            
+            // Якщо анімація ще не почалася або ще грається
+            await Task.Yield();
+        }
+        
+        Debug.Log("Death animation completed!");
+    }
+    
     private void ShowHealthBar()
     {
         if (healthBarCanvas != null)
@@ -161,6 +219,8 @@ public class EnemyController : BaseController
 
     private void Die()
     {
+        if (isDead) return; // Запобігаємо повторному виклику
+        
         isDead = true;
         isChasing = false;
 
@@ -204,19 +264,19 @@ public class EnemyController : BaseController
         PlayIdleAnimation();
     }
 
-    // Animation placeholders
+    // Animation methods
     private void PlayIdleAnimation() => Debug.Log("Idle animation ON");
-    private void PlayRunAnimation() => Debug.Log("Run animation ON");
-    private void PlayAttackAnimation() => Debug.Log("Attack animation ON");
+    private void PlayRunAnimation() => enemyAnimator.SetTrigger(EnemieAnimations.Run.ToString());
+    private void PlayDeathAnimation() => enemyAnimator.SetTrigger(EnemieAnimations.Death.ToString());
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, data ? data.aggroRadius : 0f);
-        if (playerTransform != null)
+        if (_playerTransform != null)
         {
             Gizmos.color = isChasing ? Color.green : Color.gray;
-            Gizmos.DrawLine(transform.position, playerTransform.position);
+            Gizmos.DrawLine(transform.position, _playerTransform.position);
         }
     }
 }

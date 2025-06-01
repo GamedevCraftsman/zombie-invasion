@@ -8,17 +8,23 @@ public class SpawnMapManager : BaseManager
     [SerializeField] private GameObject groundTilesContainer;
     
     private List<GameObject> groundTiles = new List<GameObject>();
-    private Vector3 startPosition = Vector3.zero;
+    private Vector3 startPosition;
 
     // Public access to ground tiles for enemy spawn system
     public List<GameObject> GroundTiles => groundTiles;
 
     protected override Task Initialize()
     {
+        SetStartPosition();
         ManageGroundTiles(gameSettings.MapLength);
         return Task.CompletedTask;
     }
 
+    private void SetStartPosition()
+    {
+        startPosition = new Vector3(0, 0, gameSettings.DistanceBetweenTiles);
+    }
+    
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -90,7 +96,7 @@ public class SpawnMapManager : BaseManager
                 foundAnyTile = true;
                 if (tile.transform.position.z > maxZ)
                 {
-                    maxZ = tile.transform.position.z;
+                    maxZ = tile.transform.position.z + gameSettings.DistanceBetweenTiles;
                 }
             }
         }

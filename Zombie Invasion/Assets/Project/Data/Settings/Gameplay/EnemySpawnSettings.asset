@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdca5a9e3a5335e4ebe12adc79910a95, type: 3}
   m_Name: EnemySpawnSettings
   m_EditorClassIdentifier: 
-  EnemyPrefab: {fileID: 9092893028510209321, guid: f6f54ccaf3d06344aaa67da741f06c9e,
+  enemyPrefab: {fileID: 9092893028510209321, guid: f6f54ccaf3d06344aaa67da741f06c9e,
     type: 3}
-  TotalEnemyCount: 50
-  SpawnPointCount: 100
-  EnemyPoolInitialSize: 60
-  SpawnAreaCenter: {x: 0, y: 0, z: 0}
-  SideOffsetRange: 1
-  MinSpacing: 1
-  DistanceBetweenSpawnPoints: 1
+  totalEnemyCount: 50
+  spawnPointCount: 100
+  enemyPoolInitialSize: 60
+  spawnAreaCenter: {x: 0, y: 0, z: 0}
+  sideXOffsetRange: 0.5
+  sideZOffsetRange: 2
+  minSpacing: 1
+  distanceBetweenSpawnPoints: 1

@@ -99,7 +99,7 @@ public class EnemyManager : BaseManager
         int nextSpawnIndex = _availableSpawnIndices.Dequeue();
         var spawnPoints = _spawnController.AllSpawnPoints;
     
-        if (nextSpawnIndex < spawnPoints.Count)
+        if (nextSpawnIndex < spawnPoints.Count && enemy != null)
         {
             enemy.transform.position = spawnPoints[nextSpawnIndex];
             enemy.ResetForPooling();

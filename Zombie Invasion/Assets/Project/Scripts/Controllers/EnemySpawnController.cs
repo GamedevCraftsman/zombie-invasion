@@ -69,8 +69,8 @@ public class EnemySpawnController : BaseController
             
             for (int pointIndex = 0; pointIndex < pointsPerTile && _allSpawnPoints.Count < _settings.SpawnPointCount; pointIndex++)
             {
-                float offsetX = Random.Range(-_settings.SideOffsetRange, _settings.SideOffsetRange);
-                float offsetZ = Random.Range(-_settings.SideOffsetRange, _settings.SideOffsetRange);
+                float offsetX = Random.Range(-_settings.SideXOffsetRange, _settings.SideXOffsetRange);
+                float offsetZ = Random.Range(-_settings.SideZOffsetRange, _settings.SideZOffsetRange);
                 Vector3 spawnPoint = new Vector3(
                     tileCenter.x + offsetX,
                     tileCenter.y,

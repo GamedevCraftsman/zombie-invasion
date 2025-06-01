@@ -15,7 +15,7 @@ public class CameraTester : BaseController
         CameraType.Dynamic
     };
     
-    private int currentIndex = 0;
+    //private int currentIndex = 0;
     
     protected override async Task Initialize()
     {
