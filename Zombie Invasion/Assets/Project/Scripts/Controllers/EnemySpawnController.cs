@@ -34,12 +34,12 @@ public class EnemySpawnController : BaseController
     
     private void SubscribeToEvents()
     {
-        _eventBus.Subscribe<StartGameEvent>(OnGameStart);
+        _eventBus.Subscribe<ReadyGameEvent>(OnGameReady);
     }
     
     private void OnDestroy()
     {
-        _eventBus?.Unsubscribe<StartGameEvent>(OnGameStart);
+        _eventBus?.Unsubscribe<ReadyGameEvent>(OnGameReady);
     }
     
     private void GenerateAllSpawnPoints()
@@ -61,7 +61,7 @@ public class EnemySpawnController : BaseController
         var tiles = _mapManager.GroundTiles;
         int pointsPerTile = Mathf.CeilToInt((float)_settings.SpawnPointCount / tiles.Count);
         
-        for (int tileIndex = 0; tileIndex < tiles.Count && _allSpawnPoints.Count < _settings.SpawnPointCount; tileIndex++)
+        for (int tileIndex = 1; tileIndex < tiles.Count && _allSpawnPoints.Count < _settings.SpawnPointCount; tileIndex++)
         {
             if (tiles[tileIndex] == null) continue;
             
@@ -98,7 +98,7 @@ public class EnemySpawnController : BaseController
         }
     }*/
     
-    private void OnGameStart(StartGameEvent gameStartEvent)
+    private void OnGameReady(ReadyGameEvent readyGameEvent)
     {
         if (_isGameStarted) return;
         

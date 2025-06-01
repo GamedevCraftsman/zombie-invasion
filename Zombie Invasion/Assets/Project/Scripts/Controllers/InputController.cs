@@ -5,6 +5,8 @@ using Zenject;
 
 public class InputController : BaseController, IInputController
 {
+    [Inject] private IGameManager _gameManager;
+    
     [Header("Input Settings")]
     [SerializeField] private bool enableKeyboardInput = true;
     [SerializeField] private bool enableMouseInput = true;
@@ -17,13 +19,17 @@ public class InputController : BaseController, IInputController
     private InputType lastInputType = InputType.None;
     
     // Properties
-    public bool IsInputEnabled => inputEnabled;
-    public bool IsGameStarted => gameStarted;
-    public InputType LastInputType => lastInputType;
+    //public bool IsInputEnabled => inputEnabled;
+   // public bool IsGameStarted => gameStarted;
+   public bool IsInputEnabled { get; }
+   public bool IsGameStarted { get; }
+   public InputType LastInputType => lastInputType;
     
     // Events
-    public event Action OnGameStartRequested;
-    public event Action<InputType> OnInputDetected;
+    //public event Action OnGameStartRequested;
+
+    //public event Action<InputType> OnInputDetected;
+    //public event Action<InputType> OnInputDetected;
     
     protected override Task Initialize()
     {
@@ -59,15 +65,14 @@ public class InputController : BaseController, IInputController
     
     private void Update()
     {
-        if (!inputEnabled || gameStarted) return;
+       // if (!inputEnabled || gameStarted) return;
         
         InputType detectedInput = DetectInput();
-        
-        if (detectedInput != InputType.None)
+       
+        if (detectedInput != InputType.None && _gameManager.CurrentState == GameState.Menu)
         {
             lastInputType = detectedInput;
-            OnInputDetected?.Invoke(detectedInput);
-            
+            //OnInputDetected?.Invoke(detectedInput);
             StartGame();
         }
     }
@@ -104,14 +109,14 @@ public class InputController : BaseController, IInputController
     
     private void StartGame()
     {
-        gameStarted = true;
-        
+        // gameStarted = true;
+        // inputEnabled = false;
         // Викликаємо event для підписників
-        OnGameStartRequested?.Invoke();
+        //OnGameStartRequested?.Invoke();
         
         // Відправляємо через EventBus для backward compatibility
-        EventBus.Fire(new StartGameEvent());
         
+        EventBus.Fire(new ReadyGameEvent());
         Debug.Log($"🚀 StartGameEvent відправлено через {lastInputType}!");
     }
     
@@ -163,7 +168,7 @@ public class InputController : BaseController, IInputController
         UnsubscribeFromEvents();
         
         // Очищуємо events
-        OnGameStartRequested = null;
-        OnInputDetected = null;
+        //OnGameStartRequested = null;
+        //OnInputDetected = null;
     }
 }

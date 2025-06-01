@@ -14,14 +14,14 @@ public interface IInputController
     void ResetForNewGame();
     
     // Input configuration
-    void SetStartGameKey(KeyCode newKey);
+    //void SetStartGameKey(KeyCode newKey);
     void EnableKeyboardInput(bool enable);
     void EnableMouseInput(bool enable);
     void EnableTouchInput(bool enable);
     
     // Events
-    event Action OnGameStartRequested;
-    event Action<InputType> OnInputDetected;
+    //event Action OnGameStartRequested;
+    //event Action<InputType> OnInputDetected;
 }
 
 public enum InputType

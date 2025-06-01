@@ -8,21 +8,31 @@ public class SpawnMapManager : BaseManager
     [SerializeField] private GameObject groundTilesContainer;
     
     private List<GameObject> groundTiles = new List<GameObject>();
-    private Vector3 startPosition;
+    private Vector3 startPosition = Vector3.zero;
 
     // Public access to ground tiles for enemy spawn system
     public List<GameObject> GroundTiles => groundTiles;
 
     protected override Task Initialize()
     {
-        SetStartPosition();
+        SubscribeToEvents();
         ManageGroundTiles(gameSettings.MapLength);
         return Task.CompletedTask;
     }
 
-    private void SetStartPosition()
+    private void SubscribeToEvents()
     {
-        startPosition = new Vector3(0, 0, gameSettings.DistanceBetweenTiles);
+        EventBus.Subscribe<CarReachedEndEvent>(OnCarReachedEndEvent);
+    }
+
+    private void UnsubscribeFromEvents()
+    {
+        EventBus?.Unsubscribe<CarReachedEndEvent>(OnCarReachedEndEvent);
+    }
+    
+    private void OnCarReachedEndEvent(CarReachedEndEvent carReachedEndEvent)
+    {
+        //ManageGroundTiles(gameSettings.MapLength);
     }
     
     private void Update()
@@ -96,7 +106,7 @@ public class SpawnMapManager : BaseManager
                 foundAnyTile = true;
                 if (tile.transform.position.z > maxZ)
                 {
-                    maxZ = tile.transform.position.z + gameSettings.DistanceBetweenTiles;
+                    maxZ = tile.transform.position.z;
                 }
             }
         }
@@ -111,5 +121,10 @@ public class SpawnMapManager : BaseManager
             // Якщо тайлів немає, використовуємо стартову позицію
             return startPosition;
         }
+    }
+
+    private void OnDestroy()
+    {
+        UnsubscribeFromEvents();
     }
 }

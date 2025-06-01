@@ -1,9 +1,14 @@
+using System;
+using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using Cinemachine;
+using Zenject;
 
 public class CameraManager : BaseManager, ICameraManager
 {
+    [Inject] private IGameManager _gameManager;
+    
     [SerializeField] private CameraConfig[] cameraConfigs;
     [SerializeField] private int basePriority = 10;
     [SerializeField] private int activePriority = 20;
@@ -14,13 +19,27 @@ public class CameraManager : BaseManager, ICameraManager
     
     protected override async Task Initialize()
     {
+        SubscribeToEvents();
         InitializeServices();
         SetInitialCamera();
         
         Debug.Log("CameraManager initialized");
         await Task.CompletedTask;
     }
-    
+
+    //Events management
+    private void SubscribeToEvents()
+    {
+        EventBus.Subscribe<ReadyGameEvent>(OnReady);
+        EventBus.Subscribe<GameOverEvent>(OnGameEnd);
+    }
+
+    private void UnsubscribeFromEvents()
+    {
+        EventBus.Unsubscribe<ReadyGameEvent>(OnReady);
+        EventBus.Unsubscribe<GameOverEvent>(OnGameEnd);
+    }
+    //Initialize
     private void InitializeServices()
     {
         _cameraRepository = new CameraRepository();
@@ -48,6 +67,30 @@ public class CameraManager : BaseManager, ICameraManager
         this.activePriority = activePriority;
         cameraConfigs = configs;
         InitializeServices();
+    }
+    
+    //For events
+    private void OnReady(ReadyGameEvent readyGameEvent)
+    {
+        if (CanSwitchToCamera(CameraType.Dynamic))
+        {
+            StartCoroutine(WaitSwitchToCamera(CameraType.Dynamic));
+        }
+    }
+
+    private IEnumerator WaitSwitchToCamera(CameraType cameraType)
+    {
+        SwitchToCamera(cameraType);
+        yield return new WaitForSeconds(0.5f);
+        EventBus.Fire(new StartGameEvent());
+    }
+
+    private void OnGameEnd(GameOverEvent gameOverEvent)
+    {
+        if (CanSwitchToCamera(CameraType.Start))
+        {
+            SwitchToCamera(CameraType.Start);
+        }
     }
     
     // ICameraStateProvider Implementation
@@ -86,4 +129,9 @@ public class CameraManager : BaseManager, ICameraManager
     // ICameraPriorityManager Implementation
     public void SetCameraPriority(CameraType cameraType, int priority) => _priorityManager.SetCameraPriority(cameraType, priority);
     public void ResetAllCameraPriorities() => _priorityManager.ResetAllCameraPriorities();
+
+    private void OnDestroy()
+    {
+        UnsubscribeFromEvents();
+    }
 }

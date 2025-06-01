@@ -11,6 +11,7 @@ public class GameInstaller : MonoInstaller
     
     [Header("Managers")]
     [SerializeField] private CameraManager cameraManager;
+    [SerializeField] private GameManager gameManager;
     
     [Header("Pool Parent")]
     [SerializeField] private Transform enemyPoolParent;
@@ -21,9 +22,9 @@ public class GameInstaller : MonoInstaller
         Container.Bind<IUIManager>().To<UIManager>().AsSingle();
         
         Container.Bind<ICameraManager>().FromInstance(cameraManager).AsSingle();
+        Container.Bind<IGameManager>().FromInstance(gameManager).AsSingle();
         Container.Bind<CameraController>().FromComponentInHierarchy().AsSingle();
         Container.Bind<IEventBus>().To<EventBus>().AsSingle();
-        Container.Bind<IGameManager>().FromComponentInHierarchy().AsSingle();
         Container.Bind<HPManager>().FromComponentInHierarchy().AsSingle();
         Container.Bind<SpawnMapManager>().FromComponentInHierarchy().AsSingle();
         

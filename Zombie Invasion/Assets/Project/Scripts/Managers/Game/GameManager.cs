@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
@@ -12,25 +13,36 @@ public class GameManager : BaseManager, IGameManager
     
     // State
     private GameState currentState = GameState.Menu;
-    private bool isInitialized = false;
+   // private bool isInitialized = false;
     
     // Properties
     public GameState CurrentState => currentState;
-    public bool IsInitialized => isInitialized;
+    //public bool IsInitialized => isInitialized;
     
     protected override Task Initialize()
     {
-        SubscribeToEvents();
+        try
+        {
+            SubscribeToEvents();
+            ChangeState(GameState.Menu);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+        }
         
-        Debug.Log("GameManager ініціалізація почалася...");
-        return InitializeAllSystems();
+        
+        // Debug.Log("GameManager ініціалізація почалася...");
+        // return InitializeAllSystems();
+        
+        return Task.CompletedTask;
     }
     
-    private async Task InitializeAllSystems()
+    /*private async Task InitializeAllSystems()
     {
         try
         {
-            // Ініціалізуємо всі системи по черзі
+            /#1#/ Ініціалізуємо всі системи по черзі
             Debug.Log("Ініціалізація CarController...");
             await carController.InitializeAsync();
             
@@ -44,25 +56,25 @@ public class GameManager : BaseManager, IGameManager
             await inputController.InitializeAsync();
             
             isInitialized = true;
-            Debug.Log("✅ GameManager: Всі системи ініціалізовано!");
+            Debug.Log("✅ GameManager: Всі системи ініціалізовано!");#1#
             
             // Встановлюємо початковий стан
             ChangeState(GameState.Menu);
             
             // Логування поточного стану
-            LogSystemStatus();
+            //LogSystemStatus();
         }
         catch (System.Exception ex)
         {
             Debug.LogError($"Помилка при ініціалізації GameManager: {ex.Message}");
             Debug.LogException(ex);
         }
-    }
+    }*/
     
     private void SubscribeToEvents()
     {
         EventBus.Subscribe<StartGameEvent>(OnStartGameEvent);
-        EventBus.Subscribe<CarReachedEndEvent>(OnCarReachedEnd);
+        //EventBus.Subscribe<CarReachedEndEvent>(OnCarReachedEnd);
         EventBus.Subscribe<GameOverEvent>(OnGameOverEvent);
         EventBus.Subscribe<PlayerDamagedEvent>(OnPlayerDamaged);
     }
@@ -92,16 +104,19 @@ public class GameManager : BaseManager, IGameManager
             Debug.Log("🎉 Гравець жив до кінця - ПЕРЕМОГА!");
             EndGame(true);
         }
-        else
-        {
-            Debug.Log("💀 Гравець мертвий - це не повинно статися!");
-            EndGame(false);
-        }
+        // else
+        // {
+        //     Debug.Log("💀 Гравець мертвий - це не повинно статися!");
+        //     EndGame(false);
+        // }
     }
     
     private void OnGameOverEvent(GameOverEvent gameOverEvent)
     {
         // Цей event тепер використовується внутрішньо
+        ChangeState(GameState.GameOver);
+        
+        
         // Логіка перенесена в EndGame()
     }
     
@@ -181,11 +196,11 @@ public class GameManager : BaseManager, IGameManager
     // Методи інтерфейсу IGameManager
     public void StartGame()
     {
-        if (!isInitialized)
-        {
-            Debug.LogWarning("Спроба запустити гру до завершення ініціалізації!");
-            return;
-        }
+        // if (!isInitialized)
+        // {
+        //     Debug.LogWarning("Спроба запустити гру до завершення ініціалізації!");
+        //     return;
+        // }
         
         if (currentState != GameState.Menu)
         {
@@ -248,12 +263,14 @@ public class GameManager : BaseManager, IGameManager
     private void ResetGameState()
     {
         // Скидаємо стан всіх систем
-        carController.ResetPosition();
+        //carController.ResetPosition();
         inputController.ResetForNewGame();
         
         // HP скинеться автоматично через StartGameEvent
     }
     
+    //---------------------------------------------------------
+    //Delete
     // Додаткові методи для зовнішнього контролю
     public void PauseGame()
     {
@@ -268,20 +285,20 @@ public class GameManager : BaseManager, IGameManager
         if (currentState != GameState.Playing) return;
         
         Time.timeScale = 1f;
-        Debug.Log("▶️ Гра знята з паузи");
+        Debug.Log("Гра знята з паузи");
     }
-    
-    public bool CanStartGame()
-    {
-        return isInitialized && currentState == GameState.Menu;
-    }
+    //---------------------------------------------------------
+    // public bool CanStartGame()
+    // {
+    //     return isInitialized && currentState == GameState.Menu;
+    // }
     
     public bool CanRestartGame()
     {
         return currentState == GameState.GameOver || currentState == GameState.Victory;
     }
     
-    private void LogSystemStatus()
+    /*private void LogSystemStatus()
     {
         Debug.Log("=== SYSTEM STATUS ===");
         Debug.Log($"GameState: {currentState}");
@@ -292,7 +309,7 @@ public class GameManager : BaseManager, IGameManager
         Debug.Log($"Поточне HP: {hpManager?.CurrentHP}/{hpManager?.MaxHP}");
         Debug.Log($"Машина на позиції: {carController?.Position}");
         Debug.Log("====================");
-    }
+    }*/
     
     private void LogFinalStats(bool isWin)
     {
