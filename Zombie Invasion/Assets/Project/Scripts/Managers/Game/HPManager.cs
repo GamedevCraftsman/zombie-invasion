@@ -31,12 +31,14 @@ public class HPManager : BaseManager
     private void SubscribeToEvents()
     {
         EventBus.Subscribe<StartGameEvent>(OnGameStarted);
+        EventBus.Subscribe<RestarGameEvent>(OnGameRestart);
         EventBus.Subscribe<PlayerDamagedEvent>(OnPlayerDamaged);
     }
     
     private void UnsubscribeFromEvents()
     {
         EventBus?.Unsubscribe<StartGameEvent>(OnGameStarted);
+        EventBus?.Unsubscribe<RestarGameEvent>(OnGameRestart);
         EventBus?.Unsubscribe<PlayerDamagedEvent>(OnPlayerDamaged);
     }
     
@@ -49,6 +51,11 @@ public class HPManager : BaseManager
     private void OnPlayerDamaged(PlayerDamagedEvent damageEvent)
     {
         TakeDamage(damageEvent.DamageAmount);
+    }
+
+    private void OnGameRestart(RestarGameEvent restartEvent)
+    {
+        ResetHP();
     }
     
     private void ResetHP()

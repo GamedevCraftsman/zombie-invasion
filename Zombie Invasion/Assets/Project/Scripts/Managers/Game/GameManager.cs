@@ -74,6 +74,7 @@ public class GameManager : BaseManager, IGameManager
     private void SubscribeToEvents()
     {
         EventBus.Subscribe<StartGameEvent>(OnStartGameEvent);
+        EventBus.Subscribe<RestarGameEvent>(OnGameRestart);
         //EventBus.Subscribe<CarReachedEndEvent>(OnCarReachedEnd);
         EventBus.Subscribe<GameOverEvent>(OnGameOverEvent);
         EventBus.Subscribe<PlayerDamagedEvent>(OnPlayerDamaged);
@@ -82,7 +83,8 @@ public class GameManager : BaseManager, IGameManager
     private void UnsubscribeFromEvents()
     {
         EventBus?.Unsubscribe<StartGameEvent>(OnStartGameEvent);
-        EventBus?.Unsubscribe<CarReachedEndEvent>(OnCarReachedEnd);
+        EventBus?.Unsubscribe<RestarGameEvent>(OnGameRestart);
+        //EventBus?.Unsubscribe<CarReachedEndEvent>(OnCarReachedEnd);
         EventBus?.Unsubscribe<GameOverEvent>(OnGameOverEvent);
         EventBus?.Unsubscribe<PlayerDamagedEvent>(OnPlayerDamaged);
     }
@@ -173,6 +175,11 @@ public class GameManager : BaseManager, IGameManager
     {
         Debug.Log("📋 Увійшли в стан Menu");
         // Тут можна активувати UI меню, зупинити музику гри тощо
+    }
+
+    private void OnGameRestart(RestarGameEvent gameRestartEvent)
+    {
+        ChangeState(GameState.Menu);
     }
     
     private void OnPlayingEntered()

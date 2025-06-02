@@ -1,10 +1,31 @@
 using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : BaseManager, IUIManager
 {
+    [SerializeField] private Button restartButton;
+    [SerializeField] private Button continueButton;
+
     protected override Task Initialize()
     {
-        throw new System.NotImplementedException();
+        SubscribeOnEvents();
+        SetButtonsEvents();
+        return Task.CompletedTask;
+    }
+
+    private void SetButtonsEvents()
+    {
+        restartButton.onClick.AddListener(() => ShowGameOverUI(false));
+        //continueButton.onClick.AddListener(() => ShowGameOverUI(true));
+    }
+
+    private void SubscribeOnEvents()
+    {
+    }
+
+    private void UnsubscribeFromEvents()
+    {
     }
 
     public void ShowGameUI()
@@ -14,7 +35,14 @@ public class UIManager : BaseManager, IUIManager
 
     public void ShowGameOverUI(bool victory)
     {
-        throw new System.NotImplementedException();
+        if (victory)
+        {
+            
+        }
+        else
+        {
+            EventBus.Fire(new RestarGameEvent());
+        }
     }
 
     public void HideAllUI()
@@ -25,5 +53,18 @@ public class UIManager : BaseManager, IUIManager
     public void UpdateHealthBar(float normalizedHealth)
     {
         throw new System.NotImplementedException();
+    }
+
+    private void OnWinGame(CarReachedEndEvent carReachedEndEvent)
+    {
+    }
+
+    private void OnLoseGame(GameOverEvent gameOverEvent)
+    {
+    }
+
+    private void OnDestroy()
+    {
+        UnsubscribeFromEvents();
     }
 }

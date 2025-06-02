@@ -39,12 +39,14 @@ public class CarController : BaseController
     {
         EventBus.Subscribe<StartGameEvent>(OnGameStarted);
         EventBus.Subscribe<GameOverEvent>(OnGameOver);
+        EventBus.Subscribe<RestarGameEvent>(OnRestartGame);
     }
     
     private void UnsubscribeFromEvents()
     {
         EventBus?.Unsubscribe<StartGameEvent>(OnGameStarted);
         EventBus?.Unsubscribe<GameOverEvent>(OnGameOver);
+        EventBus?.Unsubscribe<RestarGameEvent>(OnRestartGame);
     }
 
     private void LvlLenghtCalculation()
@@ -65,7 +67,11 @@ public class CarController : BaseController
     {
         StartMovement();
     }
-    
+
+    private void OnRestartGame(RestarGameEvent restartEvent)
+    {
+        ResetPosition();
+    }
     private void OnGameOver(GameOverEvent gameOverEvent)
     {
         if (gameOverEvent.IsWin)

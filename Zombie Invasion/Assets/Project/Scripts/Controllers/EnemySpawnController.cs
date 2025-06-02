@@ -10,7 +10,7 @@ public class EnemySpawnController : BaseController
     [Inject] private EnemySpawnSettings _settings;
     [Inject] private IPool<EnemyController> _enemyPool;
     [Inject] private SpawnMapManager _mapManager;
-    [Inject] private IEventBus _eventBus;
+   // [Inject] private IEventBus _eventBus;
     
     private List<Vector3> _allSpawnPoints = new List<Vector3>();
     private bool _isGameStarted = false;
@@ -34,12 +34,14 @@ public class EnemySpawnController : BaseController
     
     private void SubscribeToEvents()
     {
-        _eventBus.Subscribe<ReadyGameEvent>(OnGameReady);
+        EventBus.Subscribe<ReadyGameEvent>(OnGameReady);
+        EventBus.Subscribe<RestarGameEvent>(OnGameRestart);
     }
     
     private void OnDestroy()
     {
-        _eventBus?.Unsubscribe<ReadyGameEvent>(OnGameReady);
+        EventBus?.Unsubscribe<RestarGameEvent>(OnGameRestart);
+        EventBus?.Unsubscribe<ReadyGameEvent>(OnGameReady);
     }
     
     private void GenerateAllSpawnPoints()
@@ -100,10 +102,15 @@ public class EnemySpawnController : BaseController
     
     private void OnGameReady(ReadyGameEvent readyGameEvent)
     {
-        if (_isGameStarted) return;
+        //if (_isGameStarted) return;
         
         _isGameStarted = true;
         SpawnInitialEnemies();
+    }
+
+    private void OnGameRestart(RestarGameEvent gameRestartEvent)
+    {
+        GenerateAllSpawnPoints();
     }
     
     private void SpawnInitialEnemies()
