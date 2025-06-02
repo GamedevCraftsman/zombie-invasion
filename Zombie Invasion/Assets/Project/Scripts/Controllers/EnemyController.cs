@@ -23,6 +23,7 @@ public class EnemyController : BaseController
     private bool isChasing;
 
     [SerializeField, ReadOnly] private bool isDead;
+    [SerializeField, ReadOnly] private bool canMove;
     [SerializeField, ReadOnly] private bool hasAttacked;
     [SerializeField, ReadOnly] private int currentHealth;
 
@@ -73,7 +74,7 @@ public class EnemyController : BaseController
 
     private void Update()
     {
-        if (isDead || _playerTransform == null) return;
+        if (isDead || _playerTransform == null || !canMove) return;
 
         CalculateDistanceToPlayer();
     }
@@ -99,10 +100,10 @@ public class EnemyController : BaseController
         PlayRunAnimation();
     }
 
-    private async void StopChasing()
+    private void StopChasing()
     {
         isChasing = false;
-        await PlayDeathAnimationAndDie();
+        PlayDeathAnimationAndDie();
     }
 
     private void ChasePlayer()
@@ -130,17 +131,19 @@ public class EnemyController : BaseController
             AttackPlayer();
     }
 
-    private async void AttackPlayer()
+    private void AttackPlayer()
     {
         hasAttacked = true;
-
+        canMove = false;
+        
         if (EventBus != null)
             EventBus.Fire(new PlayerDamagedEvent(_data.damage));
 
-        await PlayDeathAnimationAndDie();
+        StopChasing();
     }
 
-    public async void TakeDamage(int damageAmount)
+    // Don`t delete
+    /*public async void TakeDamage(int damageAmount)
     {
         if (isDead) return;
 
@@ -154,38 +157,16 @@ public class EnemyController : BaseController
         {
             await PlayDeathAnimationAndDie();
         }
-    }
+    }*/
 
-    private async Task PlayDeathAnimationAndDie()
+    private void PlayDeathAnimationAndDie()
     {
-        if (isDead) return;
-
         PlayDeathAnimation();
-
-        await WaitForDeathAnimationAsync();
-
-        Die();
     }
 
-    private async Task WaitForDeathAnimationAsync()
+    public void OnDeath()
     {
-        string deathAnimationName = EnemieAnimations.Death.ToString();
-
-        await Task.Yield();
-
-        while (true)
-        {
-            if (enemyAnimator == null) break;
-
-            var stateInfo = enemyAnimator.GetCurrentAnimatorStateInfo(0);
-
-            if (stateInfo.IsName(deathAnimationName) && stateInfo.normalizedTime >= 1.0f)
-            {
-                break;
-            }
-
-            await Task.Yield();
-        }
+        Die();
     }
 
     private void ShowHealthBar()
@@ -216,11 +197,13 @@ public class EnemyController : BaseController
         if (healthBarCanvas != null)
             healthBarCanvas.gameObject.SetActive(false);
 
+        Debug.LogWarning("Die");
         OnEnemyDied?.Invoke(this);
     }
 
     public void ResetForPooling()
     {
+        canMove = true;
         isChasing = false;
         isDead = false;
         hasAttacked = false;
@@ -228,8 +211,8 @@ public class EnemyController : BaseController
 
         if (rb != null)
         {
-            rb.velocity = Vector3.zero;
             rb.isKinematic = false;
+            rb.velocity = Vector3.zero;
         }
 
         if (healthBarCanvas != null)

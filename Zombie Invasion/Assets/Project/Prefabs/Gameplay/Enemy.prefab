@@ -239,7 +239,7 @@ GameObject:
   - component: {fileID: 8822903700427644740}
   - component: {fileID: 731135176971033761}
   - component: {fileID: 3073407500772661241}
-  - component: {fileID: 4254906391554238085}
+  - component: {fileID: 3094641983133897986}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -314,7 +314,7 @@ CapsuleCollider:
   m_Height: 0.12790208
   m_Direction: 1
   m_Center: {x: 0, y: 0.06395104, z: 0}
---- !u!114 &4254906391554238085
+--- !u!114 &3094641983133897986
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -425,7 +425,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 674e2b5db83f9ed4abb968dd42d2e798,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2484663528605236364}
   m_SourcePrefab: {fileID: 100100000, guid: 674e2b5db83f9ed4abb968dd42d2e798, type: 3}
 --- !u!95 &2274935052055547560 stripped
 Animator:
@@ -433,6 +437,25 @@ Animator:
     type: 3}
   m_PrefabInstance: {fileID: 5690479314711851833}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4772070785002409576 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 674e2b5db83f9ed4abb968dd42d2e798,
+    type: 3}
+  m_PrefabInstance: {fileID: 5690479314711851833}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2484663528605236364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4772070785002409576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 033f95d2505e1714b9bb090a2c4654ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: 3094641983133897986}
 --- !u!4 &5292325175166424274 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 674e2b5db83f9ed4abb968dd42d2e798,

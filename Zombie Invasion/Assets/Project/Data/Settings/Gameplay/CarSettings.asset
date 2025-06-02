@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: CarSettings
   m_EditorClassIdentifier: 
   carStartPosition: {x: 0, y: 0, z: 2}
-  speed: 1
+  speed: 0.5
   acceleration: 0.5
   deceleration: 0.5
-  maxHP: 100
+  maxHP: 1000

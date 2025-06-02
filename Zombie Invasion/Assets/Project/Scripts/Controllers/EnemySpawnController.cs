@@ -59,9 +59,7 @@ public class EnemySpawnController : BaseController
         var tiles = _mapManager.GroundTiles;
         int pointsPerTile = Mathf.CeilToInt((float)_settings.SpawnPointCount / tiles.Count);
 
-        for (int tileIndex = 1;
-             tileIndex < tiles.Count && _allSpawnPoints.Count < _settings.SpawnPointCount;
-             tileIndex++)
+        for (int tileIndex = 1; tileIndex < tiles.Count && _allSpawnPoints.Count < _settings.SpawnPointCount; tileIndex++)
         {
             if (tiles[tileIndex] == null) continue;
 

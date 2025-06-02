@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Zenject;
 
 public class EnemyManager : BaseManager
@@ -74,12 +75,15 @@ public class EnemyManager : BaseManager
 
     private void HandleEnemyDeath(EnemyController deadEnemy)
     {
+        Debug.LogWarning("StartRespawn");
         if (_availableSpawnIndices.Count > 0)
         {
+            Debug.LogWarning("Respawn");
             RespawnEnemy(deadEnemy);
         }
         else
         {
+            Debug.LogWarning("Deactive");
             DeactivateEnemy(deadEnemy);
         }
     }

@@ -32,7 +32,7 @@ public class EnemyPoolHandler : IPoolable<EnemyController>
     public async void OnGet(EnemyController item)
     {
         item.gameObject.SetActive(true);
-        // Викликаємо асинхронний метод InitializeAsync
+
         await item.InitializeAsync();
     }
     

@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapTilePrefab: {fileID: 3525867083758726857, guid: 236665f03a54a7f44a6b566f3cf17d5b,
     type: 3}
-  mapLength: 2
+  mapLength: 5
   distanceBetweenTiles: 4.2
