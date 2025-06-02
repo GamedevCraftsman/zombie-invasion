@@ -14,8 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 9092893028510209321, guid: f6f54ccaf3d06344aaa67da741f06c9e,
     type: 3}
-  totalEnemyCount: 100
-  spawnPointCount: 200
-  enemyPoolInitialSize: 100
-  sideXOffsetRange: 0.5
+  totalEnemyCount: 20
+  spawnPointCount: 20
+  enemyPoolInitialSize: 20
+  sideXOffsetRange: 0.25
   sideZOffsetRange: 2
+  _minSpawnDistance: 0.1

@@ -18,6 +18,7 @@ public class EnemyController : BaseController
     [SerializeField] private Animator enemyAnimator;
     [SerializeField] private Canvas healthBarCanvas;
     [SerializeField] private UnityEngine.UI.Image healthBarFill;
+    [SerializeField] private Collider[] allColliders;
 
     [Header("Debug")] [SerializeField, ReadOnly]
     private bool isChasing;
@@ -141,9 +142,8 @@ public class EnemyController : BaseController
 
         StopChasing();
     }
-
-    // Don`t delete
-    /*public async void TakeDamage(int damageAmount)
+    
+    public void TakeDamage(int damageAmount)
     {
         if (isDead) return;
 
@@ -152,18 +152,29 @@ public class EnemyController : BaseController
 
         ShowHealthBar();
         UpdateHealthBar();
-
+        
         if (currentHealth <= 0)
         {
-            await PlayDeathAnimationAndDie();
+            isDead = true;
+            canMove = false;
+            PlayDeathAnimationAndDie();
         }
-    }*/
-
+    }
+    
     private void PlayDeathAnimationAndDie()
     {
+        ManageColliders(false);
         PlayDeathAnimation();
     }
 
+    private void ManageColliders(bool  isOn)
+    {
+        foreach (var collider in allColliders)
+        {
+            collider.enabled = isOn;
+        }
+    }
+    
     public void OnDeath()
     {
         Die();
@@ -203,6 +214,7 @@ public class EnemyController : BaseController
 
     public void ResetForPooling()
     {
+        ManageColliders(true);
         canMove = true;
         isChasing = false;
         isDead = false;

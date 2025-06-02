@@ -15,6 +15,9 @@ public class EnemySpawnSettings : ScriptableObject
     [SerializeField, Min(0f)] private float sideXOffsetRange = 2f;
     [SerializeField, Min(0f)] private float sideZOffsetRange = 2f;
 
+    [Header("Sapwn distance")]
+    [SerializeField] private float _minSpawnDistance = 2f;
+
     #region Public Properties
     
     public GameObject EnemyPrefab => enemyPrefab;
@@ -23,6 +26,7 @@ public class EnemySpawnSettings : ScriptableObject
     public int EnemyPoolInitialSize => enemyPoolInitialSize;
     public float SideXOffsetRange => sideXOffsetRange;
     public float SideZOffsetRange => sideZOffsetRange;
+    public float MinSpawnDistance => _minSpawnDistance;
     
     #endregion
 }

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
@@ -31,16 +32,32 @@ public class EnemyPoolHandler : IPoolable<EnemyController>
     
     public async void OnGet(EnemyController item)
     {
+        if (item == null) return;
+        
         item.gameObject.SetActive(true);
-
-        await item.InitializeAsync();
+        
+        // Переконуємося, що ініціалізація завершена перед поверненням
+        try
+        {
+            await item.InitializeAsync();
+            Debug.Log($"Enemy initialized at position: {item.transform.position}");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"Failed to initialize enemy: {e.Message}");
+            item.gameObject.SetActive(false);
+        }
     }
     
     public void OnRelease(EnemyController item)
     {
-        // Reset enemy state - you'll need to add this method to your EnemyController
+        if (item == null) return;
+        
+        // Reset enemy state
         item.ResetForPooling();
         item.gameObject.SetActive(false);
+        
+        Debug.Log($"Enemy released from position: {item.transform.position}");
     }
     
     public void OnDestroy(EnemyController item)

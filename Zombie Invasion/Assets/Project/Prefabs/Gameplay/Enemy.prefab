@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 9115771477033793516}
   - component: {fileID: 1120920465615269543}
   - component: {fileID: 993808892276961902}
+  - component: {fileID: 1909261111601355152}
   m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
@@ -102,6 +103,19 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &1909261111601355152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2859867301262628052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 529779de1e5bbda4caee9a091f204da2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canvas: {fileID: 9115771477033793516}
 --- !u!1 &8340810585508153408
 GameObject:
   m_ObjectHideFlags: 0
@@ -151,7 +165,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab2a0fc5ba5d94a468206d3d7fe766af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offset: {x: 0, y: 2, z: 0}
+  offset: {x: 0, y: 0, z: 0}
   lookAtCamera: 1
 --- !u!1 &8915878480753198258
 GameObject:
@@ -238,11 +252,12 @@ GameObject:
   m_Component:
   - component: {fileID: 8822903700427644740}
   - component: {fileID: 731135176971033761}
+  - component: {fileID: 3162625439242339501}
   - component: {fileID: 3073407500772661241}
   - component: {fileID: 3094641983133897986}
   m_Layer: 0
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -291,6 +306,27 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!135 &3162625439242339501
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9092893028510209321}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.04434061
+  m_Center: {x: 0, y: 0.12, z: 0}
 --- !u!136 &3073407500772661241
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -310,10 +346,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.023019314
-  m_Height: 0.12790208
+  m_Radius: 0.02474128
+  m_Height: 0.105470985
   m_Direction: 1
-  m_Center: {x: 0, y: 0.06395104, z: 0}
+  m_Center: {x: -0.00021524355, y: 0.052735493, z: 0}
 --- !u!114 &3094641983133897986
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -330,8 +366,12 @@ MonoBehaviour:
   enemyAnimator: {fileID: 2274935052055547560}
   healthBarCanvas: {fileID: 9115771477033793516}
   healthBarFill: {fileID: 1751248948961868532}
+  allColliders:
+  - {fileID: 3162625439242339501}
+  - {fileID: 3073407500772661241}
   isChasing: 0
   isDead: 0
+  canMove: 0
   hasAttacked: 0
   currentHealth: 0
 --- !u!1001 &5690479314711851833

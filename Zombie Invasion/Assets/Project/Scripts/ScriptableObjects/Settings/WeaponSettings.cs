@@ -6,8 +6,13 @@ public class WeaponSettings : ScriptableObject
     [Header("Shooting")]
     public float fireRate = 0.5f;
     public float bulletSpeed = 20f;
-    public float bulletDamage = 25f;
+    public int bulletDamage = 25;
     public float bulletLifetime = 5f;
+    public GameObject bulletPrefab;
+    
+    [Header("Bullet Pool")]
+    [Range(5, 20)]
+    public int poolSize = 10;
     
     [Header("Turret Rotation")]
     [Range(30f, 180f)]

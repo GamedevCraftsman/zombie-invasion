@@ -160,7 +160,6 @@ public class GameManager : BaseManager, IGameManager
     {
         if (currentState != GameState.Playing)
         {
-            Debug.LogWarning($"Не можна завершити гру зі стану {currentState}!");
             return;
         }
 

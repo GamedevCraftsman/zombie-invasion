@@ -7,6 +7,8 @@ public class TurretController : BaseController, ITurretController
 {
     [Header("References")]
     [SerializeField] private Transform turretTransform;
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private BulletPool bulletPool;
     
     [Header("Settings")]
     [SerializeField] private WeaponSettings weaponSettings;
@@ -20,6 +22,9 @@ public class TurretController : BaseController, ITurretController
     private bool isDragging = false;
     private Vector2 lastInputPosition;
     
+    // Shooting state
+    private float lastFireTime = 0f;
+    
     // Properties
     public bool IsControlEnabled => controlEnabled;
     public float CurrentRotationAngle => currentRotationAngle;
@@ -29,11 +34,17 @@ public class TurretController : BaseController, ITurretController
     
     protected override Task Initialize()
     {
-        ValidateComponents();
-        SubscribeToEvents();
-        ResetRotation();
+        try
+        {
+            ValidateComponents();
+            SubscribeToEvents();
+            ResetRotation();
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
         
-        Debug.Log("TurretController ініціалізовано");
         return Task.CompletedTask;
     }
     
@@ -42,12 +53,22 @@ public class TurretController : BaseController, ITurretController
         if (turretTransform == null)
         {
             turretTransform = transform;
-            Debug.LogWarning("TurretTransform не встановлено, використовується поточний transform");
+            Debug.LogWarning("TurretTransform is null! Use current transform");
+        }
+        
+        if (firePoint == null)
+        {
+            Debug.LogError("FirePoint is null! Please assign fire point transform");
+        }
+        
+        if (bulletPool == null)
+        {
+            Debug.LogError("BulletPool is null! Please assign bullet pool");
         }
         
         if (weaponSettings == null)
         {
-            Debug.LogError("WeaponSettings не встановлено!");
+            Debug.LogError("WeaponSettings is null!");
         }
     }
     
@@ -55,37 +76,43 @@ public class TurretController : BaseController, ITurretController
     {
         EventBus.Subscribe<StartGameEvent>(OnGameStarted);
         EventBus.Subscribe<GameOverEvent>(OnGameOver);
+        EventBus.Subscribe<CarReachedEndEvent>(OnCarReached);
     }
     
     private void UnsubscribeFromEvents()
     {
         EventBus?.Unsubscribe<StartGameEvent>(OnGameStarted);
         EventBus?.Unsubscribe<GameOverEvent>(OnGameOver);
+        EventBus?.Unsubscribe<CarReachedEndEvent>(OnCarReached);
     }
     
     private void OnGameStarted(StartGameEvent gameStartedEvent)
     {
         EnableControl();
-        Debug.Log("Турель активована після початку гри");
     }
     
     private void OnGameOver(GameOverEvent gameOverEvent)
     {
         DisableControl();
         ResetRotation();
-        Debug.Log("Турель деактивована після закінчення гри");
+    }
+
+    private void OnCarReached(CarReachedEndEvent carReachedEndEvent)
+    {
+        DisableControl();
+        ResetRotation();
     }
     
     private void Update()
     {
         if (!controlEnabled || weaponSettings == null) return;
-        
+
         HandleInput();
+        HandleShooting();
     }
     
     private void HandleInput()
     {
-        // Перевіряємо тип останнього вводу
         InputType inputType = inputController.LastInputType;
         
         if (inputType == InputType.Mouse || inputType == InputType.None)
@@ -96,6 +123,40 @@ public class TurretController : BaseController, ITurretController
         {
             HandleTouchInput();
         }
+    }
+    
+    private void HandleShooting()
+    {
+        // Стрільба тільки коли гравець тримає палець/мишку (isDragging)
+        if (isDragging && CanFire())
+        {
+            Fire();
+        }
+    }
+    
+    private bool CanFire()
+    {
+        return Time.time >= lastFireTime + weaponSettings.fireRate;
+    }
+    
+    private void Fire()
+    {
+        if (bulletPool == null || firePoint == null) return;
+        
+        Bullet bullet = bulletPool.GetBullet();
+        if (bullet == null) return;
+        
+        bullet.transform.position = firePoint.position;
+        bullet.transform.rotation = firePoint.rotation;
+        
+        bullet.Initialize(
+            weaponSettings.bulletSpeed,
+            weaponSettings.bulletDamage,
+            weaponSettings.bulletLifetime,
+            bulletPool
+        );
+        
+        lastFireTime = Time.time;
     }
     
     private void HandleMouseInput()
@@ -148,23 +209,17 @@ public class TurretController : BaseController, ITurretController
     {
         if (!isDragging) return;
         
-        // Обчислюємо різницю в позиції
         Vector2 deltaPosition = currentInputPosition - lastInputPosition;
         
-        // Використовуємо горизонтальну різницю для обертання
         float horizontalDelta = deltaPosition.x * weaponSettings.inputSensitivity;
         
-        // Обчислюємо новий кут
         float rotationDelta = horizontalDelta * weaponSettings.rotationSpeed * Time.deltaTime * 0.01f;
         float newAngle = currentRotationAngle + rotationDelta;
         
-        // Обмежуємо кут поворот
         newAngle = Mathf.Clamp(newAngle, -weaponSettings.maxRotationAngle, weaponSettings.maxRotationAngle);
         
-        // Застосовуємо обертання
         SetRotation(newAngle);
         
-        // Оновлюємо останню позицію
         lastInputPosition = currentInputPosition;
     }
     
@@ -177,32 +232,26 @@ public class TurretController : BaseController, ITurretController
     {
         currentRotationAngle = angle;
         
-        // Застосовуємо обертання до transform
         turretTransform.localRotation = Quaternion.Euler(0f, currentRotationAngle, 0f);
         
-        // Викликаємо events
         OnRotationChanged?.Invoke(currentRotationAngle);
         EventBus.Fire(new TurretRotationEvent(currentRotationAngle, weaponSettings.maxRotationAngle));
     }
     
-    // ITurretController implementation
     public void EnableControl()
     {
         controlEnabled = true;
-        Debug.Log("Управління турелью увімкнено");
     }
     
     public void DisableControl()
     {
         controlEnabled = false;
         isDragging = false;
-        Debug.Log("Управління турелью вимкнено");
     }
     
     public void ResetRotation()
     {
         SetRotation(0f);
-        Debug.Log("Поворот турелі скинуто");
     }
     
     private void OnDestroy()
@@ -216,23 +265,25 @@ public class TurretController : BaseController, ITurretController
     {
         if (weaponSettings == null) return;
         
-        // Малюємо межі повороту
         Vector3 center = transform.position;
         Vector3 forward = transform.forward;
         
-        // Ліва межа
         Vector3 leftBound = Quaternion.Euler(0, -weaponSettings.maxRotationAngle, 0) * forward;
         Gizmos.color = Color.red;
         Gizmos.DrawRay(center, leftBound * 3f);
         
-        // Права межа
         Vector3 rightBound = Quaternion.Euler(0, weaponSettings.maxRotationAngle, 0) * forward;
         Gizmos.color = Color.red;
         Gizmos.DrawRay(center, rightBound * 3f);
         
-        // Поточний напрямок
         Vector3 currentDirection = Quaternion.Euler(0, currentRotationAngle, 0) * forward;
         Gizmos.color = Color.green;
         Gizmos.DrawRay(center, currentDirection * 4f);
+        
+        if (firePoint != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(firePoint.position, 0.1f);
+        }
     }
 }

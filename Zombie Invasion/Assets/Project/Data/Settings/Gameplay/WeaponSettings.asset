@@ -13,9 +13,12 @@ MonoBehaviour:
   m_Name: WeaponSettings
   m_EditorClassIdentifier: 
   fireRate: 0.5
-  bulletSpeed: 20
-  bulletDamage: 25
+  bulletSpeed: 7
+  bulletDamage: 50
   bulletLifetime: 5
+  bulletPrefab: {fileID: 5198511406076633119, guid: f99e7cc189da96e4ea11db09c298636a,
+    type: 3}
+  poolSize: 20
   maxRotationAngle: 45
-  rotationSpeed: 200
-  inputSensitivity: 20
+  rotationSpeed: 150
+  inputSensitivity: 10
