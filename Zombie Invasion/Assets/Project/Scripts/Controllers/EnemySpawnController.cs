@@ -36,12 +36,14 @@ public class EnemySpawnController : BaseController
     {
         EventBus.Subscribe<ReadyGameEvent>(OnGameReady);
         EventBus.Subscribe<RestarGameEvent>(OnGameRestart);
+        EventBus.Subscribe<ContinueGameEvent>(OnContinueGame);
     }
     
     private void OnDestroy()
     {
         EventBus?.Unsubscribe<RestarGameEvent>(OnGameRestart);
         EventBus?.Unsubscribe<ReadyGameEvent>(OnGameReady);
+        EventBus?.Subscribe<ContinueGameEvent>(OnContinueGame);
     }
     
     private void GenerateAllSpawnPoints()
@@ -109,6 +111,11 @@ public class EnemySpawnController : BaseController
     }
 
     private void OnGameRestart(RestarGameEvent gameRestartEvent)
+    {
+        GenerateAllSpawnPoints();
+    }
+
+    private void OnContinueGame(ContinueGameEvent gameContinueEvent)
     {
         GenerateAllSpawnPoints();
     }

@@ -37,10 +37,11 @@ public class UIManager : BaseManager, IUIManager
     {
         if (victory)
         {
-            EventBus.Fire(new CarReachedEndEvent());
+            EventBus.Fire(new ContinueGameEvent());
         }
         else
         {
+            Debug.LogWarning("Restart");
             EventBus.Fire(new RestarGameEvent());
         }
     }

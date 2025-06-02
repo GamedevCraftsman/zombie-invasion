@@ -10,6 +10,7 @@ public class CarController : BaseController
     // Dependencies
     [Inject] private CarSettings _carSettings;
     [Inject] private GameSettings _gameSettings;
+    [Inject] private IGameManager _gameManager;
     
     // State
     private bool _isMoving = false;
@@ -39,6 +40,7 @@ public class CarController : BaseController
         EventBus.Subscribe<StartGameEvent>(OnGameStarted);
         EventBus.Subscribe<GameOverEvent>(OnGameOver);
         EventBus.Subscribe<CarReachedEndEvent>(OnReachedEndGame);
+        EventBus.Subscribe<ContinueGameEvent>(OnContinueGame);
         EventBus.Subscribe<RestarGameEvent>(OnRestartGame);
     }
     
@@ -47,12 +49,13 @@ public class CarController : BaseController
         EventBus?.Unsubscribe<StartGameEvent>(OnGameStarted);
         EventBus?.Unsubscribe<GameOverEvent>(OnGameOver);
         EventBus?.Unsubscribe<CarReachedEndEvent>(OnReachedEndGame);
+        EventBus?.Unsubscribe<ContinueGameEvent>(OnContinueGame);
         EventBus?.Unsubscribe<RestarGameEvent>(OnRestartGame);
     }
     
     private void ResetCarState()
     {
-        carTransform.position = Vector3.zero;
+        _lvlLength = 0f;
         _currentSpeed = 0f;
         _isMoving = false;
         _isGameActive = false;
@@ -81,17 +84,23 @@ public class CarController : BaseController
     
     private void OnGameOver(GameOverEvent gameOverEvent)
     {
-        if(!gameOverEvent.IsWin)
-        {
+        // if(!gameOverEvent.IsWin)
+        // {
             StopMovement();
-        }
+        //}
         
         _isGameActive = false;
+    }
+
+    private void OnContinueGame(ContinueGameEvent continueEvent)
+    {
+        ResetCarState();
     }
     
     private void LvlLenghtCalculation()
     {
-        _lvlLength = (_gameSettings.MapLength - 1) * _gameSettings.MapTilePrefab.transform.localScale.y + (_gameSettings.MapTilePrefab.transform.localScale.y / 2); 
+        _lvlLength = carTransform.position.z + (_gameSettings.MapLength - 1) * _gameSettings.MapTilePrefab.transform.localScale.y /*+ (_gameSettings.MapTilePrefab.transform.localScale.y / 2)*/; 
+        Debug.LogWarning(_lvlLength);
     }
     
     private void StartMovement()
@@ -167,13 +176,15 @@ public class CarController : BaseController
     {
         if (carTransform.position.z >= _lvlLength)
         {
-            EventBus.Fire(new CarReachedEndEvent());
+            //EventBus.Fire(new CarReachedEndEvent());
+            _gameManager.EndGame(true);
         }
     }
     
     // Public methods для зовнішнього контролю
     private void ResetPosition()
     {
+        carTransform.position = Vector3.zero;
         ResetCarState();
     }
     

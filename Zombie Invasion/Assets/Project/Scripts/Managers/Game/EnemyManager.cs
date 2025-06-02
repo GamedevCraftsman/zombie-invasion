@@ -9,7 +9,6 @@ public class EnemyManager : BaseManager
     [Inject] private EnemySpawnSettings _settings;
     [Inject] private IPool<EnemyController> _enemyPool;
     [Inject] private EnemySpawnController _spawnController;
-    [Inject] private IEventBus _eventBus;
     
     private Queue<int> _availableSpawnIndices = new Queue<int>();
     private HashSet<EnemyController> _activeEnemies = new HashSet<EnemyController>();
@@ -43,14 +42,17 @@ public class EnemyManager : BaseManager
     
     private void SubscribeToEvents()
     {
-        _eventBus.Subscribe<StartGameEvent>(OnGameStart);
-        _eventBus.Subscribe<GameOverEvent>(OnGameOver);
+        EventBus.Subscribe<StartGameEvent>(OnGameStart);
+        EventBus.Subscribe<GameOverEvent>(OnGameOver);
+        EventBus?.Subscribe<CarReachedEndEvent>(OnReachedEndOfGame);
+        
     }
     
     private void OnDestroy()
     {
-        _eventBus?.Unsubscribe<StartGameEvent>(OnGameStart);
-        _eventBus?.Unsubscribe<GameOverEvent>(OnGameOver);
+        EventBus.Unsubscribe<CarReachedEndEvent>(OnReachedEndOfGame);
+        EventBus?.Unsubscribe<StartGameEvent>(OnGameStart);
+        EventBus?.Unsubscribe<GameOverEvent>(OnGameOver);
         
         foreach (var enemy in _activeEnemies)
         {
@@ -122,8 +124,18 @@ public class EnemyManager : BaseManager
         
         Debug.Log($"Deactivated enemy. Remaining active: {_activeEnemies.Count}");
     }
-    
+
     private void OnGameOver(GameOverEvent gameOverEvent)
+    {
+        OnGameEnd();
+    }
+
+    private void OnReachedEndOfGame(CarReachedEndEvent carReachedEndEvent)
+    {
+        OnGameEnd();
+    }
+    
+    private void OnGameEnd()
     {
         _enemyPool.ReleaseAll();
         

@@ -35,6 +35,7 @@ public class UIController : BaseController
         EventBus.Subscribe<RestarGameEvent>(RestartGame);
         EventBus.Subscribe<GameOverEvent>(OnGameOver);
         EventBus.Subscribe<CarReachedEndEvent>(OnReachedEnd);
+        EventBus.Subscribe<ContinueGameEvent>(ContinueGame);
     }
 
     private void UnsubscribeFromEvents()
@@ -42,10 +43,12 @@ public class UIController : BaseController
         EventBus?.Unsubscribe<RestarGameEvent>(RestartGame);
         EventBus?.Unsubscribe<GameOverEvent>(OnGameOver);
         EventBus?.Unsubscribe<CarReachedEndEvent>(OnReachedEnd);
+        EventBus?.Unsubscribe<ContinueGameEvent>(ContinueGame);
     }
 
     private void OnGameOver(GameOverEvent gameOverEvent)
     {
+        Debug.LogWarning("OpenPanel");
         OpenEndGamePanel(restartGameLabel, restartGameButton, losePanel);
     }
 
@@ -71,6 +74,12 @@ public class UIController : BaseController
     {
         losePanel.interactable = false;
         losePanel.DOFade(0, 1f);
+    }
+
+    private void ContinueGame(ContinueGameEvent continueGameEvent)
+    {
+        winPanel.interactable = false;
+        winPanel.DOFade(0, 1f);
     }
     
     private void OnDestroy()

@@ -66,13 +66,13 @@ public class EventBus : IEventBus
     /// Debug метод для виведення інформації про всі активні підписки
     public void LogActiveSubscriptions()
     {
-        Debug.Log($"EventBus: {_eventHandlers.Count} active event types");
+        Debug.LogWarning($"EventBus: {_eventHandlers.Count} active event types");
         foreach (var kvp in _eventHandlers)
         {
             var eventType = kvp.Key;
             var handler = kvp.Value;
             var subscriberCount = handler?.GetInvocationList().Length ?? 0;
-            Debug.Log($"  {eventType.Name}: {subscriberCount} subscribers");
+            Debug.LogWarning($"  {eventType.Name}: {subscriberCount} subscribers");
         }
     }
 }

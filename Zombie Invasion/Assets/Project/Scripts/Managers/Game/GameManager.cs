@@ -75,7 +75,8 @@ public class GameManager : BaseManager, IGameManager
     {
         EventBus.Subscribe<StartGameEvent>(OnStartGameEvent);
         EventBus.Subscribe<RestarGameEvent>(OnGameRestart);
-        //EventBus.Subscribe<CarReachedEndEvent>(OnCarReachedEnd);
+        EventBus.Subscribe<CarReachedEndEvent>(OnCarReachedEnd);
+        EventBus.Subscribe<ContinueGameEvent>(OnContinueGame);
         EventBus.Subscribe<GameOverEvent>(OnGameOverEvent);
         EventBus.Subscribe<PlayerDamagedEvent>(OnPlayerDamaged);
     }
@@ -84,7 +85,8 @@ public class GameManager : BaseManager, IGameManager
     {
         EventBus?.Unsubscribe<StartGameEvent>(OnStartGameEvent);
         EventBus?.Unsubscribe<RestarGameEvent>(OnGameRestart);
-        //EventBus?.Unsubscribe<CarReachedEndEvent>(OnCarReachedEnd);
+        EventBus?.Unsubscribe<CarReachedEndEvent>(OnCarReachedEnd);
+        EventBus?.Unsubscribe<ContinueGameEvent>(OnContinueGame);
         EventBus?.Unsubscribe<GameOverEvent>(OnGameOverEvent);
         EventBus?.Unsubscribe<PlayerDamagedEvent>(OnPlayerDamaged);
     }
@@ -121,6 +123,11 @@ public class GameManager : BaseManager, IGameManager
         
         // Логіка перенесена в EndGame()
     }
+
+    private void OnContinueGame(ContinueGameEvent continueGameEvent)
+    {
+        ChangeState(GameState.Menu);
+    }
     
     private void OnPlayerDamaged(PlayerDamagedEvent damageEvent)
     {
@@ -143,7 +150,7 @@ public class GameManager : BaseManager, IGameManager
         Debug.Log($"🔄 Зміна стану гри: {previousState} → {newState}");
         
         // Сповіщаємо про зміну стану
-        EventBus.Fire(new GameStateChangedEvent(previousState, newState));
+        //EventBus.Fire(new GameStateChangedEvent(previousState, newState));
         
         // Виконуємо дії при вході в новий стан
         OnStateEntered(newState, previousState);
@@ -242,7 +249,11 @@ public class GameManager : BaseManager, IGameManager
         ChangeState(victory ? GameState.Victory : GameState.GameOver);
         
         // Відправляємо подію для інших систем
-        EventBus.Fire(new GameOverEvent(victory));
+        if (victory)
+            EventBus.Fire(new CarReachedEndEvent());
+        else
+            EventBus.Fire(new GameOverEvent(false));
+
         
         // Логування фінальної статистики
         LogFinalStats(victory);
@@ -276,47 +287,10 @@ public class GameManager : BaseManager, IGameManager
         // HP скинеться автоматично через StartGameEvent
     }
     
-    //---------------------------------------------------------
-    //Delete
-    // Додаткові методи для зовнішнього контролю
-    public void PauseGame()
-    {
-        if (currentState != GameState.Playing) return;
-        
-        Time.timeScale = 0f;
-        Debug.Log("⏸️ Гра поставлена на паузу");
-    }
-    
-    public void ResumeGame()
-    {
-        if (currentState != GameState.Playing) return;
-        
-        Time.timeScale = 1f;
-        Debug.Log("Гра знята з паузи");
-    }
-    //---------------------------------------------------------
-    // public bool CanStartGame()
-    // {
-    //     return isInitialized && currentState == GameState.Menu;
-    // }
-    
     public bool CanRestartGame()
     {
         return currentState == GameState.GameOver || currentState == GameState.Victory;
     }
-    
-    /*private void LogSystemStatus()
-    {
-        Debug.Log("=== SYSTEM STATUS ===");
-        Debug.Log($"GameState: {currentState}");
-        Debug.Log($"CarController готовий: {carController != null}");
-        Debug.Log($"HPManager готовий: {hpManager != null}");
-        Debug.Log($"HPUIController готовий: {hpUIController != null}");
-        Debug.Log($"InputController готовий: {inputController != null}");
-        Debug.Log($"Поточне HP: {hpManager?.CurrentHP}/{hpManager?.MaxHP}");
-        Debug.Log($"Машина на позиції: {carController?.Position}");
-        Debug.Log("====================");
-    }*/
     
     private void LogFinalStats(bool isWin)
     {

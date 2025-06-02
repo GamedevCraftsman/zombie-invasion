@@ -16,36 +16,38 @@ public class SpawnMapManager : BaseManager
     protected override Task Initialize()
     {
         SubscribeToEvents();
-        ManageGroundTiles(gameSettings.MapLength);
+        ManageGroundTiles(gameSettings.MapLength, false);
         return Task.CompletedTask;
     }
 
     private void SubscribeToEvents()
     {
-        EventBus.Subscribe<CarReachedEndEvent>(OnCarReachedEndEvent);
+        EventBus.Subscribe<ContinueGameEvent>(OnContinueGame);
+        
     }
 
     private void UnsubscribeFromEvents()
     {
-        EventBus?.Unsubscribe<CarReachedEndEvent>(OnCarReachedEndEvent);
+        EventBus?.Unsubscribe<ContinueGameEvent>(OnContinueGame);
     }
     
-    private void OnCarReachedEndEvent(CarReachedEndEvent carReachedEndEvent)
+    private void OnContinueGame(ContinueGameEvent continueGameEvent)
     {
-        //ManageGroundTiles(gameSettings.MapLength);
+        ManageGroundTiles(gameSettings.MapLength, false);
     }
     
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Debug.Log("Spawning map");
-            ManageGroundTiles(gameSettings.MapLength);
-        }
-    }
+    
+    // private void Update()
+    // {
+    //     if (Input.GetKeyDown(KeyCode.Space))
+    //     {
+    //         Debug.Log("Spawning map");
+    //         ManageGroundTiles(gameSettings.MapLength);
+    //     }
+    // }
 
     //Перевіряє кількість тайлів землі та розсташовує їх по порядку з заданим кроком
-    public void ManageGroundTiles(int requiredCount)
+    public void ManageGroundTiles(int requiredCount, bool isRestart)
     {
         // Очищуємо список від null об'єктів (якщо такі є)
         groundTiles.RemoveAll(tile => tile == null);
@@ -54,7 +56,7 @@ public class SpawnMapManager : BaseManager
         SpawnMissingTiles(requiredCount);
 
         // Потім переносимо всі тайли на нові позиції
-        RepositionAllTiles();
+        RepositionAllTiles(isRestart);
     }
 
     //Спавнить недостатні тайли (якщо їх не вистачає)
@@ -75,10 +77,10 @@ public class SpawnMapManager : BaseManager
     }
 
     //Переносить всі існуючі тайли на нові позиції від останнього тайла
-    private void RepositionAllTiles()
+    private void RepositionAllTiles(bool isRestart)
     {
         // Знаходимо стартову позицію для переносу тайлів
-        Vector3 repositionStartPosition = GetRepositionStartPositionAdvanced();
+        Vector3 repositionStartPosition = GetRepositionStartPositionAdvanced(isRestart);
 
         // Переносимо всі тайли на нові позиції
         for (int i = 0; i < groundTiles.Count; i++)
@@ -93,7 +95,7 @@ public class SpawnMapManager : BaseManager
     }
     
     //Альтернативний метод для більш складного перенесення
-    private Vector3 GetRepositionStartPositionAdvanced()
+    private Vector3 GetRepositionStartPositionAdvanced(bool isRestart)
     {
         // Знаходимо найдальший тайл по Z координаті
         float maxZ = float.MinValue;
@@ -111,7 +113,7 @@ public class SpawnMapManager : BaseManager
             }
         }
 
-        if (foundAnyTile)
+        if (foundAnyTile && !isRestart)
         {
             // Повертаємо позицію після найдальшого тайла
             return new Vector3(startPosition.x, startPosition.y, maxZ);
