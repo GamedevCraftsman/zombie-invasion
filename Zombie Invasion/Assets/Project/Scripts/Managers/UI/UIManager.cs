@@ -17,7 +17,7 @@ public class UIManager : BaseManager, IUIManager
     private void SetButtonsEvents()
     {
         restartButton.onClick.AddListener(() => ShowGameOverUI(false));
-        //continueButton.onClick.AddListener(() => ShowGameOverUI(true));
+        continueButton.onClick.AddListener(() => ShowGameOverUI(true));
     }
 
     private void SubscribeOnEvents()
@@ -37,7 +37,7 @@ public class UIManager : BaseManager, IUIManager
     {
         if (victory)
         {
-            
+            EventBus.Fire(new CarReachedEndEvent());
         }
         else
         {

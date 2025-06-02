@@ -28,7 +28,6 @@ public class CarController : BaseController
         if (carTransform == null)
             carTransform = transform;
 
-        LvlLenghtCalculation();
         SubscribeToEvents();
         ResetCarState();
         
@@ -39,6 +38,7 @@ public class CarController : BaseController
     {
         EventBus.Subscribe<StartGameEvent>(OnGameStarted);
         EventBus.Subscribe<GameOverEvent>(OnGameOver);
+        EventBus.Subscribe<CarReachedEndEvent>(OnReachedEndGame);
         EventBus.Subscribe<RestarGameEvent>(OnRestartGame);
     }
     
@@ -46,12 +46,8 @@ public class CarController : BaseController
     {
         EventBus?.Unsubscribe<StartGameEvent>(OnGameStarted);
         EventBus?.Unsubscribe<GameOverEvent>(OnGameOver);
+        EventBus?.Unsubscribe<CarReachedEndEvent>(OnReachedEndGame);
         EventBus?.Unsubscribe<RestarGameEvent>(OnRestartGame);
-    }
-
-    private void LvlLenghtCalculation()
-    {
-        _lvlLength = _gameSettings.MapLength * _gameSettings.MapTilePrefab.transform.localScale.z;
     }
     
     private void ResetCarState()
@@ -66,24 +62,36 @@ public class CarController : BaseController
     private void OnGameStarted(StartGameEvent startEvent)
     {
         StartMovement();
+        LvlLenghtCalculation();
     }
 
     private void OnRestartGame(RestarGameEvent restartEvent)
     {
         ResetPosition();
     }
+
+    private void OnReachedEndGame(CarReachedEndEvent carReachedEndEvent)
+    {
+        //StartWinDeceleration();
+        UpdateWinDeceleration();
+        //StopMovement();
+        
+        _isGameActive = false;
+    }
+    
     private void OnGameOver(GameOverEvent gameOverEvent)
     {
-        if (gameOverEvent.IsWin)
-        {
-            StartWinDeceleration();
-        }
-        else
+        if(!gameOverEvent.IsWin)
         {
             StopMovement();
         }
         
         _isGameActive = false;
+    }
+    
+    private void LvlLenghtCalculation()
+    {
+        _lvlLength = (_gameSettings.MapLength - 1) * _gameSettings.MapTilePrefab.transform.localScale.y + (_gameSettings.MapTilePrefab.transform.localScale.y / 2); 
     }
     
     private void StartMovement()
@@ -110,11 +118,11 @@ public class CarController : BaseController
     {
         if (!_isMoving) return;
         
-        if (_isWinning)
-        {
-            UpdateWinDeceleration();
-        }
-        else if (_isGameActive)
+        // if (_isWinning)
+        // {
+        //     UpdateWinDeceleration();
+        // }
+        if (_isGameActive)
         {
             UpdateNormalMovement();
             CheckLevelCompletion();

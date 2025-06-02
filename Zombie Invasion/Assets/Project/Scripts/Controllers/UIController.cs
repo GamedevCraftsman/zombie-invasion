@@ -2,13 +2,19 @@ using System;
 using System.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class UIController : BaseController
 {
     [Header("LosePanel")]
     [SerializeField] private CanvasGroup losePanel;
     [SerializeField] private CanvasGroup restartGameButton;
-    [SerializeField] private CanvasGroup restartGamePanel;
+    [SerializeField] private CanvasGroup restartGameLabel;
+    
+    [Header("Win Panel")]
+    [SerializeField] private CanvasGroup winPanel;
+    [SerializeField] private CanvasGroup continueGameButton;
+    [SerializeField] private CanvasGroup continueGameLabel;
 
     protected override Task Initialize()
     {
@@ -27,26 +33,38 @@ public class UIController : BaseController
     private void SubscribeToEvents()
     {
         EventBus.Subscribe<RestarGameEvent>(RestartGame);
-        EventBus.Subscribe<GameOverEvent>(OpenRestartGamePanel);
+        EventBus.Subscribe<GameOverEvent>(OnGameOver);
+        EventBus.Subscribe<CarReachedEndEvent>(OnReachedEnd);
     }
 
     private void UnsubscribeFromEvents()
     {
         EventBus?.Unsubscribe<RestarGameEvent>(RestartGame);
-        EventBus?.Unsubscribe<GameOverEvent>(OpenRestartGamePanel);
+        EventBus?.Unsubscribe<GameOverEvent>(OnGameOver);
+        EventBus?.Unsubscribe<CarReachedEndEvent>(OnReachedEnd);
+    }
+
+    private void OnGameOver(GameOverEvent gameOverEvent)
+    {
+        OpenEndGamePanel(restartGameLabel, restartGameButton, losePanel);
+    }
+
+    private void OnReachedEnd(CarReachedEndEvent carReachedEndEvent)
+    {
+        OpenEndGamePanel(continueGameLabel, continueGameButton, winPanel);
     }
     
-    private void OpenRestartGamePanel(GameOverEvent gameOverEvent)
+    private void OpenEndGamePanel(CanvasGroup label, CanvasGroup button, CanvasGroup panel)
     {
         Sequence openPanel = DOTween.Sequence();
-        losePanel.alpha = 1;
-        losePanel.interactable = true;
+        panel.alpha = 1;
+        panel.interactable = true;
         
-        openPanel.AppendCallback(() => restartGameButton.interactable = false)
-            .Join(restartGamePanel.DOFade(1,2f))
-            .Append(restartGameButton.transform.DOMoveY(190,3f)).SetEase(Ease.OutBack)
-            .Join(restartGameButton.DOFade(1,2f))
-            .AppendCallback(() => restartGameButton.interactable = true);
+        openPanel.AppendCallback(() => button.interactable = false)
+            .Join(label.DOFade(1,2f))
+            .Append(button.transform.DOMoveY(190,3f)).SetEase(Ease.OutBack)
+            .Join(button.DOFade(1,2f))
+            .AppendCallback(() => button.interactable = true);
     }
 
     private void RestartGame(RestarGameEvent restartGameEvent)
