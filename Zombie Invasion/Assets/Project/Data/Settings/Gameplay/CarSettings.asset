@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07d3d54f02a7b48439447ef17df2ce5c, type: 3}
   m_Name: CarSettings
   m_EditorClassIdentifier: 
+  carStartPosition: {x: 0, y: 0, z: 2}
   speed: 1
   acceleration: 0.5
   deceleration: 0.5

@@ -162,7 +162,7 @@ public class CarController : BaseController
 
     private void ResetPosition()
     {
-        carTransform.position = Vector3.zero;
+        carTransform.position = _carSettings.CarStartPosition;
         ResetCarState();
     }
 
