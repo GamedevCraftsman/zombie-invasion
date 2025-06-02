@@ -1,11 +1,14 @@
 using System.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HPUIController : BaseController
+public class CarHPUIController : BaseController
 {
     [Header("UI References")] [SerializeField]
     private Image hpFillImage;
+
+    [SerializeField] private CanvasGroup hpBarGroup;
 
     [Header("Visual Settings")] [SerializeField]
     private float animationSpeed = 5f;
@@ -20,14 +23,13 @@ public class HPUIController : BaseController
     {
         if (hpFillImage == null)
         {
-            Debug.LogError("HPUIController: HP Fill Image не призначено!");
+            Debug.LogError("HPUIController: HP Fill Image is missing!");
             return Task.CompletedTask;
         }
 
         ResetUI();
         SubscribeToEvents();
 
-        Debug.Log("HPUIController ініціалізовано");
         return Task.CompletedTask;
     }
 
@@ -35,10 +37,14 @@ public class HPUIController : BaseController
     {
         EventBus.Subscribe<HPChangedEvent>(OnHPChanged);
         EventBus.Subscribe<StartGameEvent>(OnGameStarted);
+        EventBus.Subscribe<GameOverEvent>(OnGameEnd);
+        EventBus.Subscribe<CarReachedEndEvent>(OnGameEnd);
     }
 
     private void UnsubscribeFromEvents()
     {
+        EventBus.Unsubscribe<GameOverEvent>(OnGameEnd);
+        EventBus.Unsubscribe<CarReachedEndEvent>(OnGameEnd);
         EventBus?.Unsubscribe<HPChangedEvent>(OnHPChanged);
         EventBus?.Unsubscribe<StartGameEvent>(OnGameStarted);
     }
@@ -46,6 +52,27 @@ public class HPUIController : BaseController
     private void OnGameStarted(StartGameEvent startEvent)
     {
         ResetUI();
+        ShowHPBar();
+    }
+
+    private void OnGameEnd(GameOverEvent gameOverEvent)
+    {
+        HideHPBar();
+    }
+
+    private void OnGameEnd(CarReachedEndEvent carReachedEndEvent)
+    {
+        HideHPBar();
+    }
+
+    private void ShowHPBar()
+    {
+        hpBarGroup.DOFade(1, 2);
+    }
+
+    private void HideHPBar()
+    {
+        hpBarGroup.alpha = 0;
     }
 
     private void OnHPChanged(HPChangedEvent hpEvent)
@@ -103,22 +130,6 @@ public class HPUIController : BaseController
         if (hpFillImage == null) return;
 
         hpFillImage.fillAmount = currentFillAmount;
-    }
-
-    public void SetAnimationSpeed(float speed)
-    {
-        animationSpeed = Mathf.Max(0f, speed);
-    }
-
-    public void EnableSmoothing(bool enable)
-    {
-        useSmoothing = enable;
-
-        if (!enable)
-        {
-            currentFillAmount = targetFillAmount;
-            ApplyVisualChanges();
-        }
     }
 
     private void OnDestroy()

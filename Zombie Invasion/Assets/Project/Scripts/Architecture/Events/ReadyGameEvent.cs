@@ -1,4 +1,3 @@
-public class ReadyGameEvent 
+public class ReadyGameEvent
 {
-    
 }

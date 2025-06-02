@@ -26,7 +26,6 @@ public class EventBus : IEventBus
         {
             _eventHandlers[eventType] = Delegate.Remove(_eventHandlers[eventType], handler);
 
-            // Якщо після видалення не залишилося обробників, видаляємо ключ
             if (_eventHandlers[eventType] == null)
             {
                 _eventHandlers.Remove(eventType);
@@ -39,31 +38,25 @@ public class EventBus : IEventBus
         var eventType = typeof(T);
         if (_eventHandlers.TryGetValue(eventType, out var handler))
         {
-            // Приводимо Delegate до потрібного типу Action<T>
             var typedHandler = handler as Action<T>;
 
             try
             {
-                // Викликаємо всі підписані обробники
                 typedHandler?.Invoke(eventData);
             }
             catch (Exception ex)
             {
-                // Логуємо помилку, щоб один зламаний обробник не зупинив інші
                 Debug.LogError($"Error in event handler for {eventType.Name}: {ex.Message}");
                 Debug.LogException(ex);
             }
         }
     }
 
-
-    /// Очищує всі підписки. Корисно при зміні сцен або перезапуску гри
     public void Clear()
     {
         _eventHandlers.Clear();
     }
-    
-    /// Debug метод для виведення інформації про всі активні підписки
+
     public void LogActiveSubscriptions()
     {
         Debug.LogWarning($"EventBus: {_eventHandlers.Count} active event types");

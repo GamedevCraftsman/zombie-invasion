@@ -9,7 +9,6 @@ public interface IGameManager
 public enum GameState
 {
     Menu,
-    Ready,
     Playing,
     GameOver,
     Victory

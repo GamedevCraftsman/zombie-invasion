@@ -1,9 +1,9 @@
-public class HPChangedEvent 
+public class HPChangedEvent
 {
     public int CurrentHP { get; }
     public int MaxHP { get; }
     public float HPPercentage { get; }
-    
+
     public HPChangedEvent(int currentHP, int maxHP)
     {
         CurrentHP = currentHP;

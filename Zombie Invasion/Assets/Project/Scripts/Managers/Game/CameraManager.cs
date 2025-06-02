@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -18,11 +19,17 @@ public class CameraManager : BaseManager, ICameraManager
 
     protected override async Task Initialize()
     {
-        SubscribeToEvents();
-        InitializeServices();
-        SetInitialCamera();
+        try
+        {
+            SubscribeToEvents();
+            InitializeServices();
+            SetInitialCamera();
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
 
-        Debug.Log("CameraManager initialized");
         await Task.CompletedTask;
     }
 

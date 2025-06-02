@@ -5,7 +5,7 @@ public class GameBootstrap : MonoBehaviour
 {
     [SerializeField] private BaseManager[] managersInOrder;
     [SerializeField] private BaseController[] controllersInOrder;
-    
+
     private async void Awake()
     {
         try
@@ -14,7 +14,7 @@ public class GameBootstrap : MonoBehaviour
             {
                 await manager.InitializeAsync();
             }
-        
+
             OnAllManagersInitialized();
         }
         catch (Exception e)

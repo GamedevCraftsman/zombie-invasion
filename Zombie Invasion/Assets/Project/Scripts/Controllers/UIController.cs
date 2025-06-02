@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class UIController : BaseController
 {

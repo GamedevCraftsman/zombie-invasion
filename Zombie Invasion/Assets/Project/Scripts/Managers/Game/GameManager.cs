@@ -9,15 +9,13 @@ public class GameManager : BaseManager, IGameManager
     [Inject] private CarController carController;
     [Inject] private HPManager hpManager;
     [Inject] private InputController inputController;
-    [Inject] private HPUIController hpUIController;
+    [Inject] private CarHPUIController hpUIController;
     
     // State
     private GameState currentState = GameState.Menu;
-   // private bool isInitialized = false;
     
     // Properties
     public GameState CurrentState => currentState;
-    //public bool IsInitialized => isInitialized;
     
     protected override Task Initialize()
     {
@@ -28,48 +26,11 @@ public class GameManager : BaseManager, IGameManager
         }
         catch (Exception e)
         {
-            Debug.LogError(e);
+            Debug.LogException(e);
         }
-        
-        
-        // Debug.Log("GameManager ініціалізація почалася...");
-        // return InitializeAllSystems();
-        
+
         return Task.CompletedTask;
     }
-    
-    /*private async Task InitializeAllSystems()
-    {
-        try
-        {
-            /#1#/ Ініціалізуємо всі системи по черзі
-            Debug.Log("Ініціалізація CarController...");
-            await carController.InitializeAsync();
-            
-            Debug.Log("Ініціалізація HPManager...");
-            await hpManager.InitializeAsync();
-            
-            Debug.Log("Ініціалізація HPUIController...");
-            await hpUIController.InitializeAsync();
-            
-            Debug.Log("Ініціалізація InputController...");
-            await inputController.InitializeAsync();
-            
-            isInitialized = true;
-            Debug.Log("✅ GameManager: Всі системи ініціалізовано!");#1#
-            
-            // Встановлюємо початковий стан
-            ChangeState(GameState.Menu);
-            
-            // Логування поточного стану
-            //LogSystemStatus();
-        }
-        catch (System.Exception ex)
-        {
-            Debug.LogError($"Помилка при ініціалізації GameManager: {ex.Message}");
-            Debug.LogException(ex);
-        }
-    }*/
     
     private void SubscribeToEvents()
     {
@@ -101,27 +62,15 @@ public class GameManager : BaseManager, IGameManager
     
     private void OnCarReachedEnd(CarReachedEndEvent carEndEvent)
     {
-        Debug.Log("🏁 GameManager: Машина досягла кінця!");
-        
         if (hpManager.IsAlive)
         {
-            Debug.Log("🎉 Гравець жив до кінця - ПЕРЕМОГА!");
             EndGame(true);
         }
-        // else
-        // {
-        //     Debug.Log("💀 Гравець мертвий - це не повинно статися!");
-        //     EndGame(false);
-        // }
     }
     
     private void OnGameOverEvent(GameOverEvent gameOverEvent)
     {
-        // Цей event тепер використовується внутрішньо
         ChangeState(GameState.GameOver);
-        
-        
-        // Логіка перенесена в EndGame()
     }
 
     private void OnContinueGame(ContinueGameEvent continueGameEvent)
@@ -131,9 +80,6 @@ public class GameManager : BaseManager, IGameManager
     
     private void OnPlayerDamaged(PlayerDamagedEvent damageEvent)
     {
-        Debug.Log($"⚡ GameManager: Гравець отримав {damageEvent.DamageAmount} урону");
-        
-        // Перевіряємо, чи не помер гравець
         if (!hpManager.IsAlive && currentState == GameState.Playing)
         {
             EndGame(false);
@@ -147,12 +93,6 @@ public class GameManager : BaseManager, IGameManager
         GameState previousState = currentState;
         currentState = newState;
         
-        Debug.Log($"🔄 Зміна стану гри: {previousState} → {newState}");
-        
-        // Сповіщаємо про зміну стану
-        //EventBus.Fire(new GameStateChangedEvent(previousState, newState));
-        
-        // Виконуємо дії при вході в новий стан
         OnStateEntered(newState, previousState);
     }
     
@@ -181,7 +121,6 @@ public class GameManager : BaseManager, IGameManager
     private void OnMenuEntered()
     {
         Debug.Log("📋 Увійшли в стан Menu");
-        // Тут можна активувати UI меню, зупинити музику гри тощо
     }
 
     private void OnGameRestart(RestarGameEvent gameRestartEvent)
@@ -191,47 +130,30 @@ public class GameManager : BaseManager, IGameManager
     
     private void OnPlayingEntered()
     {
-        Debug.Log("🎮 Увійшли в стан Playing");
-        // Тут можна запустити ігрову музику, сховати меню тощо
+
     }
     
     private void OnGameOverEntered()
     {
-        Debug.Log("💀 Увійшли в стан GameOver");
-        // Тут можна показати екран поразки, зупинити музику тощо
+
     }
     
     private void OnVictoryEntered()
     {
-        Debug.Log("🎉 Увійшли в стан Victory");
-        // Тут можна показати екран перемоги, запустити святкову музику тощо
+
     }
     
-    // Методи інтерфейсу IGameManager
     public void StartGame()
     {
-        // if (!isInitialized)
-        // {
-        //     Debug.LogWarning("Спроба запустити гру до завершення ініціалізації!");
-        //     return;
-        // }
-        
         if (currentState != GameState.Menu)
         {
             Debug.LogWarning($"Не можна запустити гру зі стану {currentState}!");
             return;
         }
         
-        Debug.Log("🚀 Запуск гри...");
-        
-        // Скидаємо стан гри (якщо потрібно)
         ResetGameState();
-        
-        // Змінюємо стан на Playing
+
         ChangeState(GameState.Playing);
-        
-        // Відправляємо внутрішню подію для запуску систем
-        // (StartGameEvent тепер обробляється внутрішньо)
     }
     
     public void EndGame(bool victory)
@@ -241,21 +163,14 @@ public class GameManager : BaseManager, IGameManager
             Debug.LogWarning($"Не можна завершити гру зі стану {currentState}!");
             return;
         }
-        
-        string result = victory ? "ПЕРЕМОГА" : "ПОРАЗКА";
-        Debug.Log($"🏆 Завершення гри - {result}");
-        
-        // Змінюємо стан
+
         ChangeState(victory ? GameState.Victory : GameState.GameOver);
-        
-        // Відправляємо подію для інших систем
+
         if (victory)
             EventBus.Fire(new CarReachedEndEvent());
         else
-            EventBus.Fire(new GameOverEvent(false));
-
+            EventBus.Fire(new GameOverEvent());
         
-        // Логування фінальної статистики
         LogFinalStats(victory);
     }
     
@@ -267,31 +182,16 @@ public class GameManager : BaseManager, IGameManager
             return;
         }
         
-        Debug.Log("🔄 Перезапуск гри...");
-        
-        // Скидаємо стан всіх систем
         ResetGameState();
         
         // Повертаємося в меню
         ChangeState(GameState.Menu);
-        
-        Debug.Log("Гра готова до нового запуску!");
     }
     
     private void ResetGameState()
     {
-        // Скидаємо стан всіх систем
-        //carController.ResetPosition();
         inputController.ResetForNewGame();
-        
-        // HP скинеться автоматично через StartGameEvent
     }
-    
-    public bool CanRestartGame()
-    {
-        return currentState == GameState.GameOver || currentState == GameState.Victory;
-    }
-    
     private void LogFinalStats(bool isWin)
     {
         Debug.Log("=== FINAL STATS ===");
@@ -306,6 +206,5 @@ public class GameManager : BaseManager, IGameManager
     private void OnDestroy()
     {
         UnsubscribeFromEvents();
-        Time.timeScale = 1f;
     }
 }

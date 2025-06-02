@@ -4,26 +4,24 @@ using Zenject;
 
 public class CarController : BaseController
 {
-    [Header("References")]
-    [SerializeField] private Transform carTransform;
-    
+    [Header("References")] [SerializeField]
+    private Transform carTransform;
+
     // Dependencies
     [Inject] private CarSettings _carSettings;
     [Inject] private GameSettings _gameSettings;
     [Inject] private IGameManager _gameManager;
-    
+
     // State
     private bool _isMoving = false;
     private bool _isGameActive = false;
     private float _currentSpeed = 0f;
-    private bool _isWinning = false;
     private float _lvlLength = 0;
-    
+
     // Properties for external access
-    public bool IsMoving => _isMoving;
     public float CurrentSpeed => _currentSpeed;
     public Vector3 Position => carTransform.position;
-    
+
     protected override async Task Initialize()
     {
         if (carTransform == null)
@@ -31,10 +29,10 @@ public class CarController : BaseController
 
         SubscribeToEvents();
         ResetCarState();
-        
+
         await Task.CompletedTask;
     }
-    
+
     private void SubscribeToEvents()
     {
         EventBus.Subscribe<StartGameEvent>(OnGameStarted);
@@ -43,7 +41,7 @@ public class CarController : BaseController
         EventBus.Subscribe<ContinueGameEvent>(OnContinueGame);
         EventBus.Subscribe<RestarGameEvent>(OnRestartGame);
     }
-    
+
     private void UnsubscribeFromEvents()
     {
         EventBus?.Unsubscribe<StartGameEvent>(OnGameStarted);
@@ -52,16 +50,15 @@ public class CarController : BaseController
         EventBus?.Unsubscribe<ContinueGameEvent>(OnContinueGame);
         EventBus?.Unsubscribe<RestarGameEvent>(OnRestartGame);
     }
-    
+
     private void ResetCarState()
     {
         _lvlLength = 0f;
         _currentSpeed = 0f;
         _isMoving = false;
         _isGameActive = false;
-        _isWinning = false;
     }
-    
+
     private void OnGameStarted(StartGameEvent startEvent)
     {
         StartMovement();
@@ -75,20 +72,13 @@ public class CarController : BaseController
 
     private void OnReachedEndGame(CarReachedEndEvent carReachedEndEvent)
     {
-        //StartWinDeceleration();
         UpdateWinDeceleration();
-        //StopMovement();
-        
         _isGameActive = false;
     }
-    
+
     private void OnGameOver(GameOverEvent gameOverEvent)
     {
-        // if(!gameOverEvent.IsWin)
-        // {
-            StopMovement();
-        //}
-        
+        StopMovement();
         _isGameActive = false;
     }
 
@@ -96,106 +86,86 @@ public class CarController : BaseController
     {
         ResetCarState();
     }
-    
+
     private void LvlLenghtCalculation()
     {
-        _lvlLength = carTransform.position.z + (_gameSettings.MapLength - 1) * _gameSettings.MapTilePrefab.transform.localScale.y /*+ (_gameSettings.MapTilePrefab.transform.localScale.y / 2)*/; 
+        _lvlLength = Mathf.Round((carTransform.position.z +
+                                  (_gameSettings.MapLength - 1) * _gameSettings.MapTilePrefab.transform.localScale.y) *
+                                 10f) / 10f;
         Debug.LogWarning(_lvlLength);
     }
-    
+
     private void StartMovement()
     {
         _isMoving = true;
         _isGameActive = true;
-        _isWinning = false;
         _currentSpeed = 0f;
     }
-    
+
     private void StopMovement()
     {
         _isMoving = false;
         _currentSpeed = 0f;
     }
-    
-    private void StartWinDeceleration()
-    {
-        _isWinning = true;
-        // Залишаємо isMoving = true для плавного сповільнення
-    }
-    
+
     private void FixedUpdate()
     {
         if (!_isMoving) return;
-        
-        // if (_isWinning)
-        // {
-        //     UpdateWinDeceleration();
-        // }
+
         if (_isGameActive)
         {
             UpdateNormalMovement();
             CheckLevelCompletion();
         }
     }
-    
+
     private void UpdateNormalMovement()
     {
-        // Плавне прискорення до цільової швидкості
         _currentSpeed = Mathf.MoveTowards(
-            _currentSpeed, 
-            _carSettings.Speed, 
+            _currentSpeed,
+            _carSettings.Speed,
             _carSettings.Acceleration * Time.fixedDeltaTime
         );
-        
-        // Застосування руху
+
+        Move();
+    }
+
+    private void Move()
+    {
         Vector3 movement = Vector3.forward * _currentSpeed * Time.fixedDeltaTime;
         carTransform.position += movement;
     }
-    
+
     private void UpdateWinDeceleration()
     {
-        // Плавне сповільнення після перемоги
         _currentSpeed = Mathf.MoveTowards(
-            _currentSpeed, 
-            0f, 
+            _currentSpeed,
+            0f,
             _carSettings.Deceleration * Time.fixedDeltaTime
         );
-        
-        // Застосування руху
-        Vector3 movement = Vector3.forward * _currentSpeed * Time.fixedDeltaTime;
-        carTransform.position += movement;
-        
-        // Зупинка, коли швидкість дійшла до нуля
+
+        Move();
+
         if (_currentSpeed <= 0f)
         {
             StopMovement();
         }
     }
-    
+
     private void CheckLevelCompletion()
     {
         if (carTransform.position.z >= _lvlLength)
         {
-            //EventBus.Fire(new CarReachedEndEvent());
             _gameManager.EndGame(true);
         }
     }
-    
-    // Public methods для зовнішнього контролю
+
     private void ResetPosition()
     {
         carTransform.position = Vector3.zero;
         ResetCarState();
     }
-    
-    // public void SetSpeed(float newSpeed)
-    // {
-    //     if (_isGameActive && !_isWinning)
-    //     {
-    //         _currentSpeed = Mathf.Clamp(newSpeed, 0f, _carSettings.Speed);
-    //     }
-    // }
-    
+
     private void OnDestroy()
     {
         UnsubscribeFromEvents();

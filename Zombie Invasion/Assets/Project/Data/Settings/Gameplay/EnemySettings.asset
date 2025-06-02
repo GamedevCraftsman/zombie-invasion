@@ -15,5 +15,5 @@ MonoBehaviour:
   aggroRadius: 0.5
   moveSpeed: 1
   rotationSpeed: 5
-  damage: 10
+  damage: 100
   maxHealth: 100

@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
-using System.Linq;
 
 public enum EnemieAnimations
 {
@@ -32,8 +30,7 @@ public class EnemyController : BaseController
     private float _distanceToPlayer;
     private EnemieAnimations _enemieAnimation;
 
-    [Inject] private IEventBus eventBus;
-    [Inject] private EnemySettings data;
+    [Inject] private EnemySettings _data;
     public event Action<EnemyController> OnEnemyDied;
 
     protected override Task Initialize()
@@ -64,7 +61,7 @@ public class EnemyController : BaseController
             rb.freezeRotation = true;
 
         // Initialize health
-        currentHealth = data.maxHealth;
+        currentHealth = _data.maxHealth;
 
         // Hide health bar initially
         if (healthBarCanvas != null)
@@ -78,8 +75,13 @@ public class EnemyController : BaseController
     {
         if (isDead || _playerTransform == null) return;
 
+        CalculateDistanceToPlayer();
+    }
+
+    private void CalculateDistanceToPlayer()
+    {
         _distanceToPlayer = Vector3.Distance(transform.position, _playerTransform.position);
-        if (_distanceToPlayer <= data.aggroRadius)
+        if (_distanceToPlayer <= _data.aggroRadius)
         {
             if (!isChasing)
                 StartChasing();
@@ -95,15 +97,12 @@ public class EnemyController : BaseController
     {
         isChasing = true;
         PlayRunAnimation();
-        Debug.Log("Enemy started chasing");
     }
 
     private async void StopChasing()
     {
         isChasing = false;
-        //PlayIdleAnimation();
         await PlayDeathAnimationAndDie();
-        Debug.Log("Enemy stopped chasing");
     }
 
     private void ChasePlayer()
@@ -113,14 +112,14 @@ public class EnemyController : BaseController
         Vector3 direction = (_playerTransform.position - transform.position).normalized;
         direction.y = 0;
 
-        Vector3 movement = direction * data.moveSpeed * Time.deltaTime;
+        Vector3 movement = direction * _data.moveSpeed * Time.deltaTime;
         rb.MovePosition(transform.position + movement);
 
         if (direction != Vector3.zero)
         {
             Quaternion targetRot = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot,
-                data.rotationSpeed * Time.deltaTime);
+                _data.rotationSpeed * Time.deltaTime);
         }
     }
 
@@ -135,15 +134,12 @@ public class EnemyController : BaseController
     {
         hasAttacked = true;
 
-        if (eventBus != null)
-            eventBus.Fire(new PlayerDamagedEvent(data.damage));
+        if (EventBus != null)
+            EventBus.Fire(new PlayerDamagedEvent(_data.damage));
 
-        Debug.Log($"Enemy attacked player for {data.damage} damage");
-        
-        // Граємо анімацію смерті і чекаємо її завершення
         await PlayDeathAnimationAndDie();
     }
-    
+
     public async void TakeDamage(int damageAmount)
     {
         if (isDead) return;
@@ -154,57 +150,44 @@ public class EnemyController : BaseController
         ShowHealthBar();
         UpdateHealthBar();
 
-        Debug.Log($"Enemy took {damageAmount} damage. Health: {currentHealth}/{data.maxHealth}");
-
         if (currentHealth <= 0)
         {
             await PlayDeathAnimationAndDie();
         }
     }
 
-    // Новий асинхронний метод для програвання анімації смерті та виконання Die()
     private async Task PlayDeathAnimationAndDie()
     {
-        if (isDead) return; // Запобігаємо повторному виклику
-        
-        // Граємо анімацію смерті
+        if (isDead) return;
+
         PlayDeathAnimation();
-        
-        // Чекаємо завершення анімації
+
         await WaitForDeathAnimationAsync();
-        
-        // Виконуємо Die() після завершення анімації
+
         Die();
     }
 
-    // Асинхронний метод очікування завершення анімації смерті
     private async Task WaitForDeathAnimationAsync()
     {
         string deathAnimationName = EnemieAnimations.Death.ToString();
-        
-        // Чекаємо один кадр для початку анімації
+
         await Task.Yield();
-        
-        // Чекаємо поки анімація повністю не завершиться
+
         while (true)
         {
             if (enemyAnimator == null) break;
-            
+
             var stateInfo = enemyAnimator.GetCurrentAnimatorStateInfo(0);
-            
-            // Перевіряємо чи грається анімація смерті і чи вона завершена
+
             if (stateInfo.IsName(deathAnimationName) && stateInfo.normalizedTime >= 1.0f)
             {
                 break;
             }
-            
-            // Якщо анімація ще не почалася або ще грається
+
             await Task.Yield();
         }
-        
-        Debug.Log("Death animation completed!");
     }
-    
+
     private void ShowHealthBar()
     {
         if (healthBarCanvas != null)
@@ -214,13 +197,13 @@ public class EnemyController : BaseController
     private void UpdateHealthBar()
     {
         if (healthBarFill != null)
-            healthBarFill.fillAmount = (float)currentHealth / data.maxHealth;
+            healthBarFill.fillAmount = (float)currentHealth / _data.maxHealth;
     }
 
     private void Die()
     {
-        if (isDead) return; // Запобігаємо повторному виклику
-        
+        if (isDead) return;
+
         isDead = true;
         isChasing = false;
 
@@ -233,46 +216,37 @@ public class EnemyController : BaseController
         if (healthBarCanvas != null)
             healthBarCanvas.gameObject.SetActive(false);
 
-        Debug.Log("Enemy died");
-
-        // Викликаємо event для системи пулінгу
         OnEnemyDied?.Invoke(this);
-
-        // Не деактивуємо об'єкт тут - це зробить пул
     }
 
     public void ResetForPooling()
     {
-        // Скидаємо всі стани
         isChasing = false;
         isDead = false;
         hasAttacked = false;
-        currentHealth = data.maxHealth;
+        currentHealth = _data.maxHealth;
 
-        // Скидаємо фізику
         if (rb != null)
         {
             rb.velocity = Vector3.zero;
             rb.isKinematic = false;
         }
 
-        // Ховаємо UI
         if (healthBarCanvas != null)
             healthBarCanvas.gameObject.SetActive(false);
 
-        // Відновлюємо анімацію
         PlayIdleAnimation();
     }
 
     // Animation methods
-    private void PlayIdleAnimation() => Debug.Log("Idle animation ON");
+    private void PlayIdleAnimation() => enemyAnimator.SetTrigger(EnemieAnimations.Idle.ToString());
     private void PlayRunAnimation() => enemyAnimator.SetTrigger(EnemieAnimations.Run.ToString());
     private void PlayDeathAnimation() => enemyAnimator.SetTrigger(EnemieAnimations.Death.ToString());
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, data ? data.aggroRadius : 0f);
+        Gizmos.DrawWireSphere(transform.position, _data ? _data.aggroRadius : 0f);
         if (_playerTransform != null)
         {
             Gizmos.color = isChasing ? Color.green : Color.gray;
