@@ -4,11 +4,21 @@ using UnityEngine;
 public class EnemySettings : ScriptableObject
 {
     [Header("AI Settings")]
-    public float aggroRadius = 10f;
-    public float moveSpeed = 5f;
-    public float rotationSpeed = 5f;
+    [SerializeField] private float aggroRadius = 10f;
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float rotationSpeed = 5f;
 
     [Header("Combat Settings")]
-    public int damage = 25;
-    public int maxHealth = 100;
+    [SerializeField] private int damage = 25;
+    [SerializeField] private int maxHealth = 100;
+
+    #region Public Values
+
+    public float AggroRadius => aggroRadius;
+    public float MoveSpeed => moveSpeed;
+    public float RotationSpeed => rotationSpeed;
+    public int Damage => damage;
+    public int MaxHealth => maxHealth;
+
+    #endregion
 }

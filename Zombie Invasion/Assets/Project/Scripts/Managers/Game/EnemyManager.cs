@@ -75,15 +75,12 @@ public class EnemyManager : BaseManager
 
     private void HandleEnemyDeath(EnemyController deadEnemy)
     {
-        Debug.LogWarning("StartRespawn");
         if (_availableSpawnIndices.Count > 0)
         {
-            Debug.LogWarning("Respawn");
             RespawnEnemy(deadEnemy);
         }
         else
         {
-            Debug.LogWarning("Deactive");
             DeactivateEnemy(deadEnemy);
         }
     }
@@ -113,8 +110,6 @@ public class EnemyManager : BaseManager
         enemy.OnEnemyDied -= HandleEnemyDeath;
         _activeEnemies.Remove(enemy);
         _enemyPool.Release(enemy);
-
-        Debug.Log($"Deactivated enemy. Remaining active: {_activeEnemies.Count}");
     }
 
     private void OnGameOver(GameOverEvent gameOverEvent)
@@ -141,8 +136,6 @@ public class EnemyManager : BaseManager
 
         _activeEnemies.Clear();
         _availableSpawnIndices.Clear();
-
-        Debug.Log("Game over - all enemies deactivated");
     }
 
     private void OnDestroy()

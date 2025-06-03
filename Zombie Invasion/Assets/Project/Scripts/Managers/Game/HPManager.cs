@@ -11,11 +11,7 @@ public class HPManager : BaseManager
     // State
     private int _currentHP;
     private int _maxHP;
-
-    // Properties
-    public int CurrentHP => _currentHP;
-    public int MaxHP => _maxHP;
-    public float HPPercentage => _maxHP > 0 ? (float)_currentHP / _maxHP : 0f;
+    
     public bool IsAlive => _currentHP > 0;
 
     protected override Task Initialize()
@@ -25,7 +21,6 @@ public class HPManager : BaseManager
 
         SubscribeToEvents();
 
-        Debug.Log($"HPManager ініціалізовано. MaxHP: {_maxHP}");
         return Task.CompletedTask;
     }
 
@@ -75,7 +70,7 @@ public class HPManager : BaseManager
     {
         if (damageAmount <= 0)
         {
-            Debug.LogWarning("Спроба завдати від'ємного або нульового урону!");
+            Debug.LogWarning("Try to take zero damage!");
             return;
         }
 

@@ -63,17 +63,16 @@ public class EnemyController : BaseController
             rb.freezeRotation = true;
 
         // Initialize health
-        currentHealth = _data.maxHealth;
+        currentHealth = _data.MaxHealth;
 
         // Hide health bar initially
         if (healthBarCanvas != null)
             healthBarCanvas.gameObject.SetActive(false);
 
         PlayIdleAnimation();
-        Debug.Log("Enemy initialized");
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (isDead || _playerTransform == null || !canMove) return;
 
@@ -83,7 +82,7 @@ public class EnemyController : BaseController
     private void CalculateDistanceToPlayer()
     {
         _distanceToPlayer = Vector3.Distance(transform.position, _playerTransform.position);
-        if (_distanceToPlayer <= _data.aggroRadius)
+        if (_distanceToPlayer <= _data.AggroRadius)
         {
             if (!isChasing)
                 StartChasing();
@@ -114,14 +113,14 @@ public class EnemyController : BaseController
         Vector3 direction = (_playerTransform.position - transform.position).normalized;
         direction.y = 0;
 
-        Vector3 movement = direction * _data.moveSpeed * Time.deltaTime;
+        Vector3 movement = direction * _data.MoveSpeed * Time.deltaTime;
         rb.MovePosition(transform.position + movement);
 
         if (direction != Vector3.zero)
         {
             Quaternion targetRot = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRot,
-                _data.rotationSpeed * Time.deltaTime);
+                _data.RotationSpeed * Time.deltaTime);
         }
     }
 
@@ -138,7 +137,7 @@ public class EnemyController : BaseController
         canMove = false;
         
         if (EventBus != null)
-            EventBus.Fire(new PlayerDamagedEvent(_data.damage));
+            EventBus.Fire(new PlayerDamagedEvent(_data.Damage));
 
         StopChasing();
     }
@@ -189,7 +188,7 @@ public class EnemyController : BaseController
     private void UpdateHealthBar()
     {
         if (healthBarFill != null)
-            healthBarFill.fillAmount = (float)currentHealth / _data.maxHealth;
+            healthBarFill.fillAmount = (float)currentHealth / _data.MaxHealth;
     }
 
     private void Die()
@@ -208,7 +207,6 @@ public class EnemyController : BaseController
         if (healthBarCanvas != null)
             healthBarCanvas.gameObject.SetActive(false);
 
-        Debug.LogWarning("Die");
         OnEnemyDied?.Invoke(this);
     }
 
@@ -219,7 +217,7 @@ public class EnemyController : BaseController
         isChasing = false;
         isDead = false;
         hasAttacked = false;
-        currentHealth = _data.maxHealth;
+        currentHealth = _data.MaxHealth;
 
         if (rb != null)
         {
@@ -241,7 +239,7 @@ public class EnemyController : BaseController
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, _data ? _data.aggroRadius : 0f);
+        Gizmos.DrawWireSphere(transform.position, _data ? _data.AggroRadius : 0f);
         if (_playerTransform != null)
         {
             Gizmos.color = isChasing ? Color.green : Color.gray;

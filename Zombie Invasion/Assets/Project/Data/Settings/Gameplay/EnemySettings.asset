@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: EnemySettings
   m_EditorClassIdentifier: 
   aggroRadius: 0.5
-  moveSpeed: 1
+  moveSpeed: 0.5
   rotationSpeed: 5
-  damage: 1
+  damage: 10
   maxHealth: 100

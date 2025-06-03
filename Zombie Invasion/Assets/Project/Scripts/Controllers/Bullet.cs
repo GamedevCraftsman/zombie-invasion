@@ -22,11 +22,11 @@ public class Bullet : MonoBehaviour
         StartCoroutine(LifetimeTimer());
     }
     
-    private void Update()
+    private void FixedUpdate()
     {
         if (!isActive) return;
         
-        transform.position += direction * speed * Time.deltaTime;
+        transform.position += direction * speed * Time.fixedDeltaTime;
     }
     
     private void OnTriggerEnter(Collider other)

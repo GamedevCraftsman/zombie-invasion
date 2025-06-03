@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
@@ -24,7 +23,6 @@ public class EnemyPoolHandler : IPoolable<EnemyController>
             return null;
         }
         
-        // Inject dependencies into your existing EnemyController
         _container.Inject(enemyController);
         
         return enemyController;
@@ -35,12 +33,10 @@ public class EnemyPoolHandler : IPoolable<EnemyController>
         if (item == null) return;
         
         item.gameObject.SetActive(true);
-        
-        // Переконуємося, що ініціалізація завершена перед поверненням
+
         try
         {
             await item.InitializeAsync();
-            Debug.Log($"Enemy initialized at position: {item.transform.position}");
         }
         catch (System.Exception e)
         {
@@ -56,8 +52,6 @@ public class EnemyPoolHandler : IPoolable<EnemyController>
         // Reset enemy state
         item.ResetForPooling();
         item.gameObject.SetActive(false);
-        
-        Debug.Log($"Enemy released from position: {item.transform.position}");
     }
     
     public void OnDestroy(EnemyController item)

@@ -1,27 +1,41 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "WeaponSettings", menuName = "Game/Weapon Settings")]
+[CreateAssetMenu(fileName = "WeaponSettings", menuName = "Game/WeaponSettings")]
 public class WeaponSettings : ScriptableObject
 {
-    [Header("Shooting")]
-    public float fireRate = 0.5f;
-    public float bulletSpeed = 20f;
-    public int bulletDamage = 25;
-    public float bulletLifetime = 5f;
-    public GameObject bulletPrefab;
-    
-    [Header("Bullet Pool")]
-    [Range(5, 20)]
-    public int poolSize = 10;
-    
-    [Header("Turret Rotation")]
-    [Range(30f, 180f)]
-    public float maxRotationAngle = 90f;
-    
-    [Range(150, 250)]
-    public float rotationSpeed = 50f;
-    
-    [Header("Input Sensitivity")]
-    [Range(10, 30)]
-    public float inputSensitivity = 1f;
+    [Header("Bullet Properties")] [SerializeField]
+    private float fireRate = 0.5f;
+
+    [SerializeField] private float bulletSpeed = 20f;
+    [SerializeField] private int bulletDamage = 25;
+    [SerializeField] private float bulletLifetime = 5f;
+    [SerializeField] private GameObject bulletPrefab;
+
+    [Header("Bullet Pool")] [SerializeField, Range(5, 20)]
+    private int poolSize = 10;
+
+    [Header("Turret Rotation")] [SerializeField, Range(30f, 180f)]
+    private float maxRotationAngle = 90f;
+
+    [SerializeField, Range(50, 150)] private float rotationSpeed = 50f;
+
+    [Header("Input Sensitivity")] [SerializeField, Range(0.1f, 10f)]
+    private float inputSensitivity = 1f;
+
+    #region Public Values
+
+    public float FireRate => fireRate;
+    public float BulletSpeed => bulletSpeed;
+    public int BulletDamage => bulletDamage;
+    public float BulletLifetime => bulletLifetime;
+    public GameObject BulletPrefab => bulletPrefab;
+
+    public int PoolSize => poolSize;
+
+    public float MaxRotationAngle => maxRotationAngle;
+    public float RotationSpeed => rotationSpeed;
+
+    public float InputSensitivity => inputSensitivity;
+
+    #endregion
 }

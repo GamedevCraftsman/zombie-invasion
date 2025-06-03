@@ -12,8 +12,8 @@ public class EnemySpawnController : BaseController
     [Inject] private SpawnMapManager _mapManager;
 
     private List<Vector3> _allSpawnPoints = new List<Vector3>();
-    private List<Vector3> _availableSpawnPoints = new List<Vector3>(); // Зберігаємо доступні точки
-    private HashSet<Vector3> _usedSpawnPositions = new HashSet<Vector3>(); // Використовуємо HashSet для швидшого пошуку
+    private List<Vector3> _availableSpawnPoints = new List<Vector3>();
+    private HashSet<Vector3> _usedSpawnPositions = new HashSet<Vector3>();
 
     public List<Vector3> AllSpawnPoints => _allSpawnPoints;
 
@@ -55,10 +55,8 @@ public class EnemySpawnController : BaseController
         {
             GeneratePointsFromTiles();
             
-            // Перемішуємо список для рандомності
             ShuffleSpawnPoints();
             
-            // Копіюємо у доступні точки
             _availableSpawnPoints.AddRange(_allSpawnPoints);
         }
     }
@@ -67,7 +65,7 @@ public class EnemySpawnController : BaseController
     {
         var tiles = _mapManager.GroundTiles;
         int pointsPerTile = Mathf.CeilToInt((float)_settings.SpawnPointCount / tiles.Count);
-        HashSet<Vector3> uniquePoints = new HashSet<Vector3>(); // Для уникнення дублікатів
+        HashSet<Vector3> uniquePoints = new HashSet<Vector3>(); 
 
         for (int tileIndex = 1; tileIndex < tiles.Count && uniquePoints.Count < _settings.SpawnPointCount; tileIndex++)
         {
@@ -75,7 +73,7 @@ public class EnemySpawnController : BaseController
 
             Vector3 tileCenter = tiles[tileIndex].transform.position;
             int attempts = 0;
-            int maxAttemptsPerTile = pointsPerTile * 3; // Збільшуємо кількість спроб
+            int maxAttemptsPerTile = pointsPerTile * 3;
 
             for (int pointIndex = 0; 
                  pointIndex < pointsPerTile && uniquePoints.Count < _settings.SpawnPointCount && attempts < maxAttemptsPerTile; 
@@ -84,12 +82,11 @@ public class EnemySpawnController : BaseController
                 float offsetX = Random.Range(-_settings.SideXOffsetRange, _settings.SideXOffsetRange);
                 float offsetZ = Random.Range(-_settings.SideZOffsetRange, _settings.SideZOffsetRange);
                 Vector3 spawnPoint = new Vector3(
-                    Mathf.Round((tileCenter.x + offsetX) * 100f) / 100f, // Округлюємо до 2 знаків після коми
+                    Mathf.Round((tileCenter.x + offsetX) * 100f) / 100f, 
                     tileCenter.y,
                     Mathf.Round((tileCenter.z + offsetZ) * 100f) / 100f
                 );
-
-                // Перевіряємо унікальність позиції
+                
                 if (uniquePoints.Add(spawnPoint))
                 {
                     pointIndex++;
@@ -98,7 +95,6 @@ public class EnemySpawnController : BaseController
         }
 
         _allSpawnPoints.AddRange(uniquePoints);
-        Debug.Log($"Generated {_allSpawnPoints.Count} unique spawn points");
     }
 
     private void ShuffleSpawnPoints()
@@ -146,8 +142,6 @@ public class EnemySpawnController : BaseController
                 var enemy = _enemyPool.Get();
                 enemy.transform.position = spawnPosition;
                 _usedSpawnPositions.Add(spawnPosition);
-                
-                Debug.Log($"Spawned enemy {i + 1} at position: {spawnPosition}");
             }
             else
             {
@@ -174,11 +168,10 @@ public class EnemySpawnController : BaseController
 
             if (IsPositionValid(candidatePosition))
             {
-                _availableSpawnPoints.RemoveAt(randomIndex); // Видаляємо використану позицію
+                _availableSpawnPoints.RemoveAt(randomIndex); 
                 return candidatePosition;
             }
             
-            // Видаляємо невалідну позицію зі списку доступних
             _availableSpawnPoints.RemoveAt(randomIndex);
         }
 

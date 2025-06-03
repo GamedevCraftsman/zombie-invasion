@@ -16,4 +16,4 @@ MonoBehaviour:
   speed: 0.5
   acceleration: 0.5
   deceleration: 0.5
-  maxHP: 1000
+  maxHP: 100

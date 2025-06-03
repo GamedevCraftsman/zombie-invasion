@@ -90,9 +90,8 @@ public class CarController : BaseController
     private void LvlLenghtCalculation()
     {
         _lvlLength = Mathf.Round((carTransform.position.z +
-                                  (_gameSettings.MapLength - 1) * _gameSettings.MapTilePrefab.transform.localScale.y) *
-                                 10f) / 10f;
-        Debug.LogWarning(_lvlLength);
+                                  (_gameSettings.MapLength - 1) * _gameSettings.DistanceBetweenTiles) *
+                                 10f) / 10f; 
     }
 
     private void StartMovement()

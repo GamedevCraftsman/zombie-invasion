@@ -5,13 +5,11 @@ using UnityEngine;
 
 public class UIController : BaseController
 {
-    [Header("LosePanel")]
-    [SerializeField] private CanvasGroup losePanel;
+    [Header("LosePanel")] [SerializeField] private CanvasGroup losePanel;
     [SerializeField] private CanvasGroup restartGameButton;
     [SerializeField] private CanvasGroup restartGameLabel;
-    
-    [Header("Win Panel")]
-    [SerializeField] private CanvasGroup winPanel;
+
+    [Header("Win Panel")] [SerializeField] private CanvasGroup winPanel;
     [SerializeField] private CanvasGroup continueGameButton;
     [SerializeField] private CanvasGroup continueGameLabel;
 
@@ -25,7 +23,7 @@ public class UIController : BaseController
         {
             Debug.LogException(e);
         }
-        
+
         return Task.CompletedTask;
     }
 
@@ -47,7 +45,6 @@ public class UIController : BaseController
 
     private void OnGameOver(GameOverEvent gameOverEvent)
     {
-        Debug.LogWarning("OpenPanel");
         OpenEndGamePanel(restartGameLabel, restartGameButton, losePanel);
     }
 
@@ -55,17 +52,17 @@ public class UIController : BaseController
     {
         OpenEndGamePanel(continueGameLabel, continueGameButton, winPanel);
     }
-    
+
     private void OpenEndGamePanel(CanvasGroup label, CanvasGroup button, CanvasGroup panel)
     {
         Sequence openPanel = DOTween.Sequence();
         panel.alpha = 1;
         panel.interactable = true;
-        
+
         openPanel.AppendCallback(() => button.interactable = false)
-            .Join(label.DOFade(1,2f))
-            .Append(button.transform.DOMoveY(190,3f)).SetEase(Ease.OutBack)
-            .Join(button.DOFade(1,2f))
+            .Join(label.DOFade(1, 2f))
+            .Append(button.transform.DOMoveY(190, 3f)).SetEase(Ease.OutBack)
+            .Join(button.DOFade(1, 2f))
             .AppendCallback(() => button.interactable = true);
     }
 
@@ -80,7 +77,7 @@ public class UIController : BaseController
         winPanel.interactable = false;
         winPanel.DOFade(0, 1f);
     }
-    
+
     private void OnDestroy()
     {
         UnsubscribeFromEvents();
