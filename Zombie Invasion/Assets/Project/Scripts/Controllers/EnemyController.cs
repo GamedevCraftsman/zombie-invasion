@@ -66,8 +66,7 @@ public class EnemyController : BaseController
         currentHealth = _data.MaxHealth;
 
         // Hide health bar initially
-        if (healthBarCanvas != null)
-            healthBarCanvas.gameObject.SetActive(false);
+        ManageHealthBar(false);
 
         PlayIdleAnimation();
     }
@@ -136,6 +135,7 @@ public class EnemyController : BaseController
         hasAttacked = true;
         canMove = false;
         
+        ManageHealthBar(false);
         if (EventBus != null)
             EventBus.Fire(new PlayerDamagedEvent(_data.Damage));
 
@@ -149,13 +149,15 @@ public class EnemyController : BaseController
         currentHealth -= damageAmount;
         currentHealth = Mathf.Max(0, currentHealth);
 
-        ShowHealthBar();
+        ManageHealthBar(true);
         UpdateHealthBar();
         
         if (currentHealth <= 0)
         {
             isDead = true;
             canMove = false;
+            
+            ManageHealthBar(false);
             PlayDeathAnimationAndDie();
         }
     }
@@ -179,12 +181,12 @@ public class EnemyController : BaseController
         Die();
     }
 
-    private void ShowHealthBar()
+    private void ManageHealthBar(bool isOn)
     {
         if (healthBarCanvas != null)
-            healthBarCanvas.gameObject.SetActive(true);
+            healthBarCanvas.gameObject.SetActive(isOn);
     }
-
+    
     private void UpdateHealthBar()
     {
         if (healthBarFill != null)
