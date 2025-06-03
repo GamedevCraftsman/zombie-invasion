@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdca5a9e3a5335e4ebe12adc79910a95, type: 3}
+  m_Name: EnemySpawnSettings
+  m_EditorClassIdentifier: 
+  enemyPrefab: {fileID: 9092893028510209321, guid: f6f54ccaf3d06344aaa67da741f06c9e,
+    type: 3}
+  totalEnemyCount: 20
+  spawnPointCount: 20
+  enemyPoolInitialSize: 20
+  sideXOffsetRange: 0.3
+  sideZOffsetRange: 2.2
+  _minSpawnDistance: 0.1
