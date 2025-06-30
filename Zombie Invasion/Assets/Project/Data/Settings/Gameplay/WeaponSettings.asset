@@ -21,4 +21,4 @@ MonoBehaviour:
   poolSize: 20
   maxRotationAngle: 45
   rotationSpeed: 100
-  inputSensitivity: 5
+  inputSensitivity: 10

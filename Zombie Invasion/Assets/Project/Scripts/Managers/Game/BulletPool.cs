@@ -5,8 +5,8 @@ public class BulletPool : MonoBehaviour
 {
     [SerializeField] private WeaponSettings weaponSettings;
 
-    private Queue<Bullet> bulletPool = new Queue<Bullet>();
-    private List<Bullet> activeBullets = new List<Bullet>();
+    private Queue<BulletController> bulletPool = new Queue<BulletController>();
+    private List<BulletController> activeBullets = new List<BulletController>();
 
     private void Start()
     {
@@ -27,11 +27,11 @@ public class BulletPool : MonoBehaviour
         for (int i = 0; i < weaponSettings.PoolSize; i++)
         {
             GameObject bulletObj = Instantiate(weaponSettings.BulletPrefab, bulletContainer.transform);
-            Bullet bullet = bulletObj.GetComponent<Bullet>();
+            BulletController bulletController = bulletObj.GetComponent<BulletController>();
 
-            if (bullet == null)
+            if (bulletController == null)
             {
-                bullet = bulletObj.AddComponent<Bullet>();
+                bulletController = bulletObj.AddComponent<BulletController>();
             }
 
             if (bulletObj.GetComponent<Collider>() == null)
@@ -42,34 +42,34 @@ public class BulletPool : MonoBehaviour
             }
 
             bulletObj.SetActive(false);
-            bulletPool.Enqueue(bullet);
+            bulletPool.Enqueue(bulletController);
         }
     }
 
-    public Bullet GetBullet()
+    public BulletController GetBullet()
     {
         if (bulletPool.Count > 0)
         {
-            Bullet bullet = bulletPool.Dequeue();
-            activeBullets.Add(bullet);
-            bullet.gameObject.SetActive(true);
-            return bullet;
+            BulletController bulletController = bulletPool.Dequeue();
+            activeBullets.Add(bulletController);
+            bulletController.gameObject.SetActive(true);
+            return bulletController;
         }
 
         Debug.LogWarning("No bullets available in pool!");
         return null;
     }
 
-    public void ReturnBullet(Bullet bullet)
+    public void ReturnBullet(BulletController bulletController)
     {
-        if (bullet == null) return;
+        if (bulletController == null) return;
 
-        bullet.ResetBullet();
+        bulletController.ResetBullet();
 
-        activeBullets.Remove(bullet);
+        activeBullets.Remove(bulletController);
 
-        bullet.gameObject.SetActive(false);
-        bulletPool.Enqueue(bullet);
+        bulletController.gameObject.SetActive(false);
+        bulletPool.Enqueue(bulletController);
     }
 
     private void OnDestroy()

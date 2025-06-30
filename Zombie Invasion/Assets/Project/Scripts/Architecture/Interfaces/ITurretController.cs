@@ -7,7 +7,15 @@ public interface ITurretController
 
     void EnableControl();
     void DisableControl();
+    void SetRotation(float angle);
     void ResetRotation();
 
-    event Action<float> OnRotationChanged;
+    //Delete in future
+    void Fire();
+
+    bool CanFire();
+    //===============================================
+    
+    //event Action<float> OnRotationChanged;
+    public event Action OnGamePlaying;
 }

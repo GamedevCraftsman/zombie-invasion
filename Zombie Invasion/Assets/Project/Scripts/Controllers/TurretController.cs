@@ -5,22 +5,18 @@ using Zenject;
 
 public class TurretController : BaseController, ITurretController
 {
-    [Header("References")] [SerializeField]
-    private Transform turretTransform;
+    [Header("References")] 
+    [SerializeField] private Transform turretTransform;
 
     [SerializeField] private Transform firePoint;
     [SerializeField] private BulletPool bulletPool;
 
-    [Header("Settings")] [SerializeField] private WeaponSettings weaponSettings;
-
     // Injected dependencies
-    [Inject] private IInputController inputController;
-
-    // State
+    [Inject] private WeaponSettings _weaponSettings;
+    
+    //State
     private bool controlEnabled = false;
     private float currentRotationAngle = 0f;
-    private bool isDragging = false;
-    private Vector2 lastInputPosition;
 
     // Shooting state
     private float lastFireTime = 0f;
@@ -30,14 +26,15 @@ public class TurretController : BaseController, ITurretController
     public float CurrentRotationAngle => currentRotationAngle;
 
     // Events
-    public event Action<float> OnRotationChanged;
+    //public event Action<float> OnRotationChanged;
+    public event Action OnGamePlaying;
+    
 
     protected override Task Initialize()
     {
         try
         {
             ValidateComponents();
-            SubscribeToEvents();
             ResetRotation();
         }
         catch (Exception e)
@@ -66,175 +63,55 @@ public class TurretController : BaseController, ITurretController
             Debug.LogError("BulletPool is null! Please assign bullet pool");
         }
 
-        if (weaponSettings == null)
+        if (_weaponSettings == null)
         {
             Debug.LogError("WeaponSettings is null!");
         }
     }
-
-    private void SubscribeToEvents()
-    {
-        EventBus.Subscribe<StartGameEvent>(OnGameStarted);
-        EventBus.Subscribe<GameOverEvent>(OnGameOver);
-        EventBus.Subscribe<CarReachedEndEvent>(OnCarReached);
-    }
-
-    private void UnsubscribeFromEvents()
-    {
-        EventBus?.Unsubscribe<StartGameEvent>(OnGameStarted);
-        EventBus?.Unsubscribe<GameOverEvent>(OnGameOver);
-        EventBus?.Unsubscribe<CarReachedEndEvent>(OnCarReached);
-    }
-
-    private void OnGameStarted(StartGameEvent gameStartedEvent)
-    {
-        EnableControl();
-    }
-
-    private void OnGameOver(GameOverEvent gameOverEvent)
-    {
-        DisableControl();
-        ResetRotation();
-    }
-
-    private void OnCarReached(CarReachedEndEvent carReachedEndEvent)
-    {
-        DisableControl();
-        ResetRotation();
-    }
-
+    
     private void Update()
     {
-        if (!controlEnabled || weaponSettings == null) return;
+        if (!controlEnabled || _weaponSettings == null) return;
 
-        HandleInput();
-        HandleShooting();
+        OnGamePlaying?.Invoke();
+        //HandleInput();
+        //HandleShooting();
     }
-
-    private void HandleInput()
+    
+    public bool CanFire()
     {
-        InputType inputType = inputController.LastInputType;
-
-        if (inputType == InputType.Mouse || inputType == InputType.None)
-        {
-            HandleMouseInput();
-        }
-        else if (inputType == InputType.Touch)
-        {
-            HandleTouchInput();
-        }
+        return Time.time >= lastFireTime + _weaponSettings.FireRate;
     }
 
-    private void HandleShooting()
-    {
-        if (isDragging && CanFire())
-        {
-            Fire();
-        }
-    }
-
-    private bool CanFire()
-    {
-        return Time.time >= lastFireTime + weaponSettings.FireRate;
-    }
-
-    private void Fire()
+    public void Fire()
     {
         if (bulletPool == null || firePoint == null) return;
 
-        Bullet bullet = bulletPool.GetBullet();
-        if (bullet == null) return;
+        BulletController bulletController = bulletPool.GetBullet();
+        if (bulletController == null) return;
 
-        bullet.transform.position = firePoint.position;
-        bullet.transform.rotation = firePoint.rotation;
+        bulletController.transform.position = firePoint.position;
+        bulletController.transform.rotation = firePoint.rotation;
 
-        bullet.Initialize(
-            weaponSettings.BulletSpeed,
-            weaponSettings.BulletDamage,
-            weaponSettings.BulletLifetime,
+        bulletController.Initialize(
+            _weaponSettings.BulletSpeed,
+            _weaponSettings.BulletDamage,
+            _weaponSettings.BulletLifetime,
             bulletPool
         );
 
         lastFireTime = Time.time;
     }
 
-    private void HandleMouseInput()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            StartDragging(Input.mousePosition);
-        }
-        else if (Input.GetMouseButton(0) && isDragging)
-        {
-            ContinueDragging(Input.mousePosition);
-        }
-        else if (Input.GetMouseButtonUp(0))
-        {
-            StopDragging();
-        }
-    }
-
-    private void HandleTouchInput()
-    {
-        if (Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-
-            switch (touch.phase)
-            {
-                case TouchPhase.Began:
-                    StartDragging(touch.position);
-                    break;
-
-                case TouchPhase.Moved when isDragging:
-                    ContinueDragging(touch.position);
-                    break;
-
-                case TouchPhase.Ended:
-                case TouchPhase.Canceled:
-                    StopDragging();
-                    break;
-            }
-        }
-    }
-
-    private void StartDragging(Vector2 inputPosition)
-    {
-        isDragging = true;
-        lastInputPosition = inputPosition;
-    }
-
-    private void ContinueDragging(Vector2 currentInputPosition)
-    {
-        if (!isDragging) return;
-
-        Vector2 deltaPosition = currentInputPosition - lastInputPosition;
-
-        float horizontalDelta = deltaPosition.x * weaponSettings.InputSensitivity;
-
-        float rotationDelta = horizontalDelta * weaponSettings.RotationSpeed * Time.deltaTime * 0.01f;
-        float newAngle = currentRotationAngle + rotationDelta;
-
-        newAngle = Mathf.Clamp(newAngle, -weaponSettings.MaxRotationAngle, weaponSettings.MaxRotationAngle);
-
-        SetRotation(newAngle);
-
-        lastInputPosition = currentInputPosition;
-    }
-
-    private void StopDragging()
-    {
-        isDragging = false;
-    }
-
-    private void SetRotation(float angle)
+   
+    public void SetRotation(float angle)
     {
         currentRotationAngle = angle;
 
         turretTransform.localRotation = Quaternion.Euler(0f, currentRotationAngle, 0f);
-
-        OnRotationChanged?.Invoke(currentRotationAngle);
-        EventBus.Fire(new TurretRotationEvent(currentRotationAngle, weaponSettings.MaxRotationAngle));
+        
+        //OnRotationChanged?.Invoke(currentRotationAngle);
+        //EventBus.Fire(new TurretRotationEvent(currentRotationAngle, _weaponSettings.MaxRotationAngle));
     }
 
     public void EnableControl()
@@ -245,7 +122,6 @@ public class TurretController : BaseController, ITurretController
     public void DisableControl()
     {
         controlEnabled = false;
-        isDragging = false;
     }
 
     public void ResetRotation()
@@ -255,23 +131,24 @@ public class TurretController : BaseController, ITurretController
 
     private void OnDestroy()
     {
-        UnsubscribeFromEvents();
-        OnRotationChanged = null;
+        OnGamePlaying = null;
+        //OnRotationChanged = null;
     }
 
-    // Debug info
+    #region Debud Info
+
     private void OnDrawGizmosSelected()
     {
-        if (weaponSettings == null) return;
+        if (_weaponSettings == null) return;
 
         Vector3 center = transform.position;
         Vector3 forward = transform.forward;
 
-        Vector3 leftBound = Quaternion.Euler(0, -weaponSettings.MaxRotationAngle, 0) * forward;
+        Vector3 leftBound = Quaternion.Euler(0, -_weaponSettings.MaxRotationAngle, 0) * forward;
         Gizmos.color = Color.red;
         Gizmos.DrawRay(center, leftBound * 3f);
 
-        Vector3 rightBound = Quaternion.Euler(0, weaponSettings.MaxRotationAngle, 0) * forward;
+        Vector3 rightBound = Quaternion.Euler(0, _weaponSettings.MaxRotationAngle, 0) * forward;
         Gizmos.color = Color.red;
         Gizmos.DrawRay(center, rightBound * 3f);
 
@@ -285,4 +162,6 @@ public class TurretController : BaseController, ITurretController
             Gizmos.DrawWireSphere(firePoint.position, 0.1f);
         }
     }
+
+    #endregion
 }

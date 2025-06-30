@@ -8,6 +8,7 @@ public class GameInstaller : MonoInstaller
     [SerializeField] private EnemySettings enemySettings;
     [SerializeField] private CarSettings carSettings;
     [SerializeField] private GameSettings gameSettings;
+    [SerializeField] private WeaponSettings weaponSettings;
     
     [Header("Managers")]
     [SerializeField] private CameraManager cameraManager;
@@ -64,7 +65,8 @@ public class GameInstaller : MonoInstaller
             .AsSingle();
 
         Container.Bind<EnemySettings>().FromInstance(enemySettings).AsSingle();
-        Container.Bind<GameSettings>().FromInstance(gameSettings);
+        Container.Bind<GameSettings>().FromInstance(gameSettings).AsSingle();
+        Container.Bind<WeaponSettings>().FromInstance(weaponSettings).AsSingle();
         Container.BindInstance(carSettings).AsSingle();
     }
     
