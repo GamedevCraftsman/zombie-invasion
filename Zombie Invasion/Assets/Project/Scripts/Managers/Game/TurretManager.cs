@@ -8,13 +8,14 @@ public class TurretManager : BaseManager
     [Inject] private WeaponSettings _weaponSettings;
     [Inject] private ITurretController _turretController;  
     [Inject] private IInputController _inputController;
+    [Inject] private IFireController _fireController;
 
     private ITurretInputHandler _inputHandler;
     protected override Task Initialize()
     {
         try
         {
-            _inputHandler = new TurretInputHandler(_turretController, _weaponSettings, _inputController);
+            _inputHandler = new TurretInputHandler(_turretController, _weaponSettings, _inputController,_fireController);
             
             SubscribeToEvents();
         }

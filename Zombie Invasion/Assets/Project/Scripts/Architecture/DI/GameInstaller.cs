@@ -39,6 +39,7 @@ public class GameInstaller : MonoInstaller
         Container.Bind<InputController>().FromComponentInHierarchy().AsSingle();
         Container.Bind<IInputController>().FromComponentInHierarchy().AsSingle();
         Container.Bind<CarHPUIController>().FromComponentInHierarchy().AsSingle();
+        Container.Bind<IFireController>().FromComponentInHierarchy().AsSingle();
         
         Container.Bind<ITurretController>()
             .To<TurretController>()

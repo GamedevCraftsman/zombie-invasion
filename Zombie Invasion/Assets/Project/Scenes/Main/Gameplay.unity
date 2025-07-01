@@ -630,8 +630,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   turretTransform: {fileID: 666431761}
-  firePoint: {fileID: 435677238}
-  bulletPool: {fileID: 20230681}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -694,7 +692,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000
-  field of view: 60
+  field of view: 60.000004
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -720,8 +718,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.3420201, y: 0, z: 0, w: 0.9396927}
-  m_LocalPosition: {x: 0, y: 0.7, z: 1.45}
+  m_LocalRotation: {x: 0.28845683, y: 0.50489646, z: -0.18376724, w: 0.79252875}
+  m_LocalPosition: {x: -0.4, y: 0.4, z: 1.8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2079,6 +2077,7 @@ Transform:
   - {fileID: 1969084541}
   - {fileID: 321096774}
   - {fileID: 1489783317}
+  - {fileID: 991441213}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &815194259
@@ -2518,7 +2517,7 @@ GameObject:
   - component: {fileID: 939838250}
   - component: {fileID: 939838251}
   m_Layer: 0
-  m_Name: UIController
+  m_Name: UI Controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2557,6 +2556,53 @@ MonoBehaviour:
   winPanel: {fileID: 918049778}
   continueGameButton: {fileID: 112027171}
   continueGameLabel: {fileID: 1539943112}
+--- !u!1 &991441212
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 991441213}
+  - component: {fileID: 991441214}
+  m_Layer: 0
+  m_Name: Fire Controller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &991441213
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 991441212}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 787355298}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &991441214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 991441212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01162c57485b3244cbc7a93ddf1405a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turretTransform: {fileID: 666431761}
+  firePoint: {fileID: 435677238}
+  bulletPool: {fileID: 20230681}
 --- !u!1 &1006776233
 GameObject:
   m_ObjectHideFlags: 0
@@ -3895,6 +3941,7 @@ MonoBehaviour:
   - {fileID: 1466068357}
   - {fileID: 321096775}
   - {fileID: 939838251}
+  - {fileID: 991441214}
 --- !u!1 &1969084540
 GameObject:
   m_ObjectHideFlags: 0

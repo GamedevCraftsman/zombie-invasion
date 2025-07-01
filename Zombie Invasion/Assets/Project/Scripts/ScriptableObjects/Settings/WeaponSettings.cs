@@ -17,9 +17,9 @@ public class WeaponSettings : ScriptableObject
     [Header("Turret Rotation")] [SerializeField, Range(30f, 180f)]
     private float maxRotationAngle = 90f;
 
-    [SerializeField, Range(50, 150)] private float rotationSpeed = 50f;
+    [SerializeField, Range(0, 5)] private float rotationSpeed = 50f;
 
-    [Header("Input Sensitivity")] [SerializeField, Range(0.1f, 10f)]
+    [Header("Input Sensitivity")] [SerializeField, Range(0.5f, 5f)]
     private float inputSensitivity = 1f;
 
     #region Public Values

@@ -1,28 +1,24 @@
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
 public class TurretController : BaseController, ITurretController
 {
-    [Header("References")] 
+    
     [SerializeField] private Transform turretTransform;
-
-    [SerializeField] private Transform firePoint;
-    [SerializeField] private BulletPool bulletPool;
-
-    // Injected dependencies
-    [Inject] private WeaponSettings _weaponSettings;
     
     //State
-    private bool controlEnabled = false;
+    //private bool controlEnabled = false;
     private float currentRotationAngle = 0f;
+    private IEnumerator _checkInput;
 
     // Shooting state
-    private float lastFireTime = 0f;
+ 
 
     // Properties
-    public bool IsControlEnabled => controlEnabled;
+    //public bool IsControlEnabled => controlEnabled;
     public float CurrentRotationAngle => currentRotationAngle;
 
     // Events
@@ -47,7 +43,7 @@ public class TurretController : BaseController, ITurretController
 
     private void ValidateComponents()
     {
-        if (turretTransform == null)
+        /*if (turretTransform == null)
         {
             turretTransform = transform;
             Debug.LogWarning("TurretTransform is null! Use current transform");
@@ -62,47 +58,28 @@ public class TurretController : BaseController, ITurretController
         {
             Debug.LogError("BulletPool is null! Please assign bullet pool");
         }
+        */
 
-        if (_weaponSettings == null)
+        // if (_weaponSettings == null)
+        // {
+        //     Debug.LogError("WeaponSettings is null!");
+        // }
+        
+        _checkInput = CheckInput();
+    }
+    
+    private IEnumerator CheckInput()
+    {
+        //if (_weaponSettings == null) yield break;
+        
+        while (true)
         {
-            Debug.LogError("WeaponSettings is null!");
+            OnGamePlaying?.Invoke();
+            yield return null;
         }
     }
     
-    private void Update()
-    {
-        if (!controlEnabled || _weaponSettings == null) return;
-
-        OnGamePlaying?.Invoke();
-        //HandleInput();
-        //HandleShooting();
-    }
     
-    public bool CanFire()
-    {
-        return Time.time >= lastFireTime + _weaponSettings.FireRate;
-    }
-
-    public void Fire()
-    {
-        if (bulletPool == null || firePoint == null) return;
-
-        BulletController bulletController = bulletPool.GetBullet();
-        if (bulletController == null) return;
-
-        bulletController.transform.position = firePoint.position;
-        bulletController.transform.rotation = firePoint.rotation;
-
-        bulletController.Initialize(
-            _weaponSettings.BulletSpeed,
-            _weaponSettings.BulletDamage,
-            _weaponSettings.BulletLifetime,
-            bulletPool
-        );
-
-        lastFireTime = Time.time;
-    }
-
    
     public void SetRotation(float angle)
     {
@@ -116,12 +93,16 @@ public class TurretController : BaseController, ITurretController
 
     public void EnableControl()
     {
-        controlEnabled = true;
+        //controlEnabled = true;
+        StartCoroutine(_checkInput);
+        Debug.Log("EnableControl");
     }
 
     public void DisableControl()
     {
-        controlEnabled = false;
+        //controlEnabled = false;
+        StopCoroutine(_checkInput);
+        Debug.Log("DisableControl");
     }
 
     public void ResetRotation()
@@ -134,34 +115,4 @@ public class TurretController : BaseController, ITurretController
         OnGamePlaying = null;
         //OnRotationChanged = null;
     }
-
-    #region Debud Info
-
-    private void OnDrawGizmosSelected()
-    {
-        if (_weaponSettings == null) return;
-
-        Vector3 center = transform.position;
-        Vector3 forward = transform.forward;
-
-        Vector3 leftBound = Quaternion.Euler(0, -_weaponSettings.MaxRotationAngle, 0) * forward;
-        Gizmos.color = Color.red;
-        Gizmos.DrawRay(center, leftBound * 3f);
-
-        Vector3 rightBound = Quaternion.Euler(0, _weaponSettings.MaxRotationAngle, 0) * forward;
-        Gizmos.color = Color.red;
-        Gizmos.DrawRay(center, rightBound * 3f);
-
-        Vector3 currentDirection = Quaternion.Euler(0, currentRotationAngle, 0) * forward;
-        Gizmos.color = Color.green;
-        Gizmos.DrawRay(center, currentDirection * 4f);
-
-        if (firePoint != null)
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(firePoint.position, 0.1f);
-        }
-    }
-
-    #endregion
 }

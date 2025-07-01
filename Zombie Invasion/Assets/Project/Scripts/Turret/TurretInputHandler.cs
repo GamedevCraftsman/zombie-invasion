@@ -5,15 +5,17 @@ public class TurretInputHandler : ITurretInputHandler
     private readonly WeaponSettings _weaponSettings; 
     private readonly IInputController _inputController;
     private readonly ITurretController _turretController;
+    private readonly IFireController _fireController;
     
     private bool _isDragging;
     private Vector2 _lastInputPosition;
 
-    public TurretInputHandler(ITurretController turretController, WeaponSettings weaponSettings, IInputController inputController)
+    public TurretInputHandler(ITurretController turretController, WeaponSettings weaponSettings, IInputController inputController, IFireController fireController)
     {
         _turretController = turretController;
         _weaponSettings = weaponSettings;
         _inputController = inputController;
+        _fireController = fireController;
         
         Initialize();
     }
@@ -26,14 +28,14 @@ public class TurretInputHandler : ITurretInputHandler
     
     private void HandleShooting()
     {
-        if (_isDragging && _turretController.CanFire())
+        if (_isDragging && _fireController.CanFire())
         {
-            _turretController.Fire();
+            _fireController.Fire();
         }
     }
 
     #region Turret Movement
-    public void HandleInput()
+    private void HandleInput()
     {
         InputType inputType = _inputController.LastInputType;
 
@@ -98,16 +100,16 @@ public class TurretInputHandler : ITurretInputHandler
         if (!_isDragging) return;
 
         Vector2 deltaPosition = currentInputPosition - _lastInputPosition;
-
         float horizontalDelta = deltaPosition.x * _weaponSettings.InputSensitivity;
 
-        float rotationDelta = horizontalDelta * _weaponSettings.RotationSpeed * Time.deltaTime * 0.01f;
+        // Прибираємо 0.01f - він робить рух залежним від FPS
+        float rotationDelta = horizontalDelta * _weaponSettings.RotationSpeed * Time.deltaTime;
         float newAngle = _turretController.CurrentRotationAngle + rotationDelta;
 
         newAngle = Mathf.Clamp(newAngle, -_weaponSettings.MaxRotationAngle, _weaponSettings.MaxRotationAngle);
 
         _turretController.SetRotation(newAngle);
-        
+    
         _lastInputPosition = currentInputPosition;
     }
 
