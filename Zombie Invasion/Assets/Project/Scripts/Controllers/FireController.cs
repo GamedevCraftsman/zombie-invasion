@@ -11,7 +11,6 @@ public class FireController : BaseController, IFireController
     [SerializeField] private Transform firePoint;
     [SerializeField] private BulletPool bulletPool;
     
-    // Injected dependencies
     [Inject] private WeaponSettings _weaponSettings;
     
     private float _lastFireTime = 0f;
@@ -59,11 +58,10 @@ public class FireController : BaseController, IFireController
     {
         if (bulletPool == null || firePoint == null || !CanFire()) return;
 
-        BulletController bulletController = bulletPool.GetBullet();
+        IBulletController bulletController = bulletPool.GetBullet();
         if (bulletController == null) return;
-
-        bulletController.transform.position = firePoint.position;
-        bulletController.transform.rotation = firePoint.rotation;
+        
+        bulletController.SetFirePoint(firePoint);
 
         bulletController.Initialize(
             _weaponSettings.BulletSpeed,

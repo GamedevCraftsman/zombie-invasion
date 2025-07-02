@@ -8,7 +8,6 @@ public class TurretController : BaseController, ITurretController
     [SerializeField] private Transform turretTransform;
     
     private IEnumerator _checkInput;
-    
     public event Action OnGamePlaying;
     
     protected override Task Initialize()

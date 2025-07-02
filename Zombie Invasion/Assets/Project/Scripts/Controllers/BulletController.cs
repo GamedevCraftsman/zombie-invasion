@@ -1,15 +1,20 @@
 using System.Collections;
 using UnityEngine;
 
-public class BulletController : MonoBehaviour
+[RequireComponent(typeof(Collider))]
+public class BulletController : MonoBehaviour, IBulletController
 {
     private float _speed;
     private int _damage;
     private float _lifetime;
+    
     private BulletPool _bulletPool;
     private Vector3 _direction;
+    
     private bool _isActive;
     
+    private Coroutine _coroutine;
+    WaitForSeconds _wait;
     public void Initialize(float bulletSpeed, int bulletDamage, float bulletLifetime, BulletPool pool)
     {
         _speed = bulletSpeed;
@@ -19,9 +24,22 @@ public class BulletController : MonoBehaviour
         _direction = transform.forward;
         _isActive = true;
         
-        StartCoroutine(LifetimeTimer());
+        //Coroutine properties
+        _wait = new WaitForSeconds(_lifetime);
+        _coroutine = StartCoroutine(LifetimeTimer());
     }
-    
+
+    public void ChangeBulletState(bool state)
+    {
+        gameObject.SetActive(state);
+    }
+
+    public void SetFirePoint(Transform firePoint)
+    {
+        transform.position = firePoint.position;
+        transform.rotation = firePoint.rotation;
+    }
+
     private void FixedUpdate()
     {
         if (!_isActive) return;
@@ -44,7 +62,7 @@ public class BulletController : MonoBehaviour
     
     private IEnumerator LifetimeTimer()
     {
-        yield return new WaitForSeconds(_lifetime);
+        yield return _wait;
         ReturnToPool();
     }
     
@@ -54,7 +72,7 @@ public class BulletController : MonoBehaviour
         
         _isActive = false;
         
-        StopAllCoroutines();
+        StopCoroutine(_coroutine);
         
         if (_bulletPool != null)
         {
@@ -64,7 +82,7 @@ public class BulletController : MonoBehaviour
     
     public void ResetBullet()
     {
-        StopAllCoroutines();
+        StopCoroutine(_coroutine);
         _isActive = false;
         _direction = Vector3.forward;
     }

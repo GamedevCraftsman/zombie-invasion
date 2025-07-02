@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 public class BulletPool : MonoBehaviour
 {
-    [SerializeField] private WeaponSettings weaponSettings;
+    [Inject] private WeaponSettings _weaponSettings;
 
-    private readonly Queue<BulletController> _bulletPool = new Queue<BulletController>();
-    private readonly List<BulletController> _activeBullets = new List<BulletController>();
+    private readonly Queue<IBulletController> _bulletPool = new ();
+    private readonly List<IBulletController> _activeBullets = new ();
 
     private void Start()
     {
@@ -15,52 +16,57 @@ public class BulletPool : MonoBehaviour
 
     private void InitializePool()
     {
-        if (weaponSettings == null || weaponSettings.BulletPrefab == null)
+        if (_weaponSettings == null || _weaponSettings.BulletPrefab == null)
         {
             Debug.LogError("WeaponSettings or bulletPrefab is null!");
             return;
         }
+        
+        SpawnBullets();
+    }
 
-        GameObject bulletContainer = new GameObject("Bullet Container");
-        bulletContainer.transform.SetParent(transform);
-
-        for (int i = 0; i < weaponSettings.PoolSize; i++)
+    private void SpawnBullets()
+    {
+        for (int i = 0; i < _weaponSettings.PoolSize; i++)
         {
-            GameObject bulletObj = Instantiate(weaponSettings.BulletPrefab, bulletContainer.transform);
-            BulletController bulletController = bulletObj.GetComponent<BulletController>();
+            GameObject bulletObj = Instantiate(_weaponSettings.BulletPrefab, this.transform);
+            IBulletController bulletController = bulletObj.GetComponent<IBulletController>();
 
-            if (bulletController == null)
-            {
-                bulletController = bulletObj.AddComponent<BulletController>();
-            }
-
-            if (bulletObj.GetComponent<Collider>() == null)
-            {
-                SphereCollider collider = bulletObj.AddComponent<SphereCollider>();
-                collider.isTrigger = true;
-                collider.radius = 0.1f;
-            }
+            Validate(bulletController);
 
             bulletObj.SetActive(false);
             _bulletPool.Enqueue(bulletController);
         }
     }
-
-    public BulletController GetBullet()
+    
+    private void Validate(IBulletController bulletController)
+    {
+        if (bulletController == null)
+        {
+            Debug.LogError("BulletController is null!");
+        }
+    }
+    
+    public IBulletController GetBullet()
     {
         if (_bulletPool.Count > 0)
         {
-            BulletController bulletController = _bulletPool.Dequeue();
-            _activeBullets.Add(bulletController);
-            bulletController.gameObject.SetActive(true);
-            return bulletController;
+            return Get();
         }
 
         Debug.LogWarning("No bullets available in pool!");
         return null;
     }
 
-    public void ReturnBullet(BulletController bulletController)
+    private IBulletController Get()
+    {
+        IBulletController bulletController = _bulletPool.Dequeue();
+        _activeBullets.Add(bulletController);
+        bulletController.ChangeBulletState(true);
+        return bulletController;
+    }
+    
+    public void ReturnBullet(IBulletController bulletController)
     {
         if (bulletController == null) return;
 
@@ -68,13 +74,12 @@ public class BulletPool : MonoBehaviour
 
         _activeBullets.Remove(bulletController);
 
-        bulletController.gameObject.SetActive(false);
+        bulletController.ChangeBulletState(false);
         _bulletPool.Enqueue(bulletController);
     }
 
     private void OnDestroy()
     {
-        // Очищуємо при знищенні
         _bulletPool.Clear();
         _activeBullets.Clear();
     }
