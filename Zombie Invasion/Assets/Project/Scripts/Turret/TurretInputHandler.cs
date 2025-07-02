@@ -7,6 +7,7 @@ public class TurretInputHandler : ITurretInputHandler
     private readonly ITurretController _turretController;
     private readonly IFireController _fireController;
     
+    private float _currentRotationAngle = 0;
     private bool _isDragging;
     private Vector2 _lastInputPosition;
 
@@ -25,15 +26,16 @@ public class TurretInputHandler : ITurretInputHandler
         _turretController.OnGamePlaying += HandleInput;
         _turretController.OnGamePlaying += HandleShooting;
     }
-    
+
+    #region Turret Shooting
     private void HandleShooting()
     {
-        if (_isDragging && _fireController.CanFire())
+        if (_isDragging)
         {
             _fireController.Fire();
         }
     }
-
+    #endregion
     #region Turret Movement
     private void HandleInput()
     {
@@ -98,21 +100,24 @@ public class TurretInputHandler : ITurretInputHandler
     private void ContinueDragging(Vector2 currentInputPosition)
     {
         if (!_isDragging) return;
-
-        Vector2 deltaPosition = currentInputPosition - _lastInputPosition;
-        float horizontalDelta = deltaPosition.x * _weaponSettings.InputSensitivity;
-
-        // Прибираємо 0.01f - він робить рух залежним від FPS
-        float rotationDelta = horizontalDelta * _weaponSettings.RotationSpeed * Time.deltaTime;
-        float newAngle = _turretController.CurrentRotationAngle + rotationDelta;
-
-        newAngle = Mathf.Clamp(newAngle, -_weaponSettings.MaxRotationAngle, _weaponSettings.MaxRotationAngle);
-
-        _turretController.SetRotation(newAngle);
-    
+        _turretController.SetRotation(MoveAngleCalculation(currentInputPosition));
         _lastInputPosition = currentInputPosition;
     }
 
+    private float MoveAngleCalculation(Vector2 currentInputPosition)
+    {
+        Vector2 deltaPosition = currentInputPosition - _lastInputPosition;
+        float horizontalDelta = deltaPosition.x * _weaponSettings.InputSensitivity;
+        
+        float screenMultiplier = _weaponSettings.BaseScreenSize / Screen.width;
+        float rotationDelta = horizontalDelta * (_weaponSettings.RotationSpeed * screenMultiplier) * Time.deltaTime;
+        float newAngle = _currentRotationAngle + rotationDelta;
+
+        newAngle = Mathf.Clamp(newAngle, -_weaponSettings.MaxRotationAngle, _weaponSettings.MaxRotationAngle);
+        _currentRotationAngle = newAngle;
+        return newAngle;
+    }
+    
     public void StopDragging()
     {
         _isDragging = false;

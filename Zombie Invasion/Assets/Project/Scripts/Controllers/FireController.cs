@@ -14,7 +14,7 @@ public class FireController : BaseController, IFireController
     // Injected dependencies
     [Inject] private WeaponSettings _weaponSettings;
     
-    private float lastFireTime = 0f;
+    private float _lastFireTime = 0f;
     
     protected override Task Initialize()
     {
@@ -50,14 +50,14 @@ public class FireController : BaseController, IFireController
         }
     }
     
-    public bool CanFire()
+    private bool CanFire()
     {
-        return Time.time >= lastFireTime + _weaponSettings.FireRate;
+        return Time.time >= _lastFireTime + _weaponSettings.FireRate;
     }
 
     public void Fire()
     {
-        if (bulletPool == null || firePoint == null) return;
+        if (bulletPool == null || firePoint == null || !CanFire()) return;
 
         BulletController bulletController = bulletPool.GetBullet();
         if (bulletController == null) return;
@@ -72,6 +72,6 @@ public class FireController : BaseController, IFireController
             bulletPool
         );
 
-        lastFireTime = Time.time;
+        _lastFireTime = Time.time;
     }
 }

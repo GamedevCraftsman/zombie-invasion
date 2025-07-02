@@ -5,8 +5,8 @@ public class BulletPool : MonoBehaviour
 {
     [SerializeField] private WeaponSettings weaponSettings;
 
-    private Queue<BulletController> bulletPool = new Queue<BulletController>();
-    private List<BulletController> activeBullets = new List<BulletController>();
+    private readonly Queue<BulletController> _bulletPool = new Queue<BulletController>();
+    private readonly List<BulletController> _activeBullets = new List<BulletController>();
 
     private void Start()
     {
@@ -42,16 +42,16 @@ public class BulletPool : MonoBehaviour
             }
 
             bulletObj.SetActive(false);
-            bulletPool.Enqueue(bulletController);
+            _bulletPool.Enqueue(bulletController);
         }
     }
 
     public BulletController GetBullet()
     {
-        if (bulletPool.Count > 0)
+        if (_bulletPool.Count > 0)
         {
-            BulletController bulletController = bulletPool.Dequeue();
-            activeBullets.Add(bulletController);
+            BulletController bulletController = _bulletPool.Dequeue();
+            _activeBullets.Add(bulletController);
             bulletController.gameObject.SetActive(true);
             return bulletController;
         }
@@ -66,16 +66,16 @@ public class BulletPool : MonoBehaviour
 
         bulletController.ResetBullet();
 
-        activeBullets.Remove(bulletController);
+        _activeBullets.Remove(bulletController);
 
         bulletController.gameObject.SetActive(false);
-        bulletPool.Enqueue(bulletController);
+        _bulletPool.Enqueue(bulletController);
     }
 
     private void OnDestroy()
     {
         // Очищуємо при знищенні
-        bulletPool.Clear();
-        activeBullets.Clear();
+        _bulletPool.Clear();
+        _activeBullets.Clear();
     }
 }
