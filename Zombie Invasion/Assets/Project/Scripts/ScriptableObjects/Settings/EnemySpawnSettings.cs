@@ -12,10 +12,10 @@ public class EnemySpawnSettings : ScriptableObject
     [SerializeField, Min(1)] private int enemyPoolInitialSize = 60;
 
     [Header("Spawn Area Settings")]
-    [SerializeField, Min(0f)] private float sideXOffsetRange = 2f;
-    [SerializeField, Min(0f)] private float sideZOffsetRange = 2f;
+    [SerializeField, Range(0, 1)] private float sideXOffsetRange = 2f;
+    [SerializeField, Range(0, 2)] private float sideZOffsetRange = 2f;
 
-    [Header("Sapwn distance")]
+    [Header("Spawn distance")]
     [SerializeField] private float _minSpawnDistance = 2f;
 
     #region Public Properties

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 using Zenject;
 
 public class GameInstaller : MonoInstaller
@@ -40,6 +41,7 @@ public class GameInstaller : MonoInstaller
         Container.Bind<IInputController>().FromComponentInHierarchy().AsSingle();
         Container.Bind<CarHPUIController>().FromComponentInHierarchy().AsSingle();
         Container.Bind<IFireController>().FromComponentInHierarchy().AsSingle();
+        Container.Bind<ICarController>().FromComponentInHierarchy().AsSingle();
         
         Container.Bind<ITurretController>()
             .To<TurretController>()

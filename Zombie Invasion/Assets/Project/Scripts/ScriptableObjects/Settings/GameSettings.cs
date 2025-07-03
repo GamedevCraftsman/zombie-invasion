@@ -12,4 +12,14 @@ public class GameSettings : ScriptableObject
     public int MapLength => mapLength;
     public GameObject MapTilePrefab => mapTilePrefab;
     public float DistanceBetweenTiles => distanceBetweenTiles;
+    
+    public float LvlLenghtCalculation(Transform carTransform)
+    {
+        //Round to the nearest tenth.
+        float lvlLenght = Mathf.Round((carTransform.position.z 
+                                       + (mapLength - 1) 
+                                       * distanceBetweenTiles) * 10f) / 10f; 
+        
+        return lvlLenght;
+    }
 }

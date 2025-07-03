@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 20230680}
   - component: {fileID: 20230681}
   m_Layer: 0
-  m_Name: BulletPool
+  m_Name: Bullet Pool
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -167,7 +167,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c3d55b9a24b67a4ba3007525f411530, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponSettings: {fileID: 11400000, guid: b72c5f421adda404d8eb92f76fdde77d, type: 2}
 --- !u!1 &43532042
 GameObject:
   m_ObjectHideFlags: 0
@@ -548,6 +547,7 @@ Transform:
   - {fileID: 815194261}
   - {fileID: 20230680}
   - {fileID: 1972937262}
+  - {fileID: 1240649891}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &189070516
@@ -785,11 +785,11 @@ MonoBehaviour:
   m_ShowCameraFrustum: 1
   m_IgnoreTimeScale: 0
   m_WorldUpOverride: {fileID: 0}
-  m_UpdateMethod: 0
+  m_UpdateMethod: 2
   m_BlendUpdateMethod: 0
   m_DefaultBlend:
     m_Style: 1
-    m_Time: 0.5
+    m_Time: 1
     m_CustomCurve:
       serializedVersion: 2
       m_Curve: []
@@ -3098,6 +3098,50 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1240649890
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1240649891}
+  - component: {fileID: 1240649892}
+  m_Layer: 0
+  m_Name: Car Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1240649891
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240649890}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 186896867}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1240649892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240649890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 160076d4d2bc4095893c33b890ad5336, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1284950867
 GameObject:
   m_ObjectHideFlags: 0
@@ -3933,6 +3977,7 @@ MonoBehaviour:
   - {fileID: 2020676611}
   - {fileID: 104034830}
   - {fileID: 1972937263}
+  - {fileID: 1240649892}
   controllersInOrder:
   - {fileID: 597822991}
   - {fileID: 1586703802}
@@ -3998,7 +4043,7 @@ GameObject:
   - component: {fileID: 1972937262}
   - component: {fileID: 1972937263}
   m_Layer: 0
-  m_Name: TurretManager
+  m_Name: Turret Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

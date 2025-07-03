@@ -6,10 +6,10 @@ using Zenject;
 public class GameManager : BaseManager, IGameManager
 {
     // Dependencies
-    [Inject] private CarController carController;
+    //[Inject] private CarController carController;
     [Inject] private HPManager hpManager;
     [Inject] private InputController inputController;
-    [Inject] private CarHPUIController hpUIController;
+    //[Inject] private CarHPUIController hpUIController;
 
     // State
     private GameState currentState = GameState.Menu;
