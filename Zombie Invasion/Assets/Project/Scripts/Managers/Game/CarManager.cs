@@ -48,7 +48,6 @@ public class CarManager : BaseManager
     private void OnGameStarted(StartGameEvent startEvent)
     {
         _carController.StartMovement();
-        //_carController.LvlLenghtCalculation();
     }
 
     private void OnRestartGame(RestarGameEvent restartEvent)

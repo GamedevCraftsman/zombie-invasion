@@ -10,6 +10,7 @@ public class GameInstaller : MonoInstaller
     [SerializeField] private CarSettings carSettings;
     [SerializeField] private GameSettings gameSettings;
     [SerializeField] private WeaponSettings weaponSettings;
+    [SerializeField] private GameplayUISettings gameplayUISettings;
     
     [Header("Managers")]
     [SerializeField] private CameraManager cameraManager;
@@ -42,6 +43,7 @@ public class GameInstaller : MonoInstaller
         Container.Bind<CarHPUIController>().FromComponentInHierarchy().AsSingle();
         Container.Bind<IFireController>().FromComponentInHierarchy().AsSingle();
         Container.Bind<ICarController>().FromComponentInHierarchy().AsSingle();
+        Container.Bind<ICarHPUIController>().FromComponentInHierarchy().AsSingle();
         
         Container.Bind<ITurretController>()
             .To<TurretController>()
@@ -71,6 +73,7 @@ public class GameInstaller : MonoInstaller
         Container.Bind<GameSettings>().FromInstance(gameSettings).AsSingle();
         Container.Bind<WeaponSettings>().FromInstance(weaponSettings).AsSingle();
         Container.BindInstance(carSettings).AsSingle();
+        Container.BindInstance(gameplayUISettings).AsSingle();
     }
     
     private IPool<EnemyController> CreateEnemyPool(InjectContext context)

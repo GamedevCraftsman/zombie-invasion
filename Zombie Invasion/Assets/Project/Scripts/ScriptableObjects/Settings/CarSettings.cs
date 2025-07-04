@@ -9,13 +9,13 @@ public class CarSettings : ScriptableObject
     [SerializeField] private float acceleration = 5f;
 
     [Header("Health")] 
-    [SerializeField] private int maxHP = 100;
+    [SerializeField] private int maxHp = 100;
 
     #region Public Values
 
     public float Speed => speed;
     public float Acceleration => acceleration;
-    public int MaxHP => maxHP;
+    public int MaxHP => maxHp;
     public Vector3 CarStartPosition => carStartPosition;
 
     #endregion

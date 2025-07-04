@@ -12,7 +12,7 @@ public class HPManager : BaseManager
     // State
     private int _currentHp;
     private int _maxHp;
-    
+
     public bool IsAlive => _currentHp > 0;
 
     [Inject]
@@ -21,13 +21,13 @@ public class HPManager : BaseManager
         _carSettings = carSettings;
         _gameManager = gameManager;
     }
-    
+
     protected override Task Initialize()
     {
         try
         {
             _maxHp = _carSettings.MaxHP;
-            ResetHP();
+            ResetHp();
 
             SubscribeToEvents();
         }
@@ -38,6 +38,8 @@ public class HPManager : BaseManager
 
         return Task.CompletedTask;
     }
+
+    #region Events
 
     private void SubscribeToEvents()
     {
@@ -57,7 +59,7 @@ public class HPManager : BaseManager
 
     private void OnGameStarted(StartGameEvent startEvent)
     {
-        ResetHP();
+        ResetHp();
     }
 
     private void OnPlayerDamaged(PlayerDamagedEvent damageEvent)
@@ -67,15 +69,22 @@ public class HPManager : BaseManager
 
     private void OnGameRestart(RestarGameEvent restartEvent)
     {
-        ResetHP();
+        ResetHp();
     }
 
     private void OnGameContinue(ContinueGameEvent continueEvent)
     {
-        ResetHP();
+        ResetHp();
     }
 
-    private void ResetHP()
+    private void OnDestroy()
+    {
+        UnsubscribeFromEvents();
+    }
+
+    #endregion
+
+    private void ResetHp()
     {
         _currentHp = _maxHp;
         FireHpChangedEvent();
@@ -89,15 +98,16 @@ public class HPManager : BaseManager
             return;
         }
 
-        int previousHP = _currentHp;
+        ChangeHp(damageAmount);
+    }
+
+    private void ChangeHp(int damageAmount)
+    {
+        int previousHp = _currentHp;
         _currentHp = Mathf.Max(0, _currentHp - damageAmount);
 
         FireHpChangedEvent();
-
-        if (_currentHp <= 0 && previousHP > 0)
-        {
-            _gameManager.EndGame(false);
-        }
+        IsLoseHp(previousHp);
     }
 
     private void FireHpChangedEvent()
@@ -105,8 +115,11 @@ public class HPManager : BaseManager
         EventBus.Fire(new HPChangedEvent(_currentHp, _maxHp));
     }
 
-    private void OnDestroy()
+    private void IsLoseHp(int previousHp)
     {
-        UnsubscribeFromEvents();
+        if (_currentHp <= 0 && previousHp > 0)
+        {
+            _gameManager.EndGame(false);
+        }
     }
 }
