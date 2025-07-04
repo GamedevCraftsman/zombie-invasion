@@ -82,8 +82,6 @@ public class CarController : BaseController, ICarController
         _currentSpeed = 0f;
     }
     #endregion
-    
-    
     #region Movement
     private void UpdateNormalMovement()
     {
@@ -104,113 +102,26 @@ public class CarController : BaseController, ICarController
         Vector3 movement = Vector3.forward * (_currentSpeed * Time.fixedDeltaTime);
         carTransform.position += movement;
     }
-
-    public void SmoothStop()
-    {
-        StartCoroutine(UpdateWinDeceleration());
-    }
     
-    private IEnumerator UpdateWinDeceleration()
-    {
-        // замінюємо null на WaitForFixedUpdate(), щоб корутина йшла в унісон з фізикою
-        while (_currentSpeed > 0f)
-        {
-            _currentSpeed = Mathf.MoveTowards(
-                _currentSpeed,
-                0f,
-                _carSettings.Deceleration * Time.fixedDeltaTime
-            );
-            yield return null;
-        }
-
-        // потроху вирівнюємо позицію без різкого «стрибка»
-        float startZ = carTransform.position.z;
-        float distanceToCover = _lvlLength - startZ;
-        float t = 0f;
-        float duration = distanceToCover / (_carSettings.Deceleration * Time.fixedDeltaTime); 
-        // або просто кількість ітерацій, але тут краще час
-        while (t < 1f)
-        {
-            t += Time.fixedDeltaTime / duration;
-            float z = Mathf.Lerp(startZ, _lvlLength, t);
-            carTransform.position = new Vector3(carTransform.position.x, 
-                carTransform.position.y, 
-                z);
-            yield return null;
-        }
-
-        // наприкінці ставимо точно
-        carTransform.position = new Vector3(
-            carTransform.position.x,
-            carTransform.position.y,
-            _lvlLength
-        );
-        
-        // фіксуємо позицію точно в кінці рівня
-        Vector3 pos = carTransform.position;
-        carTransform.position = new Vector3(pos.x, pos.y, _lvlLength);
-        
-        Debug.LogWarning("Real stop!");
-        StopMovement();
-        _isGameActive = false;
-        //_gameManager.EndGame(true);
-        
-        
-        /*while (_currentSpeed > 0)
-        {
-            _currentSpeed = Mathf.MoveTowards(
-                _currentSpeed,
-                0f,
-                _carSettings.Deceleration * Time.fixedDeltaTime
-            );
-            
-            yield return null;
-        }
-        
-        StopMovement();
-        _isGameActive = false;*/
-    }
     public void ResetPosition()
          {
              carTransform.position = _carSettings.CarStartPosition;
              ResetCarState();
          }
     #endregion
-    
-     // public void LvlLenghtCalculation()
-     // {
-     //     //Round to the nearest tenth.
-     //     _lvlLength = Mathf.Round((carTransform.position.z 
-     //                               + (_gameSettings.MapLength - 1) 
-     //                               * _gameSettings.DistanceBetweenTiles) * 10f) / 10f; 
-     // }
 
     private void CheckLevelCompletion()
     {
-        
-        // якщо ми вже почали гальмувати — нічого не робимо
-        //if (_isStopping) return;
-
-        // відстань до фінішу
-        float distanceToFinish = _lvlLength - carTransform.position.z;
-
-        // обчислюємо гальмівний шлях: v^2 / (2 * a)
-        float stoppingDistance = (_currentSpeed * _currentSpeed) 
-                                 / (2f * _carSettings.Deceleration);
-
-        //Debug.LogWarning($"Distance to finish: {distanceToFinish}/nStopping distance: {stoppingDistance}");
-        // як тільки залишилося рівно стільки, щоб загальмувати — стартуємо корутину
-        if (distanceToFinish <= stoppingDistance)
+        if (carTransform.position.z >= _lvlLength)
         {
-            Debug.LogWarning("Stopping car");
-            //_isStopping = true;
             _gameManager.EndGame(true);
-            //StartCoroutine(UpdateWinDeceleration());
+            SetCorrectPosition();
         }
-        
-        // if (carTransform.position.z >= _lvlLength)
-        // {
-        //     _gameManager.EndGame(true);
-        // }
+    }
+
+    private void SetCorrectPosition()
+    {
+        Vector3 pos = carTransform.position;
+        carTransform.position = new Vector3(pos.x, pos.y, _lvlLength);
     }
 }

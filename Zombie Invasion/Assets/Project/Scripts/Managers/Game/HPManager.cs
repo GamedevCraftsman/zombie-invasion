@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
@@ -5,21 +6,35 @@ using Zenject;
 public class HPManager : BaseManager
 {
     // Dependencies
-    [Inject] private CarSettings _carSettings;
-    [Inject] private IGameManager _gameManager;
+    private CarSettings _carSettings;
+    private IGameManager _gameManager;
 
     // State
-    private int _currentHP;
-    private int _maxHP;
+    private int _currentHp;
+    private int _maxHp;
     
-    public bool IsAlive => _currentHP > 0;
+    public bool IsAlive => _currentHp > 0;
 
+    [Inject]
+    public void Construct(CarSettings carSettings, IGameManager gameManager)
+    {
+        _carSettings = carSettings;
+        _gameManager = gameManager;
+    }
+    
     protected override Task Initialize()
     {
-        _maxHP = _carSettings.MaxHP;
-        ResetHP();
+        try
+        {
+            _maxHp = _carSettings.MaxHP;
+            ResetHP();
 
-        SubscribeToEvents();
+            SubscribeToEvents();
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
 
         return Task.CompletedTask;
     }
@@ -62,8 +77,8 @@ public class HPManager : BaseManager
 
     private void ResetHP()
     {
-        _currentHP = _maxHP;
-        FireHPChangedEvent();
+        _currentHp = _maxHp;
+        FireHpChangedEvent();
     }
 
     private void TakeDamage(int damageAmount)
@@ -74,20 +89,20 @@ public class HPManager : BaseManager
             return;
         }
 
-        int previousHP = _currentHP;
-        _currentHP = Mathf.Max(0, _currentHP - damageAmount);
+        int previousHP = _currentHp;
+        _currentHp = Mathf.Max(0, _currentHp - damageAmount);
 
-        FireHPChangedEvent();
+        FireHpChangedEvent();
 
-        if (_currentHP <= 0 && previousHP > 0)
+        if (_currentHp <= 0 && previousHP > 0)
         {
             _gameManager.EndGame(false);
         }
     }
 
-    private void FireHPChangedEvent()
+    private void FireHpChangedEvent()
     {
-        EventBus.Fire(new HPChangedEvent(_currentHP, _maxHP));
+        EventBus.Fire(new HPChangedEvent(_currentHp, _maxHp));
     }
 
     private void OnDestroy()

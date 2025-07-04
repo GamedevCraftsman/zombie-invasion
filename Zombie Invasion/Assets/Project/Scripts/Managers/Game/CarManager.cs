@@ -58,7 +58,7 @@ public class CarManager : BaseManager
 
     private void OnReachedEndGame(CarReachedEndEvent carReachedEndEvent)
     {
-        _carController.SmoothStop();
+        _carController.StopMovement();
     }
 
     private void OnGameOver(GameOverEvent gameOverEvent)

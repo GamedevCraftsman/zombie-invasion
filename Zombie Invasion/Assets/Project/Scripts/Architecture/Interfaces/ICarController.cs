@@ -4,9 +4,4 @@ public interface ICarController
     void StartMovement();
     void StopMovement();
     void ResetPosition();
-    
-    void SmoothStop();
-    //Delete in future
-    //void LvlLenghtCalculation();
-
 }
