@@ -15,7 +15,7 @@ public class CarSettings : ScriptableObject
 
     public float Speed => speed;
     public float Acceleration => acceleration;
-    public int MaxHP => maxHp;
+    public int MaxHp => maxHp;
     public Vector3 CarStartPosition => carStartPosition;
 
     #endregion

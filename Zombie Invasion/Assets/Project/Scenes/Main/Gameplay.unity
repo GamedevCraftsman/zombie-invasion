@@ -790,7 +790,7 @@ MonoBehaviour:
   m_BlendUpdateMethod: 0
   m_DefaultBlend:
     m_Style: 1
-    m_Time: 1
+    m_Time: 0.5
     m_CustomCurve:
       serializedVersion: 2
       m_Curve: []
@@ -933,7 +933,6 @@ MonoBehaviour:
   gameSettings: {fileID: 11400000, guid: 04b3fb0ed5ba0b5469daf9e159925d87, type: 2}
   weaponSettings: {fileID: 11400000, guid: b72c5f421adda404d8eb92f76fdde77d, type: 2}
   gameplayUISettings: {fileID: 11400000, guid: 0cfe426d75466c74ca26a2bc93c37f01, type: 2}
-  cameraManager: {fileID: 1006776235}
   gameManager: {fileID: 2088857082}
   enemyPoolParent: {fileID: 1526281317}
 --- !u!1001 &406893965
@@ -2270,7 +2269,7 @@ MonoBehaviour:
   - m_Script
   m_LockStageInInspector: 
   m_StreamingVersion: 20170927
-  m_Priority: 10
+  m_Priority: 20
   m_StandbyUpdate: 2
   m_LookAt: {fileID: 0}
   m_Follow: {fileID: 1202109943}
@@ -2702,6 +2701,7 @@ MonoBehaviour:
     virtualCamera: {fileID: 535179896}
   basePriority: 10
   activePriority: 20
+  waitToStartLvlTime: 0.5
 --- !u!1 &1012324269
 GameObject:
   m_ObjectHideFlags: 3
@@ -2800,9 +2800,8 @@ Transform:
   m_Children:
   - {fileID: 886542099}
   - {fileID: 535179895}
-  - {fileID: 1586703801}
-  - {fileID: 330585546}
   - {fileID: 1006776234}
+  - {fileID: 330585546}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1164597170
@@ -3548,50 +3547,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1579818860}
   m_CullTransparentMesh: 1
---- !u!1 &1586703800
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1586703801}
-  - component: {fileID: 1586703802}
-  m_Layer: 0
-  m_Name: Camera Controller
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1586703801
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1586703800}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1089168527}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1586703802
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1586703800}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8649785714d729343a3d418360e12546, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1610092295
 GameObject:
   m_ObjectHideFlags: 0
@@ -4026,7 +3981,6 @@ MonoBehaviour:
   - {fileID: 746786415}
   controllersInOrder:
   - {fileID: 597822991}
-  - {fileID: 1586703802}
   - {fileID: 1969084542}
   - {fileID: 451608775}
   - {fileID: 1466068357}

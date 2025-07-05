@@ -26,7 +26,7 @@ public class HPManager : BaseManager
     {
         try
         {
-            _maxHp = _carSettings.MaxHP;
+            _maxHp = _carSettings.MaxHp;
             ResetHp();
 
             SubscribeToEvents();

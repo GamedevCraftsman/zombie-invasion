@@ -7,14 +7,15 @@ public class CameraPriorityService : ICameraPriorityManager
 
     public CameraPriorityService(ICameraRepository repository, int basePriority)
     {
-        this._cameraRepository = repository;
-        this._basePriority = basePriority;
+        _cameraRepository = repository;
+        _basePriority = basePriority;
     }
 
     public void SetCameraPriority(CameraType cameraType, int priority)
     {
         if (_cameraRepository.TryGetCameraByType(cameraType, out var config))
         {
+            ResetAllCameraPriorities();
             config.Camera.Priority = priority;
         }
         else
@@ -23,7 +24,7 @@ public class CameraPriorityService : ICameraPriorityManager
         }
     }
 
-    public void ResetAllCameraPriorities()
+    private void ResetAllCameraPriorities()
     {
         foreach (var config in _cameraRepository.GetAllCameras())
         {

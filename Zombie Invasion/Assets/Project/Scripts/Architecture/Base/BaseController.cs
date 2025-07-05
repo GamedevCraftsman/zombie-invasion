@@ -4,8 +4,8 @@ using UnityEngine;
 
 public abstract class BaseController : MonoBehaviour
 {
-    [Inject] protected IEventBus EventBus;
-    
+    [Inject] protected IEventBus EventBus { get; }
+
     public async Task InitializeAsync()
     {
         await Initialize();

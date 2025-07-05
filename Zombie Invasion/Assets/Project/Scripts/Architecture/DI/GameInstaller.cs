@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Rendering;
 using Zenject;
 
 public class GameInstaller : MonoInstaller
@@ -13,7 +12,6 @@ public class GameInstaller : MonoInstaller
     [SerializeField] private GameplayUISettings gameplayUISettings;
     
     [Header("Managers")]
-    [SerializeField] private CameraManager cameraManager;
     [SerializeField] private GameManager gameManager;
     
     [Header("Pool Parent")]
@@ -24,9 +22,7 @@ public class GameInstaller : MonoInstaller
         // Managers
         Container.Bind<IUIManager>().To<UIManager>().AsSingle();
         
-        Container.Bind<ICameraManager>().FromInstance(cameraManager).AsSingle();
         Container.Bind<IGameManager>().FromInstance(gameManager).AsSingle();
-        Container.Bind<CameraController>().FromComponentInHierarchy().AsSingle();
         Container.Bind<IEventBus>().To<EventBus>().AsSingle();
         Container.Bind<HPManager>().FromComponentInHierarchy().AsSingle();
         Container.Bind<SpawnMapManager>().FromComponentInHierarchy().AsSingle();
