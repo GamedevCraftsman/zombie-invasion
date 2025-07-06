@@ -11,9 +11,11 @@ public class EnemyManager : BaseManager
     [Inject] private IPool<EnemyController> _enemyPool;
     [Inject] private EnemySpawnController _spawnController;
 
-    private Queue<int> _availableSpawnIndices = new Queue<int>();
+    //private Queue<int> _availableSpawnIndices = new Queue<int>();
     private HashSet<EnemyController> _activeEnemies = new HashSet<EnemyController>();
-
+    private int _nextSpawnIndex;
+    private int _enemiesLeft;
+    
     protected override Task Initialize()
     {
         try
@@ -31,12 +33,18 @@ public class EnemyManager : BaseManager
 
     private void InitializeSpawnQueue()
     {
-        _availableSpawnIndices.Clear();
-
-        for (int i = _settings.TotalEnemyCount; i < _settings.SpawnPointCount; i++)
+        _enemiesLeft = _settings.TotalEnemyCount - _settings.EnemyPoolInitialSize;
+        
+        if (_enemiesLeft != 0)
         {
-            _availableSpawnIndices.Enqueue(i);
+            _nextSpawnIndex = _settings.EnemyPoolInitialSize + 1;
         }
+        // _availableSpawnIndices.Clear();
+
+        // for (int i = _settings.TotalEnemyCount; i < _settings.SpawnPointCount; i++)
+        // {
+        //     _availableSpawnIndices.Enqueue(i);
+        // }
     }
 
     private void SubscribeToEvents()
@@ -75,7 +83,7 @@ public class EnemyManager : BaseManager
 
     private void HandleEnemyDeath(EnemyController deadEnemy)
     {
-        if (_availableSpawnIndices.Count > 0)
+        if (_enemiesLeft > 0)
         {
             RespawnEnemy(deadEnemy);
         }
@@ -87,20 +95,23 @@ public class EnemyManager : BaseManager
 
     private async void RespawnEnemy(EnemyController enemy)
     {
-        int nextSpawnIndex = _availableSpawnIndices.Dequeue();
+       //_availableSpawnIndices.Dequeue();
         var spawnPoints = _spawnController.AllSpawnPoints;
 
-        if (nextSpawnIndex < spawnPoints.Count && enemy != null)
+        if (_nextSpawnIndex < spawnPoints.Count && enemy != null)
         {
-            enemy.transform.position = spawnPoints[nextSpawnIndex];
+            enemy.transform.position = spawnPoints[_nextSpawnIndex];
             enemy.ResetForPooling();
 
             await enemy.InitializeAsync();
 
-            Debug.Log($"Respawned enemy at spawn point {nextSpawnIndex}");
+            Debug.Log($"Respawned enemy at spawn point {_nextSpawnIndex}");
+            _nextSpawnIndex++;
         }
         else
         {
+            _nextSpawnIndex = 
+            _enemiesLeft = 0;
             DeactivateEnemy(enemy);
         }
     }
@@ -135,7 +146,7 @@ public class EnemyManager : BaseManager
         }
 
         _activeEnemies.Clear();
-        _availableSpawnIndices.Clear();
+        //_availableSpawnIndices.Clear();
     }
 
     private void OnDestroy()

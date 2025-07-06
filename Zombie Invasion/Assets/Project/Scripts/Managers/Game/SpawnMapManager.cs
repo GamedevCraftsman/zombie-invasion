@@ -2,24 +2,31 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using Zenject;
 
 public class SpawnMapManager : BaseManager
 {
-    [SerializeField] private GameSettings gameSettings;
     [SerializeField] private GameObject groundTilesContainer;
-
-    private List<GameObject> groundTiles = new List<GameObject>();
-    private Vector3 startPosition = Vector3.zero;
-
+    
+    private readonly List<GameObject> _groundTiles = new();
+    private readonly Vector3 _startPosition = Vector3.zero;
+    private GameSettings _gameSettings;
+    
     // Public access to ground tiles for enemy spawn system
-    public List<GameObject> GroundTiles => groundTiles;
+    public List<GameObject> GroundTiles => _groundTiles;
+
+    [Inject]
+    private void Construct(GameSettings gameSettings)
+    {
+        _gameSettings = gameSettings;
+    }
 
     protected override Task Initialize()
     {
         try
         {
             SubscribeToEvents();
-            ManageGroundTiles(gameSettings.MapLength, false);
+            ManageGroundTiles(_gameSettings.MapLength, false);
         }
         catch (Exception e)
         {
@@ -28,6 +35,8 @@ public class SpawnMapManager : BaseManager
 
         return Task.CompletedTask;
     }
+
+    #region Events
 
     private void SubscribeToEvents()
     {
@@ -41,13 +50,20 @@ public class SpawnMapManager : BaseManager
 
     private void OnContinueGame(ContinueGameEvent continueGameEvent)
     {
-        ManageGroundTiles(gameSettings.MapLength, false);
+        ManageGroundTiles(_gameSettings.MapLength, false);
     }
 
-    public void ManageGroundTiles(int requiredCount, bool isRestart)
+    private void OnDestroy()
+    {
+        UnsubscribeFromEvents();
+    }
+
+    #endregion
+
+    private void ManageGroundTiles(int requiredCount, bool isRestart)
     {
         //Remove nulls
-        groundTiles.RemoveAll(tile => tile == null);
+        _groundTiles.RemoveAll(tile => tile == null);
 
         SpawnMissingTiles(requiredCount);
 
@@ -56,7 +72,7 @@ public class SpawnMapManager : BaseManager
 
     private void SpawnMissingTiles(int requiredCount)
     {
-        int currentCount = groundTiles.Count;
+        int currentCount = _groundTiles.Count;
 
         if (currentCount < requiredCount)
         {
@@ -64,8 +80,8 @@ public class SpawnMapManager : BaseManager
 
             for (int i = 0; i < tilesToSpawn; i++)
             {
-                GameObject newTile = Instantiate(gameSettings.MapTilePrefab, groundTilesContainer.transform);
-                groundTiles.Add(newTile);
+                GameObject newTile = Instantiate(_gameSettings.MapTilePrefab, groundTilesContainer.transform);
+                _groundTiles.Add(newTile);
             }
         }
     }
@@ -75,13 +91,13 @@ public class SpawnMapManager : BaseManager
         Vector3 repositionStartPosition = GetRepositionStartPositionAdvanced(isRestart);
 
         // Move to new positions
-        for (int i = 0; i < groundTiles.Count; i++)
+        for (int i = 0; i < _groundTiles.Count; i++)
         {
-            if (groundTiles[i] != null)
+            if (_groundTiles[i] != null)
             {
                 Vector3 newTilePosition =
-                    repositionStartPosition + Vector3.forward * (i * gameSettings.DistanceBetweenTiles);
-                groundTiles[i].transform.position = newTilePosition;
+                    repositionStartPosition + Vector3.forward * (i * _gameSettings.DistanceBetweenTiles);
+                _groundTiles[i].transform.position = newTilePosition;
             }
         }
     }
@@ -91,7 +107,7 @@ public class SpawnMapManager : BaseManager
         float maxZ = float.MinValue;
         bool foundAnyTile = false;
 
-        foreach (GameObject tile in groundTiles)
+        foreach (GameObject tile in _groundTiles)
         {
             if (tile != null)
             {
@@ -105,16 +121,11 @@ public class SpawnMapManager : BaseManager
 
         if (foundAnyTile && !isRestart)
         {
-            return new Vector3(startPosition.x, startPosition.y, maxZ);
+            return new Vector3(_startPosition.x, _startPosition.y, maxZ); //return last tile position
         }
         else
         {
-            return startPosition;
+            return _startPosition;
         }
-    }
-
-    private void OnDestroy()
-    {
-        UnsubscribeFromEvents();
     }
 }

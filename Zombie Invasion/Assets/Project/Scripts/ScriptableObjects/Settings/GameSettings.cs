@@ -6,7 +6,7 @@ public class GameSettings : ScriptableObject
     [Header("Objects")]
     [SerializeField] GameObject mapTilePrefab;
     [Header("Properties")]
-    [SerializeField] int mapLength = 60;
+    [SerializeField, Min(2)] int mapLength = 60;
     [SerializeField] float distanceBetweenTiles = 0.5f;
 
     public int MapLength => mapLength;

@@ -3,13 +3,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
-public enum EnemieAnimations
-{
-    Run,
-    Idle,
-    Death
-}
-
 public class EnemyController : BaseController
 {
     [Header("Components")] [SerializeField]
@@ -28,7 +21,7 @@ public class EnemyController : BaseController
     [SerializeField, ReadOnly] private bool hasAttacked;
     [SerializeField, ReadOnly] private int currentHealth;
 
-    private Transform _playerTransform;
+    private Transform _playerTransform; //Make inject
     private float _distanceToPlayer;
     private EnemieAnimations _enemieAnimation;
 
