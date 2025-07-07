@@ -20,7 +20,7 @@ public class EnemyManager : BaseManager
     {
         try
         {
-            InitializeSpawnQueue();
+            //InitializeSpawnQueue();
             SubscribeToEvents();
         }
         catch (Exception e)
@@ -31,7 +31,23 @@ public class EnemyManager : BaseManager
         return Task.CompletedTask;
     }
 
-    private void InitializeSpawnQueue()
+    /*private void InitializeSpawnQueue()
+    {
+        // _enemiesLeft = _settings.TotalEnemyCount - _settings.EnemyPoolInitialSize;
+        //
+        // if (_enemiesLeft != 0)
+        // {
+        //     _nextSpawnIndex = _settings.EnemyPoolInitialSize + 1;
+        // }
+        // _availableSpawnIndices.Clear();
+
+        // for (int i = _settings.TotalEnemyCount; i < _settings.SpawnPointCount; i++)
+        // {
+        //     _availableSpawnIndices.Enqueue(i);
+        // }
+    }*/
+
+    private void CountEnemiesLeft()
     {
         _enemiesLeft = _settings.TotalEnemyCount - _settings.EnemyPoolInitialSize;
         
@@ -39,14 +55,8 @@ public class EnemyManager : BaseManager
         {
             _nextSpawnIndex = _settings.EnemyPoolInitialSize + 1;
         }
-        // _availableSpawnIndices.Clear();
-
-        // for (int i = _settings.TotalEnemyCount; i < _settings.SpawnPointCount; i++)
-        // {
-        //     _availableSpawnIndices.Enqueue(i);
-        // }
     }
-
+    
     private void SubscribeToEvents()
     {
         EventBus.Subscribe<StartGameEvent>(OnGameStart);
@@ -65,6 +75,7 @@ public class EnemyManager : BaseManager
     private void OnGameStart(StartGameEvent startEvent)
     {
         SubscribeToActiveEnemies();
+        CountEnemiesLeft();
     }
 
     private void SubscribeToActiveEnemies()
@@ -110,8 +121,8 @@ public class EnemyManager : BaseManager
         }
         else
         {
-            _nextSpawnIndex = 
-            _enemiesLeft = 0;
+            //InitializeSpawnQueue();
+            //_enemiesLeft = 0;
             DeactivateEnemy(enemy);
         }
     }

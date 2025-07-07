@@ -3,23 +3,24 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "EnemySpawnSettings", menuName = "Game/Enemy Spawn Settings")]
 public class EnemySpawnSettings : ScriptableObject
 {
-    [Header("Enemy Settings")] [SerializeField]
-    private GameObject enemyPrefab;
+    [Header("Enemy Settings")] 
+    [SerializeField] private GameObject enemyPrefab;
 
     [Header("Spawn Count Settings")] 
     [SerializeField] private GameSettings gameSettings;
+
     [SerializeField, Min(0)] private int totalEnemyCount = 50;
 
     [SerializeField, Min(0)] private int spawnPointCount = 100;
     [SerializeField, Min(1)] private int enemyPoolInitialSize = 60;
 
-    [Header("Spawn Area Settings")] [SerializeField, Range(0, 1)]
-    private float sideXOffsetRange = 1f;
+    [Header("Spawn Area Settings")] 
+    [SerializeField, Range(0, 1)] private float sideXOffsetRange = 1f;
 
     [SerializeField, Range(0, 2)] private float sideZOffsetRange = 2f;
 
-    [Header("Spawn distance")] [SerializeField]
-    private float minSpawnDistance = 2f;
+    [Header("Spawn distance")] 
+    [SerializeField] private float minSpawnDistance = 2f;
 
     [SerializeField] private bool ignoreFirstTile;
     [SerializeField] private bool ignoreLastTile;
@@ -62,21 +63,37 @@ public class EnemySpawnSettings : ScriptableObject
     }
 
     #endregion
-    
+
     private void OnValidate()
+    {
+        MakePoolLessTotalEnemyCount();
+        SetMinPoolSize();
+
+        spawnPointCount = totalEnemyCount;
+    }
+
+    #region Private Methods
+
+    private void MakePoolLessTotalEnemyCount()
     {
         if (totalEnemyCount < enemyPoolInitialSize)
         {
             enemyPoolInitialSize = totalEnemyCount;
         }
-
-        if (enemyPoolInitialSize <
-            Mathf.CeilToInt((float)spawnPointCount / (gameSettings.MapLength - CountIgnoreTiles())) * 2)
-        {
-            enemyPoolInitialSize =
-                Mathf.CeilToInt((float)spawnPointCount / (gameSettings.MapLength - CountIgnoreTiles()) * 2);
-        }
-        
-        spawnPointCount = totalEnemyCount;
     }
+
+    private void SetMinPoolSize()
+    {
+        if (enemyPoolInitialSize < EnemiesForTwoTiles())
+        {
+            enemyPoolInitialSize = EnemiesForTwoTiles();
+        }
+    }
+
+    private int EnemiesForTwoTiles()
+    {
+        return Mathf.CeilToInt((float)spawnPointCount / (gameSettings.MapLength - CountIgnoreTiles())) * 2;
+    }
+
+    #endregion
 }

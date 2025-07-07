@@ -17,7 +17,7 @@ MonoBehaviour:
   gameSettings: {fileID: 11400000, guid: 04b3fb0ed5ba0b5469daf9e159925d87, type: 2}
   totalEnemyCount: 20
   spawnPointCount: 20
-  enemyPoolInitialSize: 14
+  enemyPoolInitialSize: 20
   sideXOffsetRange: 0.3
   sideZOffsetRange: 1.75
   minSpawnDistance: 0.15
