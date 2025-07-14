@@ -1,4 +1,4 @@
-public enum EnemieAnimations
+public enum EnemyAnimations
 {
     Run,
     Idle,

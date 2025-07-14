@@ -49,7 +49,7 @@ public class GameInstaller : MonoInstaller
         // Enemy Spawn Controller
         Container.Bind<EnemySpawnController>()
             .FromComponentInHierarchy()
-            .AsSingle();
+            .AsSingle().NonLazy();
         
         // Pool System
         Container.Bind<IPoolable<EnemyController>>()
@@ -70,6 +70,26 @@ public class GameInstaller : MonoInstaller
         Container.Bind<WeaponSettings>().FromInstance(weaponSettings).AsSingle();
         Container.BindInstance(carSettings).AsSingle();
         Container.BindInstance(gameplayUISettings).AsSingle();
+        
+        //===============
+        // Нові SRP‑класи
+        Container.Bind<ISpawnPointValidator>()
+            .To<SpawnPointValidator>()
+            .AsSingle();
+        Container.Bind<ISpawnPointGenerator>()
+            .To<SpawnPointGenerator>()
+            .AsSingle();
+        Container.Bind<IEnemySpawner>()
+            .To<EnemySpawner>()
+            .AsSingle();
+
+        // Контролер та його подієвий хендлер
+        //Container.Bind<EnemySpawnController>()
+            //.AsSingle()
+            //.NonLazy(); // щоб Initialize викликався одразу
+         Container.Bind<IInitializable>()
+             .To<EnemySpawnEventHandler>()
+             .AsSingle();
     }
     
     private IPool<EnemyController> CreateEnemyPool(InjectContext context)

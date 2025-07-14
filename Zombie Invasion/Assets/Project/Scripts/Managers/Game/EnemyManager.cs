@@ -53,7 +53,7 @@ public class EnemyManager : BaseManager
         
         if (_enemiesLeft != 0)
         {
-            _nextSpawnIndex = _settings.EnemyPoolInitialSize + 1;
+            _nextSpawnIndex = _settings.EnemyPoolInitialSize;
         }
     }
     
@@ -81,7 +81,7 @@ public class EnemyManager : BaseManager
     private void SubscribeToActiveEnemies()
     {
         var activeEnemies = FindObjectsOfType<EnemyController>();
-
+        Debug.Log("Enemies lenght: " + activeEnemies.Length);
         foreach (var enemy in activeEnemies)
         {
             if (enemy.gameObject.activeSelf)
@@ -104,17 +104,22 @@ public class EnemyManager : BaseManager
         }
     }
 
-    private async void RespawnEnemy(EnemyController enemy)
+    private /*async*/ void RespawnEnemy(EnemyController enemy)
     {
        //_availableSpawnIndices.Dequeue();
         var spawnPoints = _spawnController.AllSpawnPoints;
 
         if (_nextSpawnIndex < spawnPoints.Count && enemy != null)
         {
-            enemy.transform.position = spawnPoints[_nextSpawnIndex];
+            // enemy.transform.position = spawnPoints[_nextSpawnIndex];
+            // enemy.ResetForPooling();
+            
             enemy.ResetForPooling();
-
-            await enemy.InitializeAsync();
+            _enemyPool.Release(enemy);
+            _enemyPool.Get();
+            enemy.transform.position = spawnPoints[_nextSpawnIndex];
+            
+            //await enemy.InitializeAsync();
 
             Debug.Log($"Respawned enemy at spawn point {_nextSpawnIndex}");
             _nextSpawnIndex++;

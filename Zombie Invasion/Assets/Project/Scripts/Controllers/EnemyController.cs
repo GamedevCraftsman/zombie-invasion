@@ -13,6 +13,7 @@ public class EnemyController : BaseController
     [SerializeField] private UnityEngine.UI.Image healthBarFill;
     [SerializeField] private Collider[] allColliders;
 
+    #region For debug
     [Header("Debug")] [SerializeField, ReadOnly]
     private bool isChasing;
 
@@ -20,10 +21,11 @@ public class EnemyController : BaseController
     [SerializeField, ReadOnly] private bool canMove;
     [SerializeField, ReadOnly] private bool hasAttacked;
     [SerializeField, ReadOnly] private int currentHealth;
-
+#endregion
+    
     private Transform _playerTransform; //Make inject
     private float _distanceToPlayer;
-    private EnemieAnimations _enemieAnimation;
+    private EnemyAnimations _enemyAnimation;
 
     [Inject] private EnemySettings _data;
     public event Action<EnemyController> OnEnemyDied;
@@ -105,7 +107,7 @@ public class EnemyController : BaseController
         Vector3 direction = (_playerTransform.position - transform.position).normalized;
         direction.y = 0;
 
-        Vector3 movement = direction * _data.MoveSpeed * Time.deltaTime;
+        Vector3 movement = direction * (_data.MoveSpeed * Time.deltaTime);
         rb.MovePosition(transform.position + movement);
 
         if (direction != Vector3.zero)
@@ -147,17 +149,19 @@ public class EnemyController : BaseController
         
         if (currentHealth <= 0)
         {
-            isDead = true;
             canMove = false;
             
             ManageHealthBar(false);
-            PlayDeathAnimationAndDie();
+            StopChasing();
         }
     }
     
     private void PlayDeathAnimationAndDie()
     {
         ManageColliders(false);
+        
+        Debug.Log("Start dead animation");
+        
         PlayDeathAnimation();
     }
 
@@ -170,7 +174,9 @@ public class EnemyController : BaseController
     }
     
     public void OnDeath()
-    {
+    {        
+        Debug.Log("Start Dead");
+
         Die();
     }
 
@@ -190,8 +196,8 @@ public class EnemyController : BaseController
     {
         if (isDead) return;
 
-        isDead = true;
-        isChasing = false;
+         isDead = true;
+        // canMove = false;
 
         if (rb != null)
         {
@@ -202,6 +208,7 @@ public class EnemyController : BaseController
         if (healthBarCanvas != null)
             healthBarCanvas.gameObject.SetActive(false);
 
+        Debug.Log("Dead");
         OnEnemyDied?.Invoke(this);
     }
 
@@ -227,9 +234,9 @@ public class EnemyController : BaseController
     }
 
     // Animation methods
-    private void PlayIdleAnimation() => enemyAnimator.SetTrigger(EnemieAnimations.Idle.ToString());
-    private void PlayRunAnimation() => enemyAnimator.SetTrigger(EnemieAnimations.Run.ToString());
-    private void PlayDeathAnimation() => enemyAnimator.SetTrigger(EnemieAnimations.Death.ToString());
+    private void PlayIdleAnimation() => enemyAnimator.SetTrigger(EnemyAnimations.Idle.ToString());
+    private void PlayRunAnimation() => enemyAnimator.SetTrigger(EnemyAnimations.Run.ToString());
+    private void PlayDeathAnimation() => enemyAnimator.SetTrigger(EnemyAnimations.Death.ToString());
 
     private void OnDrawGizmosSelected()
     {
