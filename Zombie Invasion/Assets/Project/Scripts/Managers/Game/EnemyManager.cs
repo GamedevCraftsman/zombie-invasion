@@ -1,98 +1,42 @@
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Rendering;
 using Zenject;
 
-public class EnemyManager : BaseManager
+public class EnemyManager : MonoBehaviour, IEnemyManager
 {
-    [Inject] private EnemySpawnSettings _settings;
-    [Inject] private IPool<EnemyController> _enemyPool;
-    [Inject] private EnemySpawnController _spawnController;
+    private EnemySpawnSettings _settings;
+    private IPool<EnemyController> _enemyPool;
+    private EnemySpawnController _spawnController;
 
-    //private Queue<int> _availableSpawnIndices = new Queue<int>();
-    private HashSet<EnemyController> _activeEnemies = new HashSet<EnemyController>();
-    private int _nextSpawnIndex;
+    private int _nextSpawnIndex = 0;
     private int _enemiesLeft;
-    
-    protected override Task Initialize()
-    {
-        try
-        {
-            //InitializeSpawnQueue();
-            SubscribeToEvents();
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-        }
 
-        return Task.CompletedTask;
+    [Inject]
+    public void Construct(EnemySpawnSettings settings, IPool<EnemyController> enemyPool,
+        EnemySpawnController spawnController)
+    {
+        _settings = settings;
+        _enemyPool = enemyPool;
+        _spawnController = spawnController;
     }
 
-    /*private void InitializeSpawnQueue()
-    {
-        // _enemiesLeft = _settings.TotalEnemyCount - _settings.EnemyPoolInitialSize;
-        //
-        // if (_enemiesLeft != 0)
-        // {
-        //     _nextSpawnIndex = _settings.EnemyPoolInitialSize + 1;
-        // }
-        // _availableSpawnIndices.Clear();
+    #region For events
 
-        // for (int i = _settings.TotalEnemyCount; i < _settings.SpawnPointCount; i++)
-        // {
-        //     _availableSpawnIndices.Enqueue(i);
-        // }
-    }*/
-
-    private void CountEnemiesLeft()
+    public void CountEnemiesLeft()
     {
-        _enemiesLeft = _settings.TotalEnemyCount - _settings.EnemyPoolInitialSize;
+        Debug.LogWarning("CountEnemiesLeft");
         
+        _enemiesLeft = _settings.TotalEnemyCount - _settings.EnemyPoolInitialSize;
+
         if (_enemiesLeft != 0)
         {
             _nextSpawnIndex = _settings.EnemyPoolInitialSize;
         }
     }
     
-    private void SubscribeToEvents()
-    {
-        EventBus.Subscribe<StartGameEvent>(OnGameStart);
-        EventBus.Subscribe<GameOverEvent>(OnGameOver);
-        EventBus?.Subscribe<CarReachedEndEvent>(OnReachedEndOfGame);
-    }
+    #endregion
 
-    private void UnsubscribeFromEvents()
-    {
-        EventBus?.Unsubscribe<CarReachedEndEvent>(OnReachedEndOfGame);
-        EventBus?.Unsubscribe<StartGameEvent>(OnGameStart);
-        EventBus?.Unsubscribe<GameOverEvent>(OnGameOver);
-    }
-
-
-    private void OnGameStart(StartGameEvent startEvent)
-    {
-        SubscribeToActiveEnemies();
-        CountEnemiesLeft();
-    }
-
-    private void SubscribeToActiveEnemies()
-    {
-        var activeEnemies = FindObjectsOfType<EnemyController>();
-        Debug.Log("Enemies lenght: " + activeEnemies.Length);
-        foreach (var enemy in activeEnemies)
-        {
-            if (enemy.gameObject.activeSelf)
-            {
-                enemy.OnEnemyDied += HandleEnemyDeath;
-                _activeEnemies.Add(enemy);
-            }
-        }
-    }
-
-    private void HandleEnemyDeath(EnemyController deadEnemy)
+    public void HandleEnemyDeath(EnemyController deadEnemy)
     {
         if (_enemiesLeft > 0)
         {
@@ -104,77 +48,37 @@ public class EnemyManager : BaseManager
         }
     }
 
-    private /*async*/ void RespawnEnemy(EnemyController enemy)
+    private void RespawnEnemy(EnemyController enemy)
     {
-       //_availableSpawnIndices.Dequeue();
-        var spawnPoints = _spawnController.AllSpawnPoints;
+        List<Vector3> spawnPoints = _spawnController.AllSpawnPoints;
+        
+        Debug.LogWarning($"Points count: {_spawnController.AllSpawnPoints.Count}\nNext spawn index: {_nextSpawnIndex}\nEnemies Left: {_enemiesLeft}");
 
         if (_nextSpawnIndex < spawnPoints.Count && enemy != null)
         {
-            // enemy.transform.position = spawnPoints[_nextSpawnIndex];
-            // enemy.ResetForPooling();
-            
-            enemy.ResetForPooling();
-            _enemyPool.Release(enemy);
-            _enemyPool.Get();
-            enemy.transform.position = spawnPoints[_nextSpawnIndex];
-            
-            //await enemy.InitializeAsync();
+            Respawn(enemy, spawnPoints);
 
             Debug.Log($"Respawned enemy at spawn point {_nextSpawnIndex}");
             _nextSpawnIndex++;
         }
         else
         {
-            //InitializeSpawnQueue();
-            //_enemiesLeft = 0;
             DeactivateEnemy(enemy);
         }
+    }
+
+    private void Respawn(EnemyController enemy, List<Vector3> spawnPoints)
+    {
+        enemy.ResetForPooling();
+        _enemyPool.Release(enemy);
+        
+        _enemyPool.Get();
+        enemy.transform.position = spawnPoints[_nextSpawnIndex];
     }
 
     private void DeactivateEnemy(EnemyController enemy)
     {
         enemy.OnEnemyDied -= HandleEnemyDeath;
-        _activeEnemies.Remove(enemy);
         _enemyPool.Release(enemy);
-    }
-
-    private void OnGameOver(GameOverEvent gameOverEvent)
-    {
-        OnGameEnd();
-    }
-
-    private void OnReachedEndOfGame(CarReachedEndEvent carReachedEndEvent)
-    {
-        OnGameEnd();
-    }
-
-    private void OnGameEnd()
-    {
-        _enemyPool.ReleaseAll();
-
-        foreach (var enemy in _activeEnemies)
-        {
-            if (enemy != null)
-            {
-                enemy.OnEnemyDied -= HandleEnemyDeath;
-            }
-        }
-
-        _activeEnemies.Clear();
-        //_availableSpawnIndices.Clear();
-    }
-
-    private void OnDestroy()
-    {
-        UnsubscribeFromEvents();
-
-        foreach (var enemy in _activeEnemies)
-        {
-            if (enemy != null)
-            {
-                enemy.OnEnemyDied -= HandleEnemyDeath;
-            }
-        }
     }
 }

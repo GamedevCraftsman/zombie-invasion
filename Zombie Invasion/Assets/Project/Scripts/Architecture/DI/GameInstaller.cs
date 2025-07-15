@@ -26,11 +26,13 @@ public class GameInstaller : MonoInstaller
         Container.Bind<IEventBus>().To<EventBus>().AsSingle();
         Container.Bind<HPManager>().FromComponentInHierarchy().AsSingle();
         Container.Bind<SpawnMapManager>().FromComponentInHierarchy().AsSingle();
+        Container.Bind<IEnemyManager>().FromComponentInHierarchy().AsSingle();
         
         // Enemy System Manager
         Container.Bind<EnemyManager>()
             .FromComponentInHierarchy()
             .AsSingle();
+        Container.BindInterfacesTo<EnemyEventSubscriber>().AsSingle().NonLazy();
         
         //Controllers
         Container.Bind<CarController>().FromComponentInHierarchy().AsSingle();
@@ -82,11 +84,6 @@ public class GameInstaller : MonoInstaller
         Container.Bind<IEnemySpawner>()
             .To<EnemySpawner>()
             .AsSingle();
-
-        // Контролер та його подієвий хендлер
-        //Container.Bind<EnemySpawnController>()
-            //.AsSingle()
-            //.NonLazy(); // щоб Initialize викликався одразу
          Container.Bind<IInitializable>()
              .To<EnemySpawnEventHandler>()
              .AsSingle();

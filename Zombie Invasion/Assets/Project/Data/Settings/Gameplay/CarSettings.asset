@@ -15,5 +15,4 @@ MonoBehaviour:
   carStartPosition: {x: 0, y: 0, z: 2}
   speed: 0.5
   acceleration: 0.5
-  deceleration: 0.5
-  maxHP: 100
+  maxHp: 10000

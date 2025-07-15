@@ -1546,6 +1546,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf0b38f07440158448640d0d1c8a8ad0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _spawnPoints: []
 --- !u!1 &639500219
 GameObject:
   m_ObjectHideFlags: 0
@@ -3953,7 +3954,6 @@ MonoBehaviour:
   - {fileID: 815194260}
   - {fileID: 1006776235}
   - {fileID: 1489783318}
-  - {fileID: 2020676611}
   - {fileID: 104034830}
   - {fileID: 1972937263}
   - {fileID: 1240649892}

@@ -10,10 +10,10 @@ public class EnemySpawnController : BaseController
     private EnemySpawnSettings _settings;
     private IPool<EnemyController> _pool;
     private SpawnMapManager _mapManager;
-    [SerializeField] private List<Vector3> _spawnPoints;
 
+    private List<Vector3> _spawnPoints;
     public List<Vector3> AllSpawnPoints => _spawnPoints;
-    
+
     public void Inject(
         SpawnMapManager mapManager,
         EnemySpawnSettings settings,
@@ -32,7 +32,7 @@ public class EnemySpawnController : BaseController
     {
         try
         {
-            _spawnPoints = new List<Vector3>();
+            _spawnPoints = new List<Vector3>(capacity: _settings.SpawnPointCount);
             SubscribeToEvents();
             GenerateSpawnPoints();
         }
@@ -44,10 +44,11 @@ public class EnemySpawnController : BaseController
         return Task.CompletedTask;
     }
 
+    #region Events
+
     private void SubscribeToEvents()
     {
         EventBus.Subscribe<ReadyGameEvent>(OnGameReady);
-        //EventBus.Subscribe<StartGameEvent>(OnGameStart);
         EventBus.Subscribe<RestarGameEvent>(OnGameRestart);
         EventBus.Subscribe<ContinueGameEvent>(OnContinueGame);
     }
@@ -55,21 +56,15 @@ public class EnemySpawnController : BaseController
     private void UnsubscribeFromEvents()
     {
         EventBus.Unsubscribe<ReadyGameEvent>(OnGameReady);
-        //EventBus.Unsubscribe<StartGameEvent>(OnGameStart);
         EventBus.Unsubscribe<RestarGameEvent>(OnGameRestart);
         EventBus.Unsubscribe<ContinueGameEvent>(OnContinueGame);
     }
-    
+
     private void OnGameReady(ReadyGameEvent e)
     {
         SpawnEnemies();
     }
 
-    // private void OnGameStart(StartGameEvent e)
-    // {
-    //     SpawnEnemies();
-    // }
-    
     private void OnGameRestart(RestarGameEvent e)
     {
         GenerateSpawnPoints();
@@ -79,6 +74,8 @@ public class EnemySpawnController : BaseController
     {
         GenerateSpawnPoints();
     }
+
+    #endregion
 
     private void GenerateSpawnPoints()
     {

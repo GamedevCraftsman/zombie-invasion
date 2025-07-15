@@ -10,6 +10,7 @@ public class Pool<T> : IPool<T> where T : Component
 
     public bool IsAvailable => AvailableCount > 0;
     public int AvailableCount => _allItems.Count(item => item != null && !item.gameObject.activeSelf);
+    public List<T> AllItems => _allItems;
 
     public Pool(IPoolable<T> poolable, int initialSize, Transform parentTransform = null)
     {

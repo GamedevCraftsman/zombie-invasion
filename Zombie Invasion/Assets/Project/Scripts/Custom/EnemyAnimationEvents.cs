@@ -8,7 +8,6 @@ public class EnemyAnimationEvents : MonoBehaviour
     {
         if (controller != null)
         {
-            Debug.LogWarning("OnDeath");
             controller.OnDeath();
         }
     }

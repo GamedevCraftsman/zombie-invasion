@@ -29,7 +29,7 @@ public class EnemySpawnEventHandler : IInitializable
 
     public void Initialize()
     {
-        Debug.LogWarning("Initialize");
+        Debug.Log("Initialize EnemySpawnController");
         _controller.Inject(_mapManager, _settings, _pool, _generator, _spawner);
     }
 }
