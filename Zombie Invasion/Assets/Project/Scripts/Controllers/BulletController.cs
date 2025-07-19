@@ -51,7 +51,7 @@ public class BulletController : MonoBehaviour, IBulletController
     {
         if (!_isActive) return;
         
-        EnemyController enemy = other.GetComponent<EnemyController>();
+        EnemyController enemy = other.GetComponentInParent<EnemyController>();
         if (enemy != null)
         {
             enemy.TakeDamage(_damage);

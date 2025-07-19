@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
 using Zenject;
 
@@ -26,7 +27,8 @@ public class EnemyController : BaseController
     private Transform _playerTransform; //Make inject
     private float _distanceToPlayer;
     private EnemyAnimations _enemyAnimation;
-
+    private bool _canChase;
+    
     [Inject] private EnemySettings _data;
     public event Action<EnemyController> OnEnemyDied;
 
@@ -70,10 +72,20 @@ public class EnemyController : BaseController
     {
         if (isDead || _playerTransform == null || !canMove) return;
 
-        CalculateDistanceToPlayer();
+        if (!isChasing && _canChase)
+        {
+            StartChasing();
+        }
+
+        if (_canChase && isChasing)
+        {
+            ChasePlayer();
+        }
+        
+        //CalculateDistanceToPlayer();
     }
 
-    private void CalculateDistanceToPlayer()
+    /*private void CalculateDistanceToPlayer()
     {
         _distanceToPlayer = Vector3.Distance(transform.position, _playerTransform.position);
         if (_distanceToPlayer <= _data.AggroRadius)
@@ -86,16 +98,18 @@ public class EnemyController : BaseController
         {
             StopChasing();
         }
-    }
+    }*/
 
-    private void StartChasing()
+    public void StartChasing()
     {
+        _canChase = true;
         isChasing = true;
         PlayRunAnimation();
     }
 
     private void StopChasing()
     {
+        _canChase = false;
         isChasing = false;
         PlayDeathAnimationAndDie();
     }
@@ -103,7 +117,7 @@ public class EnemyController : BaseController
     private void ChasePlayer()
     {
         if (rb == null) return;
-
+        
         Vector3 direction = (_playerTransform.position - transform.position).normalized;
         direction.y = 0;
 
@@ -118,14 +132,19 @@ public class EnemyController : BaseController
         }
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        if (isDead || hasAttacked) return;
-        if (other.CompareTag("Player"))
-            AttackPlayer();
-    }
+    // private void OnTriggerEnter(Collider other)
+    // {
+    //     if (isDead || hasAttacked) return;
+    //     if (other.CompareTag("Player"))
+    //         AttackPlayer();
+    // }
 
-    private void AttackPlayer()
+    public bool CanAttack()
+    {
+        return isDead || hasAttacked;
+    }
+    
+    public void AttackPlayer()
     {
         hasAttacked = true;
         canMove = false;

@@ -980,6 +980,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: turret
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 61b267a3f0898b342a5efca099ff1100,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1118,7 +1123,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 435677238}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Fire Point
   m_TagString: Untagged
   m_Icon: {fileID: 4162164826716764455, guid: 0000000000000000d000000000000000, type: 0}
@@ -1546,7 +1551,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf0b38f07440158448640d0d1c8a8ad0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spawnPoints: []
 --- !u!1 &639500219
 GameObject:
   m_ObjectHideFlags: 0
@@ -1858,7 +1862,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 666431761}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Turret
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1893,7 +1897,7 @@ GameObject:
   - component: {fileID: 671643246}
   - component: {fileID: 671643248}
   - component: {fileID: 671643247}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: HP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1967,7 +1971,7 @@ GameObject:
   m_Component:
   - component: {fileID: 735613801}
   - component: {fileID: 735613802}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Car
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -2950,6 +2954,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 652775c163a33eb4ea9069662dfe50b0,
         type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 652775c163a33eb4ea9069662dfe50b0,
+        type: 3}
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
@@ -2977,7 +2986,7 @@ GameObject:
   - component: {fileID: 1219342507}
   - component: {fileID: 1219342506}
   - component: {fileID: 1219342509}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3494,7 +3503,7 @@ GameObject:
   - component: {fileID: 1579818861}
   - component: {fileID: 1579818863}
   - component: {fileID: 1579818862}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: HP Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4115,7 +4124,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2045961005}
   - component: {fileID: 2045961006}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: HP Bar
   m_TagString: Untagged
   m_Icon: {fileID: 0}

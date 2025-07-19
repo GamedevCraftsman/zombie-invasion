@@ -58,6 +58,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -5568371526223589888, guid: 5359a4b6708f6ed48bc378537f896eb8,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: -2577548232221058511, guid: 5359a4b6708f6ed48bc378537f896eb8,
         type: 3}
       propertyPath: m_LocalScale.x
@@ -167,6 +172,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Bullet
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 5359a4b6708f6ed48bc378537f896eb8,
+        type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
