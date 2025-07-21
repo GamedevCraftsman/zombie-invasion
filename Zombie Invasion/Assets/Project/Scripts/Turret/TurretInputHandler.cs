@@ -10,7 +10,7 @@ public class TurretInputHandler : ITurretInputHandler
     private float _currentRotationAngle = 0;
     private bool _isDragging;
     private Vector2 _lastInputPosition;
-
+    
     public TurretInputHandler(ITurretController turretController, WeaponSettings weaponSettings, IInputController inputController, IFireController fireController)
     {
         _turretController = turretController;
