@@ -21,4 +21,5 @@ MonoBehaviour:
   poolSize: 20
   maxRotationAngle: 45
   rotationSpeed: 2
-  inputSensitivity: 2.75
+  inputSensitivity: 1.75
+  baseScreenSize: 1080

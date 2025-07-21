@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "GameplayUISettings", menuName = "Game/GameplayUISettings")]
+[CreateAssetMenu(fileName = "GameplayUISettings", menuName = "UI/Gameplay UI Settings")]
 public class GameplayUISettings : ScriptableObject
 {
     [Header("Car HP settings")] 

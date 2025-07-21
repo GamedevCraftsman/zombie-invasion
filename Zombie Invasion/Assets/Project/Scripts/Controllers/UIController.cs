@@ -2,6 +2,8 @@ using System;
 using System.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using Zenject;
+using Sequence = DG.Tweening.Sequence;
 
 public class UIController : BaseController
 {
@@ -13,6 +15,16 @@ public class UIController : BaseController
     [SerializeField] private CanvasGroup continueGameButton;
     [SerializeField] private CanvasGroup continueGameLabel;
 
+    private const float Open = 1;
+    private const float Close = 0;
+
+    private UISettings _uiSettings;
+    [Inject]
+    public void Construct(UISettings uiSettings)
+    {
+        _uiSettings = uiSettings;
+    } 
+    
     protected override Task Initialize()
     {
         try
@@ -26,6 +38,8 @@ public class UIController : BaseController
 
         return Task.CompletedTask;
     }
+
+    #region Events
 
     private void SubscribeToEvents()
     {
@@ -53,29 +67,34 @@ public class UIController : BaseController
         OpenEndGamePanel(continueGameLabel, continueGameButton, winPanel);
     }
 
-    private void OpenEndGamePanel(CanvasGroup label, CanvasGroup button, CanvasGroup panel)
-    {
-        Sequence openPanel = DOTween.Sequence();
-        panel.alpha = 1;
-        panel.interactable = true;
-
-        openPanel.AppendCallback(() => button.interactable = false)
-            .Join(label.DOFade(1, 2f))
-            .Append(button.transform.DOMoveY(190, 3f)).SetEase(Ease.OutBack)
-            .Join(button.DOFade(1, 2f))
-            .AppendCallback(() => button.interactable = true);
-    }
-
     private void RestartGame(RestarGameEvent restartGameEvent)
     {
         losePanel.interactable = false;
-        losePanel.DOFade(0, 1f);
+        losePanel.DOFade(Close, _uiSettings.DisappearPanelTime);
     }
 
     private void ContinueGame(ContinueGameEvent continueGameEvent)
     {
         winPanel.interactable = false;
-        winPanel.DOFade(0, 1f);
+        winPanel.DOFade(Close, _uiSettings.DisappearPanelTime);
+    }
+
+    #endregion
+
+    private void OpenEndGamePanel(CanvasGroup label, CanvasGroup button, CanvasGroup panel)
+    {
+        Sequence openPanel = DOTween.Sequence();
+        panel.alpha = Open;
+        panel.interactable = true;
+
+        button.alpha = Close;
+        button.transform.position = new Vector3(button.transform.position.x, _uiSettings.ButtonStartPos, button.transform.position.z); 
+        
+        openPanel.AppendCallback(() => button.interactable = false)
+            .Join(label.DOFade(Open, _uiSettings.AppearPanelTime))
+            .Append(button.transform.DOMoveY(_uiSettings.ButtonEndPos, _uiSettings.ButtonMoveTime)).SetEase(_uiSettings.ButtonMoveEase)
+            .Join(button.DOFade(Open, _uiSettings.AppearPanelTime))
+            .AppendCallback(() => button.interactable = true);
     }
 
     private void OnDestroy()

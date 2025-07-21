@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "CarSettings", menuName = "Game/CarSettings")]
+[CreateAssetMenu(fileName = "CarSettings", menuName = "Game/Car Settings")]
 public class CarSettings : ScriptableObject
 {
     [Header("Movement")] 

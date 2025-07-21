@@ -1,4 +1,5 @@
 using Project.Scripts.Controllers;
+using UnityEditor;
 using UnityEngine;
 using Zenject;
 
@@ -14,6 +15,7 @@ public class GameInstaller : MonoInstaller
     [SerializeField] private GameSettings gameSettings;
     [SerializeField] private WeaponSettings weaponSettings;
     [SerializeField] private GameplayUISettings gameplayUISettings;
+    [SerializeField] private UISettings uiSettings;
     
     [Header("Managers")]
     [SerializeField] private GameManager gameManager;
@@ -71,6 +73,7 @@ public class GameInstaller : MonoInstaller
         Container.Bind<EnemySpawnSettings>()
             .FromInstance(enemySpawnSettings)
             .AsSingle();
+        Container.Bind<UISettings>().FromInstance(uiSettings).AsSingle();
 
         Container.Bind<EnemySettings>().FromInstance(enemySettings).AsSingle();
         Container.Bind<GameSettings>().FromInstance(gameSettings).AsSingle();

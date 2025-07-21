@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "GameSettings", menuName = "Game/GameSettings")]
+[CreateAssetMenu(fileName = "GameSettings", menuName = "Game/Game Settings")]
 public class GameSettings : ScriptableObject
 {
     [Header("Objects")]

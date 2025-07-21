@@ -901,6 +901,7 @@ MonoBehaviour:
   gameSettings: {fileID: 11400000, guid: 04b3fb0ed5ba0b5469daf9e159925d87, type: 2}
   weaponSettings: {fileID: 11400000, guid: b72c5f421adda404d8eb92f76fdde77d, type: 2}
   gameplayUISettings: {fileID: 11400000, guid: 0cfe426d75466c74ca26a2bc93c37f01, type: 2}
+  uiSettings: {fileID: 11400000, guid: 8cbbcddc34e48164287e9f9642a79320, type: 2}
   gameManager: {fileID: 2088857082}
   enemyPoolParent: {fileID: 1526281317}
 --- !u!1001 &406893965
@@ -1192,7 +1193,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enableMouseInput: 1
   enableTouchInput: 1
-  startGameKey: 32
 --- !u!1 &518868845
 GameObject:
   m_ObjectHideFlags: 0
