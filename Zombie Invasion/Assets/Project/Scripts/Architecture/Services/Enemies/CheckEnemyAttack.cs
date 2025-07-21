@@ -1,4 +1,5 @@
 using UnityEngine;
+using Zenject;
 
 public class CheckEnemyAttack : MonoBehaviour
 {
@@ -6,11 +7,11 @@ public class CheckEnemyAttack : MonoBehaviour
     
     private void OnTriggerEnter(Collider other)
     {
-        if (enemyController.CanAttack()) return;
-
         if (other.CompareTag("Player"))
         {
-            enemyController.AttackPlayer();
+            if(enemyController.EnemyAttack != null)
+                enemyController.EnemyAttack.AttackPlayer(enemyController.StopChasing, enemyController.HealthBarCanvas);
+            else Debug.LogWarning("EnemyAttack = null");
         }
     }
 }

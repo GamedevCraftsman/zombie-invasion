@@ -1,6 +1,6 @@
 using System;
+using System.Collections;
 using System.Threading.Tasks;
-using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
 using Zenject;
 
@@ -14,23 +14,52 @@ public class EnemyController : BaseController
     [SerializeField] private UnityEngine.UI.Image healthBarFill;
     [SerializeField] private Collider[] allColliders;
 
-    #region For debug
-    [Header("Debug")] [SerializeField, ReadOnly]
-    private bool isChasing;
-
-    [SerializeField, ReadOnly] private bool isDead;
-    [SerializeField, ReadOnly] private bool canMove;
-    [SerializeField, ReadOnly] private bool hasAttacked;
-    [SerializeField, ReadOnly] private int currentHealth;
-#endregion
-    
-    private Transform _playerTransform; //Make inject
-    private float _distanceToPlayer;
+    private Transform _playerTransform;
     private EnemyAnimations _enemyAnimation;
-    private bool _canChase;
+
+    #region Temporary values
+
+    private int _currentHealth;
+
+    private WaitForFixedUpdate _waitForFixedUpdate;
     
-    [Inject] private EnemySettings _data;
+    private Coroutine _chaseCoroutine;
+
+    #endregion
+
+    #region Injections
+
+    private EnemySettings _data;
+
+    private CarController _carController;
+
+    private IEnemyAttack _enemyAttack;
+
+    private IEnemyHealthBarService _enemyHealthBarService;
+
+    #endregion
+
+    #region Public values
+
     public event Action<EnemyController> OnEnemyDied;
+    public Canvas HealthBarCanvas => healthBarCanvas;
+    public IEnemyAttack EnemyAttack => _enemyAttack;
+
+    #endregion
+
+    [Inject]
+    private void Construct(EnemySettings enemySettings, CarController carController, IEnemyAttack enemyAttack,
+        IEnemyHealthBarService enemyHealthBarService)
+    {
+        _data = enemySettings;
+        _carController = carController;
+        _enemyAttack = enemyAttack;
+        _enemyHealthBarService = enemyHealthBarService;
+        
+        _waitForFixedUpdate = new WaitForFixedUpdate();
+    }
+
+    #region Initialization
 
     protected override Task Initialize()
     {
@@ -49,175 +78,90 @@ public class EnemyController : BaseController
     private void Initialized()
     {
         // Assign player
-        var player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-            _playerTransform = player.transform;
-
-        // Ensure Rigidbody
-        if (rb == null)
-            rb = GetComponent<Rigidbody>();
-        if (rb != null)
-            rb.freezeRotation = true;
+        _playerTransform = _carController.CarTransform;
 
         // Initialize health
-        currentHealth = _data.MaxHealth;
+        _currentHealth = _data.MaxHealth;
 
         // Hide health bar initially
-        ManageHealthBar(false);
+        ManageHealthBar(false, healthBarCanvas);
 
         PlayIdleAnimation();
     }
 
-    private void FixedUpdate()
-    {
-        if (isDead || _playerTransform == null || !canMove) return;
+    #endregion
 
-        if (!isChasing && _canChase)
-        {
-            StartChasing();
-        }
-
-        if (_canChase && isChasing)
-        {
-            ChasePlayer();
-        }
-        
-        //CalculateDistanceToPlayer();
-    }
-
-    /*private void CalculateDistanceToPlayer()
-    {
-        _distanceToPlayer = Vector3.Distance(transform.position, _playerTransform.position);
-        if (_distanceToPlayer <= _data.AggroRadius)
-        {
-            if (!isChasing)
-                StartChasing();
-            ChasePlayer();
-        }
-        else if (isChasing)
-        {
-            StopChasing();
-        }
-    }*/
+    #region Chasing
 
     public void StartChasing()
     {
-        _canChase = true;
-        isChasing = true;
+        _chaseCoroutine = StartCoroutine(ChasePlayer());
         PlayRunAnimation();
     }
 
-    private void StopChasing()
+    public void StopChasing()
     {
-        _canChase = false;
-        isChasing = false;
+        if (_chaseCoroutine != null)
+            StopCoroutine(_chaseCoroutine);
+
         PlayDeathAnimationAndDie();
     }
 
-    private void ChasePlayer()
+    private IEnumerator ChasePlayer()
     {
-        if (rb == null) return;
-        
-        Vector3 direction = (_playerTransform.position - transform.position).normalized;
-        direction.y = 0;
-
-        Vector3 movement = direction * (_data.MoveSpeed * Time.deltaTime);
-        rb.MovePosition(transform.position + movement);
-
-        if (direction != Vector3.zero)
+        while (true)
         {
-            Quaternion targetRot = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot,
-                _data.RotationSpeed * Time.deltaTime);
+            if (rb == null) break;
+
+            Vector3 direction = (_playerTransform.position - transform.position).normalized;
+            direction.y = 0;
+
+            Vector3 movement = direction * (_data.MoveSpeed * Time.deltaTime);
+            rb.MovePosition(transform.position + movement);
+
+            if (direction != Vector3.zero)
+            {
+                Quaternion targetRot = Quaternion.LookRotation(direction);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot,
+                    _data.RotationSpeed * Time.deltaTime);
+            }
+
+            yield return _waitForFixedUpdate;
         }
     }
 
-    // private void OnTriggerEnter(Collider other)
-    // {
-    //     if (isDead || hasAttacked) return;
-    //     if (other.CompareTag("Player"))
-    //         AttackPlayer();
-    // }
-
-    public bool CanAttack()
-    {
-        return isDead || hasAttacked;
-    }
-    
-    public void AttackPlayer()
-    {
-        hasAttacked = true;
-        canMove = false;
-        
-        ManageHealthBar(false);
-        if (EventBus != null)
-            EventBus.Fire(new PlayerDamagedEvent(_data.Damage));
-
-        StopChasing();
-    }
-    
-    public void TakeDamage(int damageAmount)
-    {
-        if (isDead) return;
-
-        currentHealth -= damageAmount;
-        currentHealth = Mathf.Max(0, currentHealth);
-
-        ManageHealthBar(true);
-        UpdateHealthBar();
-        
-        if (currentHealth <= 0)
-        {
-            canMove = false;
-            
-            ManageHealthBar(false);
-            StopChasing();
-        }
-    }
-    
     private void PlayDeathAnimationAndDie()
     {
         ManageColliders(false);
-        
+
         Debug.Log("Start dead animation");
-        
+
         PlayDeathAnimation();
     }
 
-    private void ManageColliders(bool  isOn)
-    {
-        foreach (var collider in allColliders)
-        {
-            collider.enabled = isOn;
-        }
-    }
-    
+    #endregion
+
+    #region Animation methods
+
+    private void PlayIdleAnimation() => enemyAnimator.SetTrigger(EnemyAnimations.Idle.ToString());
+
+    private void PlayRunAnimation() => enemyAnimator.SetTrigger(EnemyAnimations.Run.ToString());
+
+    private void PlayDeathAnimation() => enemyAnimator.SetTrigger(EnemyAnimations.Death.ToString());
+
+    #endregion
+
+    #region Death methods
+
     public void OnDeath()
-    {        
+    {
         Debug.Log("Start Dead");
 
         Die();
     }
 
-    private void ManageHealthBar(bool isOn)
-    {
-        if (healthBarCanvas != null)
-            healthBarCanvas.gameObject.SetActive(isOn);
-    }
-    
-    private void UpdateHealthBar()
-    {
-        if (healthBarFill != null)
-            healthBarFill.fillAmount = (float)currentHealth / _data.MaxHealth;
-    }
-
     private void Die()
     {
-        if (isDead) return;
-
-         isDead = true;
-        // canMove = false;
-
         if (rb != null)
         {
             rb.velocity = Vector3.zero;
@@ -234,11 +178,7 @@ public class EnemyController : BaseController
     public void ResetForPooling()
     {
         ManageColliders(true);
-        canMove = true;
-        isChasing = false;
-        isDead = false;
-        hasAttacked = false;
-        currentHealth = _data.MaxHealth;
+        _currentHealth = _data.MaxHealth;
 
         if (rb != null)
         {
@@ -252,24 +192,31 @@ public class EnemyController : BaseController
         PlayIdleAnimation();
     }
 
-    // Animation methods
-    private void PlayIdleAnimation() => enemyAnimator.SetTrigger(EnemyAnimations.Idle.ToString());
-    private void PlayRunAnimation() => enemyAnimator.SetTrigger(EnemyAnimations.Run.ToString());
-    private void PlayDeathAnimation() => enemyAnimator.SetTrigger(EnemyAnimations.Death.ToString());
+    #endregion
 
-    private void OnDrawGizmosSelected()
+    public void TakeDamage(int damageAmount)
     {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, _data ? _data.AggroRadius : 0f);
-        if (_playerTransform != null)
+        _currentHealth -= damageAmount;
+        _currentHealth = Mathf.Max(0, _currentHealth);
+
+        ManageHealthBar(true, healthBarCanvas);
+        _enemyHealthBarService.UpdateHealthBar(healthBarFill, _currentHealth, _data.MaxHealth);
+
+        if (_currentHealth <= 0)
         {
-            Gizmos.color = isChasing ? Color.green : Color.gray;
-            Gizmos.DrawLine(transform.position, _playerTransform.position);
+            ManageHealthBar(false, healthBarCanvas);
+            StopChasing();
         }
     }
-}
 
-// ReadOnly attribute for Inspector display
-public class ReadOnlyAttribute : PropertyAttribute
-{
+    private void ManageColliders(bool isOn)
+    {
+        foreach (var collider in allColliders)
+        {
+            collider.enabled = isOn;
+        }
+    }
+
+    private void ManageHealthBar(bool isOn, Canvas healthBar) =>
+        _enemyHealthBarService.ManageHealthBar(isOn, healthBar);
 }

@@ -325,6 +325,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   offset: {x: 0, y: 0, z: 0}
   lookAtCamera: 1
+  mainCamera: {fileID: 0}
+  canvas: {fileID: 9115771477033793516}
 --- !u!1 &8915878480753198258
 GameObject:
   m_ObjectHideFlags: 0
@@ -484,11 +486,6 @@ MonoBehaviour:
   - {fileID: 2216940270351934882}
   - {fileID: 3893248616047847542}
   - {fileID: 5646375856342403607}
-  isChasing: 0
-  isDead: 0
-  canMove: 0
-  hasAttacked: 0
-  currentHealth: 0
 --- !u!1001 &5690479314711851833
 PrefabInstance:
   m_ObjectHideFlags: 0

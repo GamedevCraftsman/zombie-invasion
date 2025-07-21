@@ -19,7 +19,7 @@ MonoBehaviour:
   spawnPointCount: 25
   enemyPoolInitialSize: 18
   sideXOffsetRange: 0.3
-  sideZOffsetRange: 1.75
+  sideZOffsetRange: 2
   minSpawnDistance: 0.15
   ignoreFirstTile: 1
   ignoreLastTile: 1

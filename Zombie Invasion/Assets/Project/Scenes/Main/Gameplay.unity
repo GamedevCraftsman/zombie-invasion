@@ -894,6 +894,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0142ecb237994c94691513ed58899be4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  camera: {fileID: 330585545}
   enemySpawnSettings: {fileID: 11400000, guid: 01f61019016df1248bb4bd09ed0f9383, type: 2}
   enemySettings: {fileID: 11400000, guid: 17bd05903d19f9e42910ee79278a84f7, type: 2}
   carSettings: {fileID: 11400000, guid: 43096b65e36f4344d84ed02a86b4d55f, type: 2}
@@ -3596,7 +3597,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b8b371df14bc94418ae6af37f362ae9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxFrameRate: 120
+  maxFrameRate: 60
 --- !u!4 &1610092297
 Transform:
   m_ObjectHideFlags: 0

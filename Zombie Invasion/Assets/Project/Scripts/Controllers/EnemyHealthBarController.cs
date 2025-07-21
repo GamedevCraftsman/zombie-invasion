@@ -1,48 +1,59 @@
 using UnityEngine;
+using Zenject;
 
 public class EnemyHealthBarController : MonoBehaviour
 {
-    [Header("Settings")] [SerializeField] private Vector3 offset = new Vector3(0, 2f, 0);
+    [Header("Settings")] 
+    [SerializeField] private Vector3 offset = new(0, 2f, 0);
     [SerializeField] private bool lookAtCamera = true;
+    [SerializeField] private Canvas canvas;
 
-    private Camera mainCamera;
-    private Canvas canvas;
+    private Camera _mainCamera;
 
-    private void Start()
+    [Inject]
+    public void Construct(Camera mainCamera)
     {
-        // FindCamer
-        mainCamera = Camera.main;
-        if (mainCamera == null)
-        {
-            mainCamera = FindObjectOfType<Camera>();
-        }
+        _mainCamera = mainCamera;
+        
+        Init();
+    } 
 
-        // Get Canvas
-        canvas = GetComponent<Canvas>();
+    private void Init()
+    {
+        SetUpCanvas();
+    }
 
-        // Set up Canvas
+    private void SetUpCanvas()
+    {
         if (canvas != null)
         {
             canvas.renderMode = RenderMode.WorldSpace;
-            canvas.worldCamera = mainCamera;
+            canvas.worldCamera = _mainCamera;
         }
     }
-
+    
     private void LateUpdate()
     {
         if (!gameObject.activeInHierarchy) return;
+    
+        SetOverEnemy();
+        RotateToCamera();
+    }
 
-        // Positioning over enemy
+    private void SetOverEnemy()
+    {
         if (transform.parent != null)
         {
             transform.position = transform.parent.position + offset;
         }
+    }
 
-        // Rotate To Camera
-        if (lookAtCamera && mainCamera != null)
+    private void RotateToCamera()
+    {
+        if (lookAtCamera && _mainCamera != null)
         {
-            transform.LookAt(transform.position + mainCamera.transform.rotation * Vector3.forward,
-                mainCamera.transform.rotation * Vector3.up);
+            transform.LookAt(transform.position + _mainCamera.transform.rotation * Vector3.forward,
+                _mainCamera.transform.rotation * Vector3.up);
         }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
@@ -17,10 +16,10 @@ public class CarController : BaseController, ICarController
     // State
     private bool _isMoving;
     private bool _isGameActive;
-    //private bool _isStopping;
-    private float _currentSpeed = 0;
-    private float _lvlLength = 0;
+    private float _currentSpeed;
+    private float _lvlLength;
 
+    public Transform CarTransform => carTransform;
     [Inject]
     public void Construct(CarSettings carSettings, GameSettings gameSettings, IGameManager gameManager)
     {

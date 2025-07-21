@@ -3,6 +3,9 @@ using Zenject;
 
 public class GameInstaller : MonoInstaller
 {
+    [Header("Camera")]
+    [SerializeField] private Camera camera;
+    
     [Header("Settings")]
     [SerializeField] private EnemySpawnSettings enemySpawnSettings;
     [SerializeField] private EnemySettings enemySettings;
@@ -53,6 +56,7 @@ public class GameInstaller : MonoInstaller
             .FromComponentInHierarchy()
             .AsSingle().NonLazy();
         
+   
         // Pool System
         Container.Bind<IPoolable<EnemyController>>()
             .To<EnemyPoolHandler>()
@@ -73,7 +77,6 @@ public class GameInstaller : MonoInstaller
         Container.BindInstance(carSettings).AsSingle();
         Container.BindInstance(gameplayUISettings).AsSingle();
         
-        //===============
         // Нові SRP‑класи
         Container.Bind<ISpawnPointValidator>()
             .To<SpawnPointValidator>()
@@ -87,6 +90,13 @@ public class GameInstaller : MonoInstaller
          Container.Bind<IInitializable>()
              .To<EnemySpawnEventHandler>()
              .AsSingle();
+         
+         //===============
+         Container.Bind<IEnemyAttack>().To<EnemyAttack>().AsTransient();
+         Container.Bind<IEnemyHealthBarService>().To<EnemyHealthBarService>().AsSingle();
+         
+         //Camera
+         Container.Bind<Camera>().FromInstance(camera).AsSingle();
     }
     
     private IPool<EnemyController> CreateEnemyPool(InjectContext context)
