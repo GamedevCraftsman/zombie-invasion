@@ -1,20 +1,21 @@
 using UnityEngine;
+using Zenject;
 
 public class Billboard : MonoBehaviour
 {
-    private Camera mainCamera;
+    private Camera _mainCamera;
 
-    void Start()
+    [Inject]
+    private void Construct(Camera mainCamera)
     {
-        mainCamera = Camera.main;
+        _mainCamera = mainCamera;
     }
 
     void LateUpdate()
     {
-        if (mainCamera != null)
+        if (_mainCamera != null)
         {
-            // Повертаємо об'єкт у бік камери
-            transform.forward = mainCamera.transform.forward;
+            transform.forward = _mainCamera.transform.forward;
         }
     }
 }

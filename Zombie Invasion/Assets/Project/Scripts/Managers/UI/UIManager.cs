@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,7 +10,15 @@ public class UIManager : BaseManager, IUIManager
 
     protected override Task Initialize()
     {
-        SetButtonsEvents();
+        try
+        {
+            SetButtonsEvents();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+        }
+
         return Task.CompletedTask;
     }
 
@@ -17,11 +26,6 @@ public class UIManager : BaseManager, IUIManager
     {
         restartButton.onClick.AddListener(() => ShowGameOverUI(false));
         continueButton.onClick.AddListener(() => ShowGameOverUI(true));
-    }
-    
-    public void ShowGameUI()
-    {
-        throw new System.NotImplementedException();
     }
 
     public void ShowGameOverUI(bool victory)

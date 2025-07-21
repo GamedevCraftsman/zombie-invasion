@@ -1,12 +1,11 @@
 using Project.Scripts.Controllers;
-using UnityEditor;
 using UnityEngine;
 using Zenject;
 
 public class GameInstaller : MonoInstaller
 {
     [Header("Camera")]
-    [SerializeField] private Camera camera;
+    [SerializeField] private Camera mainCamera;
     
     [Header("Settings")]
     [SerializeField] private EnemySpawnSettings enemySpawnSettings;
@@ -19,10 +18,9 @@ public class GameInstaller : MonoInstaller
     
     [Header("Managers")]
     [SerializeField] private GameManager gameManager;
-    
-    [Header("Pool Parent")]
-    [SerializeField] private Transform enemyPoolParent;
-    
+
+    [Header("Pool Parent")] [SerializeField]
+    private Transform enemyPoolParent;
     public override void InstallBindings()
     {
         // Managers
@@ -100,7 +98,7 @@ public class GameInstaller : MonoInstaller
          Container.Bind<IEnemyHealthBarService>().To<EnemyHealthBarService>().AsSingle();
          
          //Camera
-         Container.Bind<Camera>().FromInstance(camera).AsSingle();
+         Container.Bind<Camera>().FromInstance(mainCamera).AsSingle();
     }
     
     private IPool<EnemyController> CreateEnemyPool(InjectContext context)

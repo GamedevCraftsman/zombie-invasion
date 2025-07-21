@@ -2,39 +2,39 @@
 
 public class CameraRenderer : MonoBehaviour
 {
-    public Vector2 DefaultResolution = new Vector2(720, 1280);
-    [Range(0f, 1f)] public float WidthOrHeight = 0;
+    [SerializeField] private Vector2 defaultResolution = new(1080, 1920);
+    [SerializeField, Range(0f, 1f)] private float widthOrHeight = 0;
 
-    private Camera componentCamera;
+    private Camera _componentCamera;
 
-    private float initialSize;
-    private float targetAspect;
+    private float _initialSize;
+    private float _targetAspect;
 
-    private float initialFov;
-    private float horizontalFov = 120f;
+    private float _initialFov;
+    private float _horizontalFov = 120f;
 
     private void Start()
     {
-        componentCamera = GetComponent<Camera>();
-        initialSize = componentCamera.orthographicSize;
+        _componentCamera = GetComponent<Camera>();
+        _initialSize = _componentCamera.orthographicSize;
 
-        targetAspect = DefaultResolution.x / DefaultResolution.y;
+        _targetAspect = defaultResolution.x / defaultResolution.y;
 
-        initialFov = componentCamera.fieldOfView;
-        horizontalFov = CalcVerticalFov(initialFov, 1 / targetAspect);
+        _initialFov = _componentCamera.fieldOfView;
+        _horizontalFov = CalcVerticalFov(_initialFov, 1 / _targetAspect);
     }
 
     private void Update()
     {
-        if (componentCamera.orthographic)
+        if (_componentCamera.orthographic)
         {
-            float constantWidthSize = initialSize * (targetAspect / componentCamera.aspect);
-            componentCamera.orthographicSize = Mathf.Lerp(constantWidthSize, initialSize, WidthOrHeight);
+            float constantWidthSize = _initialSize * (_targetAspect / _componentCamera.aspect);
+            _componentCamera.orthographicSize = Mathf.Lerp(constantWidthSize, _initialSize, widthOrHeight);
         }
         else
         {
-            float constantWidthFov = CalcVerticalFov(horizontalFov, componentCamera.aspect);
-            componentCamera.fieldOfView = Mathf.Lerp(constantWidthFov, initialFov, WidthOrHeight);
+            float constantWidthFov = CalcVerticalFov(_horizontalFov, _componentCamera.aspect);
+            _componentCamera.fieldOfView = Mathf.Lerp(constantWidthFov, _initialFov, widthOrHeight);
         }
     }
 
