@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
@@ -41,11 +42,13 @@ public class SpawnMapManager : BaseManager
     private void SubscribeToEvents()
     {
         EventBus.Subscribe<ContinueGameEvent>(OnContinueGame);
+        EventBus.Subscribe<RestarGameEvent>(OnGameRestart);
     }
 
     private void UnsubscribeFromEvents()
     {
         EventBus?.Unsubscribe<ContinueGameEvent>(OnContinueGame);
+        EventBus?.Unsubscribe<RestarGameEvent>(OnGameRestart);
     }
 
     private void OnContinueGame(ContinueGameEvent continueGameEvent)
@@ -53,6 +56,11 @@ public class SpawnMapManager : BaseManager
         ManageGroundTiles(_gameSettings.MapLength, false);
     }
 
+    private void OnGameRestart(RestarGameEvent restartGameEvent)
+    {
+        ManageGroundTiles(_gameSettings.MapLength, true);
+    }
+    
     private void OnDestroy()
     {
         UnsubscribeFromEvents();
@@ -89,7 +97,7 @@ public class SpawnMapManager : BaseManager
     private void RepositionAllTiles(bool isRestart)
     {
         Vector3 repositionStartPosition = GetRepositionStartPositionAdvanced(isRestart);
-
+        
         // Move to new positions
         for (int i = 0; i < _groundTiles.Count; i++)
         {
@@ -97,7 +105,7 @@ public class SpawnMapManager : BaseManager
             {
                 Vector3 newTilePosition =
                     repositionStartPosition + Vector3.forward * (i * _gameSettings.DistanceBetweenTiles);
-                _groundTiles[i].transform.position = newTilePosition;
+                _groundTiles[i].transform.localPosition = newTilePosition;
             }
         }
     }
@@ -123,9 +131,7 @@ public class SpawnMapManager : BaseManager
         {
             return new Vector3(_startPosition.x, _startPosition.y, maxZ); //return last tile position
         }
-        else
-        {
-            return _startPosition;
-        }
+
+        return _startPosition;
     }
 }
