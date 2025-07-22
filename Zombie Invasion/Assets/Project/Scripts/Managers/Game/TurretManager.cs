@@ -5,12 +5,25 @@ using Zenject;
 
 public class TurretManager : BaseManager
 {
-    [Inject] private WeaponSettings _weaponSettings;
-    [Inject] private ITurretController _turretController;  
-    [Inject] private IInputController _inputController;
-    [Inject] private IFireController _fireController;
-
+    private WeaponSettings _weaponSettings;
+    private ITurretController _turretController;  
+    private IInputController _inputController;
+    private IFireController _fireController;
+    private IAimStateService _aimStateService;
+    
     private ITurretInputHandler _inputHandler;
+
+    [Inject]
+    public void Construct(ITurretController turretController, IInputController inputController,
+        IFireController fireController, WeaponSettings weaponSettings, IAimStateService aimStateService)
+    {
+        _weaponSettings = weaponSettings;
+        _turretController = turretController;
+        _inputController = inputController;
+        _fireController = fireController;
+        _aimStateService = aimStateService;
+    }
+    
     protected override Task Initialize()
     {
         try
@@ -45,12 +58,14 @@ public class TurretManager : BaseManager
     private void OnGameStarted(StartGameEvent gameStartedEvent)
     {
         _turretController.EnableControl();
+        _aimStateService.AimManage(true);
     }
 
     private void OnGameOver(GameOverEvent gameOverEvent)
     {
         _turretController.DisableControl();
         _turretController.ResetRotation();
+        _aimStateService.AimManage(false);
         
        //Add StopDragging() =>  _isDragging = false;
        _inputHandler.StopDragging();
@@ -60,6 +75,7 @@ public class TurretManager : BaseManager
     {
         _turretController.DisableControl();
         _turretController.ResetRotation();
+        _aimStateService.AimManage(false);
         
         _inputHandler.StopDragging();
     }

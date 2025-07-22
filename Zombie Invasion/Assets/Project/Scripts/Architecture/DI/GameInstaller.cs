@@ -96,6 +96,7 @@ public class GameInstaller : MonoInstaller
          //===============
          Container.Bind<IEnemyAttack>().To<EnemyAttack>().AsTransient();
          Container.Bind<IEnemyHealthBarService>().To<EnemyHealthBarService>().AsSingle();
+         Container.Bind<IAimStateService>().FromComponentInHierarchy().AsSingle();
          
          //Camera
          Container.Bind<Camera>().FromInstance(mainCamera).AsSingle();

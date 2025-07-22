@@ -2,22 +2,23 @@ using UnityEngine;
 
 public class TurretInputHandler : ITurretInputHandler
 {
-    private readonly WeaponSettings _weaponSettings; 
+    private readonly WeaponSettings _weaponSettings;
     private readonly IInputController _inputController;
     private readonly ITurretController _turretController;
     private readonly IFireController _fireController;
-    
+
     private float _currentRotationAngle = 0;
     private bool _isDragging;
     private Vector2 _lastInputPosition;
-    
-    public TurretInputHandler(ITurretController turretController, WeaponSettings weaponSettings, IInputController inputController, IFireController fireController)
+
+    public TurretInputHandler(ITurretController turretController, WeaponSettings weaponSettings,
+        IInputController inputController, IFireController fireController)
     {
         _turretController = turretController;
         _weaponSettings = weaponSettings;
         _inputController = inputController;
         _fireController = fireController;
-        
+
         Initialize();
     }
 
@@ -28,6 +29,7 @@ public class TurretInputHandler : ITurretInputHandler
     }
 
     #region Turret Shooting
+
     private void HandleShooting()
     {
         if (_isDragging)
@@ -35,8 +37,11 @@ public class TurretInputHandler : ITurretInputHandler
             _fireController.Fire();
         }
     }
+
     #endregion
+
     #region Turret Movement
+
     private void HandleInput()
     {
         InputType inputType = _inputController.LastInputType;
@@ -50,7 +55,7 @@ public class TurretInputHandler : ITurretInputHandler
             HandleTouchInput();
         }
     }
- 
+
     private void HandleMouseInput()
     {
         if (Input.GetMouseButtonDown(0))
@@ -90,7 +95,7 @@ public class TurretInputHandler : ITurretInputHandler
             }
         }
     }
-    
+
     private void StartDragging(Vector2 inputPosition)
     {
         _isDragging = true;
@@ -108,7 +113,7 @@ public class TurretInputHandler : ITurretInputHandler
     {
         Vector2 deltaPosition = currentInputPosition - _lastInputPosition;
         float horizontalDelta = deltaPosition.x * _weaponSettings.InputSensitivity;
-        
+
         float screenMultiplier = _weaponSettings.BaseScreenSize / Screen.width;
         float rotationDelta = horizontalDelta * (_weaponSettings.RotationSpeed * screenMultiplier) * Time.deltaTime;
         float newAngle = _currentRotationAngle + rotationDelta;
@@ -117,10 +122,11 @@ public class TurretInputHandler : ITurretInputHandler
         _currentRotationAngle = newAngle;
         return newAngle;
     }
-    
+
     public void StopDragging()
     {
         _isDragging = false;
     }
+
     #endregion
 }

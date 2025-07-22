@@ -19,12 +19,13 @@ public class UIController : BaseController
     private const float Close = 0;
 
     private UISettings _uiSettings;
+
     [Inject]
     public void Construct(UISettings uiSettings)
     {
         _uiSettings = uiSettings;
-    } 
-    
+    }
+
     protected override Task Initialize()
     {
         try
@@ -69,17 +70,24 @@ public class UIController : BaseController
 
     private void RestartGame(RestarGameEvent restartGameEvent)
     {
-        losePanel.interactable = false;
-        losePanel.DOFade(Close, _uiSettings.DisappearPanelTime);
+        CloseEndGamePanel(losePanel, restartGameButton);
     }
 
     private void ContinueGame(ContinueGameEvent continueGameEvent)
     {
-        winPanel.interactable = false;
-        winPanel.DOFade(Close, _uiSettings.DisappearPanelTime);
+        CloseEndGamePanel(winPanel, continueGameButton);
     }
 
     #endregion
+
+    private void CloseEndGamePanel(CanvasGroup panel, CanvasGroup button)
+    {
+        Sequence closePanel = DOTween.Sequence();
+        panel.interactable = false;
+
+        closePanel.Append(panel.DOFade(Close, _uiSettings.DisappearPanelTime))
+            .OnComplete( () => ResetButtonPosition(button));
+    }
 
     private void OpenEndGamePanel(CanvasGroup label, CanvasGroup button, CanvasGroup panel)
     {
@@ -88,13 +96,21 @@ public class UIController : BaseController
         panel.interactable = true;
 
         button.alpha = Close;
-        button.transform.position = new Vector3(button.transform.position.x, _uiSettings.ButtonStartPos, button.transform.position.z); 
-        
+
         openPanel.AppendCallback(() => button.interactable = false)
             .Join(label.DOFade(Open, _uiSettings.AppearPanelTime))
-            .Append(button.transform.DOMoveY(_uiSettings.ButtonEndPos, _uiSettings.ButtonMoveTime)).SetEase(_uiSettings.ButtonMoveEase)
+            .Append(button.transform.DOMoveY(_uiSettings.ButtonEndPos, _uiSettings.ButtonMoveTime))
+            .SetEase(_uiSettings.ButtonMoveEase)
             .Join(button.DOFade(Open, _uiSettings.AppearPanelTime))
-            .AppendCallback(() => button.interactable = true);
+            .AppendCallback(() => button.interactable = true)
+            .Complete();
+        
+    }
+
+    private void ResetButtonPosition(CanvasGroup button)
+    {
+        button.transform.position = new Vector3(button.transform.position.x, _uiSettings.ButtonStartPos,
+            button.transform.position.z);
     }
 
     private void OnDestroy()

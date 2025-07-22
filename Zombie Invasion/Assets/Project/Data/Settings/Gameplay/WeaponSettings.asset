@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6af4425c07edfa4e96cb77a8886a539, type: 3}
   m_Name: WeaponSettings
   m_EditorClassIdentifier: 
-  fireRate: 0.5
-  bulletSpeed: 7
+  fireRate: 0.4
+  bulletSpeed: 3
   bulletDamage: 50
-  bulletLifetime: 5
+  bulletLifetime: 2
   bulletPrefab: {fileID: 5198511406076633119, guid: f99e7cc189da96e4ea11db09c298636a,
     type: 3}
   poolSize: 20
   maxRotationAngle: 45
   rotationSpeed: 2
-  inputSensitivity: 1.75
+  inputSensitivity: 2
   baseScreenSize: 1080
