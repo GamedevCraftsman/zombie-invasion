@@ -31,7 +31,7 @@ public class EnemyController : BaseController
 
     private EnemySettings _data;
 
-    private CarController _carController;
+    private ICarController _carController;
 
     private IEnemyAttack _enemyAttack;
 
@@ -48,7 +48,7 @@ public class EnemyController : BaseController
     #endregion
 
     [Inject]
-    private void Construct(EnemySettings enemySettings, CarController carController, IEnemyAttack enemyAttack,
+    private void Construct(EnemySettings enemySettings, ICarController carController, IEnemyAttack enemyAttack,
         IEnemyHealthBarService enemyHealthBarService)
     {
         _data = enemySettings;
@@ -78,7 +78,7 @@ public class EnemyController : BaseController
     private void Initialized()
     {
         // Assign player
-        _playerTransform = _carController.CarTransform;
+        _playerTransform = _carController.Car.transform;
 
         // Initialize health
         _currentHealth = _data.MaxHealth;

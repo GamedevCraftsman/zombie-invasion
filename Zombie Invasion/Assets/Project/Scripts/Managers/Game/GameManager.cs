@@ -8,7 +8,7 @@ public class GameManager : BaseManager, IGameManager
 {
     // Dependencies
     private HPManager _hpManager;
-    private InputController _inputController;
+    private IInputController _inputController;
 
     // State
     private GameState _currentState = GameState.Menu;
@@ -17,7 +17,7 @@ public class GameManager : BaseManager, IGameManager
     public GameState CurrentState => _currentState;
 
     [Inject]
-    public void Construct(HPManager hpManager, InputController inputController)
+    public void Construct(HPManager hpManager, IInputController inputController)
     {
         _hpManager = hpManager;
         _inputController = inputController;

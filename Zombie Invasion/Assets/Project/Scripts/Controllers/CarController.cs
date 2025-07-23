@@ -1,12 +1,13 @@
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
 public class CarController : BaseController, ICarController
 {
     [Header("References")] [SerializeField]
-    private Transform carTransform;
+    private GameObject car;
 
     // Dependencies
     private CarSettings _carSettings;
@@ -19,7 +20,7 @@ public class CarController : BaseController, ICarController
     private float _currentSpeed;
     private float _lvlLength;
 
-    public Transform CarTransform => carTransform;
+    public GameObject Car => car;
     [Inject]
     public void Construct(CarSettings carSettings, GameSettings gameSettings, IGameManager gameManager)
     {
@@ -32,9 +33,6 @@ public class CarController : BaseController, ICarController
     {
         try
         {
-            if (carTransform == null)
-                carTransform = transform;
-
             ResetCarState();
         }
         catch (Exception e)
@@ -67,7 +65,7 @@ public class CarController : BaseController, ICarController
 
     public void StartMovement()
     {
-        _lvlLength = _gameSettings.LvlLenghtCalculation(carTransform);
+        _lvlLength = _gameSettings.LvlLenghtCalculation(car.transform);
         
         _isMoving = true;
         _isGameActive = true;
@@ -99,19 +97,19 @@ public class CarController : BaseController, ICarController
     private void Move()
     {
         Vector3 movement = Vector3.forward * (_currentSpeed * Time.fixedDeltaTime);
-        carTransform.position += movement;
+        car.transform.position += movement;
     }
     
     public void ResetPosition()
          {
-             carTransform.position = _carSettings.CarStartPosition;
+             car.transform.position = _carSettings.CarStartPosition;
              ResetCarState();
          }
     #endregion
 
     private void CheckLevelCompletion()
     {
-        if (carTransform.position.z >= _lvlLength)
+        if (car.transform.position.z >= _lvlLength)
         {
             _gameManager.EndGame(true);
             SetCorrectPosition();
@@ -120,7 +118,7 @@ public class CarController : BaseController, ICarController
 
     private void SetCorrectPosition()
     {
-        Vector3 pos = carTransform.position;
-        carTransform.position = new Vector3(pos.x, pos.y, _lvlLength);
+        Vector3 pos = car.transform.position;
+        car.transform.position = new Vector3(pos.x, pos.y, _lvlLength);
     }
 }
