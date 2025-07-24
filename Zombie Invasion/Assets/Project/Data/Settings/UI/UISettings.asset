@@ -14,3 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   disappearPanelTime: 0.5
   appearPanelTime: 1
+  buttonMoveTime: 2
+  buttonMoveEase: 27
+  buttonStartPos: -200
+  buttonEndPos: 190
+  timeToRelive: 10

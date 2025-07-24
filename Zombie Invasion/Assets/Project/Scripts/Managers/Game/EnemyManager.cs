@@ -24,8 +24,6 @@ public class EnemyManager : MonoBehaviour, IEnemyManager
 
     public void CountEnemiesLeft()
     {
-        Debug.LogWarning("CountEnemiesLeft");
-        
         _enemiesLeft = _settings.TotalEnemyCount - _settings.EnemyPoolInitialSize;
 
         if (_enemiesLeft != 0)

@@ -1,6 +1,8 @@
+using System;
 using DG.Tweening;
 using UnityEngine;
 
+[Serializable]
 [CreateAssetMenu(fileName = "UISettings", menuName = "UI/UI Settings")]
 public class UISettings : ScriptableObject
 {
@@ -14,6 +16,9 @@ public class UISettings : ScriptableObject
     [SerializeField] private float buttonStartPos = -200;
     [SerializeField] private float buttonEndPos = 190;
 
+    [Header("Relive Panel")] 
+    [SerializeField] private int timeToRelive = 20;
+
     #region Public values
 
     public float DisappearPanelTime => disappearPanelTime;
@@ -26,5 +31,7 @@ public class UISettings : ScriptableObject
     public float ButtonStartPos => buttonStartPos;
     public float ButtonEndPos => buttonEndPos;
 
+    //Relive Panel
+    public int TimeToRelive => timeToRelive;
     #endregion
 }
