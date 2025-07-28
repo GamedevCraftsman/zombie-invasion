@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class UIManager : BaseManager, IUIManager
 {
+    [SerializeField] private Button respawnButton;
     [SerializeField] private Button restartButton;
     [SerializeField] private Button continueButton;
 
@@ -24,6 +25,7 @@ public class UIManager : BaseManager, IUIManager
 
     private void SetButtonsEvents()
     {
+        respawnButton.onClick.AddListener(ShowRewardedAd);
         restartButton.onClick.AddListener(() => ShowGameOverUI(false));
         continueButton.onClick.AddListener(() => ShowGameOverUI(true));
     }
@@ -39,5 +41,12 @@ public class UIManager : BaseManager, IUIManager
             Debug.LogWarning("Restart");
             EventBus.Fire(new RestarGameEvent());
         }
+    }
+
+    private void ShowRewardedAd()
+    {
+        respawnButton.interactable = false;
+        
+        EventBus.Fire(new ShowReliveAdEvent());
     }
 }

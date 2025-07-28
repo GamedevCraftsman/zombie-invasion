@@ -8,17 +8,19 @@ using Zenject;
 
 public class ReliveController : BaseController
 {
-    [Header("General")]
+    [Header("General")] 
     [SerializeField] private GameObject backDarkPanel;
     [SerializeField] private CanvasGroup timer;
+    [SerializeField] private Button reliveButton;
     
-    [Header("Timer")]
+    [Header("Timer")] 
     [SerializeField] private TMP_Text timerText;
     [SerializeField] private Image bar;
 
+    private Coroutine _timerCoroutine;
     private ITimer _showTimer;
     private ITimeCounter _timeCounter;
-    
+
     private UISettings _uiSettings;
 
     [Inject]
@@ -26,7 +28,7 @@ public class ReliveController : BaseController
     {
         _uiSettings = uiSettings;
     }
-    
+
     protected override Task Initialize()
     {
         try
@@ -38,7 +40,7 @@ public class ReliveController : BaseController
         {
             Debug.LogError(e);
         }
-        
+
         return Task.CompletedTask;
     }
 
@@ -47,15 +49,27 @@ public class ReliveController : BaseController
         _showTimer = new ShowReliveTimer(backDarkPanel, timer);
         _timeCounter = new StandartTimeCounter(_uiSettings.TimeToRelive);
     }
-    
+
+    #region Events
+
     private void SubscribeEvents()
     {
         EventBus.Subscribe<GameOverEvent>(OnGameOver);
+        EventBus.Subscribe<EndReliveAdEvent>(OnEndReliveAd);
     }
 
     private void UnsubscribeEvents()
     {
         EventBus?.Unsubscribe<GameOverEvent>(OnGameOver);
+        EventBus?.Unsubscribe<EndReliveAdEvent>(OnEndReliveAd);
+    }
+
+    private void OnEndReliveAd(EndReliveAdEvent endReliveAdEvent)
+    {
+        StopCoroutine(_timerCoroutine);
+        _showTimer.HideTimerPanel();
+        
+        reliveButton.interactable = true;
     }
 
     private void OnGameOver(GameOverEvent gameOverEvent)
@@ -63,24 +77,26 @@ public class ReliveController : BaseController
         _timeCounter.ResetCounter(timerText, bar);
         _showTimer.ShowTimerPanel();
 
-        StartCoroutine(Timer());
+        _timerCoroutine = StartCoroutine(Timer());
     }
+
+    #endregion
 
     private IEnumerator Timer()
     {
         yield return new WaitUntil(PanelOpened);
         Debug.LogWarning("PanelOpened: " + PanelOpened());
-        
+
         WaitForSeconds wait = new WaitForSeconds(1);
 
         while (true)
         {
             bool isTimeGo = _timeCounter.CountDownTick(timerText, bar);
-            
+
             if (!isTimeGo) break;
             yield return wait;
         }
-        
+
         _showTimer.HideTimerPanel();
     }
 
@@ -88,7 +104,7 @@ public class ReliveController : BaseController
     {
         return _showTimer.IsOpened;
     }
-    
+
     private void OnDestroy()
     {
         UnsubscribeEvents();
