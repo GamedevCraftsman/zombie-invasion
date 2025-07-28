@@ -7,11 +7,13 @@ using Sequence = DG.Tweening.Sequence;
 
 public class UIController : BaseController
 {
-    [Header("LosePanel")] [SerializeField] private CanvasGroup losePanel;
+    [Header("LosePanel")] 
+    [SerializeField] private CanvasGroup losePanel;
     [SerializeField] private CanvasGroup restartGameButton;
     [SerializeField] private CanvasGroup restartGameLabel;
 
-    [Header("Win Panel")] [SerializeField] private CanvasGroup winPanel;
+    [Header("Win Panel")] 
+    [SerializeField] private CanvasGroup winPanel;
     [SerializeField] private CanvasGroup continueGameButton;
     [SerializeField] private CanvasGroup continueGameLabel;
 

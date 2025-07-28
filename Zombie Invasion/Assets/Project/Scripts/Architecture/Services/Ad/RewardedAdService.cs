@@ -1,24 +1,27 @@
 using System;
 using UnityEngine;
 using Unity.Services.LevelPlay;
+using Zenject;
 
-public class RewardedAdService
+public class RewardedAdService : IRewardedAdService, IDisposable
 {
-    private readonly string _adUnitId;
+    private readonly AdSettings _adSettings;
     private LevelPlayRewardedAd _rewardedAd;
 
     public event Action OnGiveReward;
     
-    public RewardedAdService(string adUnitId)
+    [Inject]
+    public RewardedAdService(AdSettings adSettings)
     {
-        _adUnitId = adUnitId;
+        _adSettings = adSettings;
+        
         CreateRewardedAd();
     }
     
-    void CreateRewardedAd()
+    private void CreateRewardedAd()
     {
         //Create RewardedAd instance
-        _rewardedAd = new LevelPlayRewardedAd(_adUnitId);
+        _rewardedAd = new LevelPlayRewardedAd(_adSettings.RewardedAdUnitId);
         
         SubscribeRewardedMethods();
     }
@@ -28,6 +31,13 @@ public class RewardedAdService
         _rewardedAd.OnAdLoaded += RewardedOnAdLoadedEvent;
         _rewardedAd.OnAdLoadFailed += RewardedOnAdLoadFailedEvent;
         _rewardedAd.OnAdRewarded += RewardedOnAdRewarded;
+    }
+    
+    private void UnsubscribeRewardedMethods()
+    {
+        _rewardedAd.OnAdLoaded -= RewardedOnAdLoadedEvent;
+        _rewardedAd.OnAdLoadFailed -= RewardedOnAdLoadFailedEvent;
+        _rewardedAd.OnAdRewarded -= RewardedOnAdRewarded;
     }
 
     public void LoadRewardedAd()
@@ -41,6 +51,11 @@ public class RewardedAdService
         {
             _rewardedAd.ShowAd("Game_Screen");
         }
+    }
+
+    private void DestroyRewardedAd()
+    {
+        _rewardedAd.DestroyAd();
     }
     
     //Implement RewardedAd events
@@ -59,5 +74,13 @@ public class RewardedAdService
     {
         //Give reward
         OnGiveReward?.Invoke();
+    }
+
+    public void Dispose()
+    {
+        UnsubscribeRewardedMethods();
+        DestroyRewardedAd();
+        
+        Debug.LogWarning("Rewarded ad destroyed");
     }
 }

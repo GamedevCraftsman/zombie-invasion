@@ -1,18 +1,24 @@
+using System;
 using UnityEngine;
 using Unity.Services.LevelPlay;
+using Zenject;
 
-public class BannerAdService
+public class BannerAdService : IBannerAdService, IDisposable
 {
+    private readonly AdSettings _adSettings;
     private LevelPlayBannerAd _bannerAd;
 
-    public BannerAdService(string bannerAdPath)
+    [Inject]
+    public BannerAdService(AdSettings adSettings)
     {
-        CreateBannerAd(bannerAdPath);
+        _adSettings = adSettings;
+        
+        CreateBannerAd();
     }
 
-    void CreateBannerAd(string bannerAdPath)
+    private void CreateBannerAd()
     {
-       CreateInstance(bannerAdPath);
+       CreateInstance(_adSettings.BannerUnitId);
 
        SubscribeEvents();
     }
@@ -29,9 +35,20 @@ public class BannerAdService
         _bannerAd.LoadAd();
     }
 
+    private void DestroyBannerAd()
+    {
+        _bannerAd.DestroyAd();
+    }
+    
     #region Events
 
     private void SubscribeEvents()
+    {
+        _bannerAd.OnAdLoaded += BannerOnAdLoadedEvent;
+        _bannerAd.OnAdLoadFailed += BannerOnAdLoadFailedEvent;
+    }
+    
+    private void UnsubscribeEvents()
     {
         _bannerAd.OnAdLoaded += BannerOnAdLoadedEvent;
         _bannerAd.OnAdLoadFailed += BannerOnAdLoadFailedEvent;
@@ -50,6 +67,13 @@ public class BannerAdService
     }
 
     #endregion
-    
-    
+
+
+    public void Dispose()
+    {
+        UnsubscribeEvents();
+        DestroyBannerAd();
+        
+        Debug.LogWarning("Banner ad destroyed!");
+    }
 }

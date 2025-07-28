@@ -5,10 +5,10 @@ using Zenject;
 
 public class AdManager : BaseManager
 {
-    private AdService _adService;
+    private IAdService _adService;
 
     [Inject]
-    public void Construct(AdService adService)
+    public void Construct(IAdService adService)
     {
         _adService = adService;
     }

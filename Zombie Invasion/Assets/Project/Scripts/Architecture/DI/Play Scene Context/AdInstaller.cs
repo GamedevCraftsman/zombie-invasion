@@ -3,10 +3,19 @@ using Zenject;
 
 public class AdInstaller : MonoInstaller
 {
-    [SerializeField] private AdService adService;
+    [Header("Settings")]
+    [SerializeField] private AdSettings adSettings;
     
     public override void InstallBindings()
     {
-        Container.Bind<AdService>().FromInstance(adService).AsSingle();
+        //Services
+        Container.BindInterfacesTo<AdService>().AsSingle();
+        Container.BindInterfacesTo<BannerAdService>().AsSingle();
+        Container.BindInterfacesTo<RewardedAdService>().AsSingle();
+        Container.BindInterfacesTo<InterstitialAdService>().AsSingle();
+    
+        //Settings
+        Container.Bind<AdSettings>().FromInstance(adSettings).AsSingle();
+    
     }
 }
