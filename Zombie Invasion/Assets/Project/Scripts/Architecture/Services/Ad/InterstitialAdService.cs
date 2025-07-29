@@ -1,6 +1,5 @@
 using System;
 using Unity.Services.LevelPlay;
-using Unity.VisualScripting;
 using UnityEngine;
 using Zenject;
 
@@ -13,79 +12,70 @@ public class InterstitialAdService : IInterstitialAdService, IDisposable
     public InterstitialAdService(AdSettings adSettings)
     {
         _adSettings = adSettings;
-        
+
         CreateInterstitialAd();
     }
 
-    void CreateInterstitialAd()
-    {
-        //Create InterstitialAd instance
-        _interstitialAd = new LevelPlayInterstitialAd(_adSettings.InterstitialAdUnitId);
+    #region Events
 
-        //Subscribe InterstitialAd events
+    private void SubscribeEvents()
+    {
         _interstitialAd.OnAdLoaded += InterstitialOnAdLoadedEvent;
         _interstitialAd.OnAdLoadFailed += InterstitialOnAdLoadFailedEvent;
-        _interstitialAd.OnAdDisplayed += InterstitialOnAdDisplayedEvent;
-        _interstitialAd.OnAdDisplayFailed += InterstitialOnAdDisplayFailedEvent;
-        _interstitialAd.OnAdClicked += InterstitialOnAdClickedEvent;
-        _interstitialAd.OnAdClosed += InterstitialOnAdClosedEvent;
-        _interstitialAd.OnAdInfoChanged += InterstitialOnAdInfoChangedEvent;
+    }
+
+    private void UnsubscribeEvents()
+    {
+        _interstitialAd.OnAdLoaded -= InterstitialOnAdLoadedEvent;
+        _interstitialAd.OnAdLoadFailed -= InterstitialOnAdLoadFailedEvent;
+    }
+
+    private void InterstitialOnAdLoadedEvent(LevelPlayAdInfo adInfo)
+    {
+        Debug.LogWarning("Interstitial ad loaded");
+
+        ShowInterstitialAd();
+    }
+
+    private void InterstitialOnAdLoadFailedEvent(LevelPlayAdError ironSourceError)
+    {
+        Debug.LogWarning($"Interstitial ad load failed. {ironSourceError.ErrorCode}: {ironSourceError.ErrorMessage}");
+    }
+
+    #endregion
+
+    void CreateInterstitialAd()
+    {
+        _interstitialAd = new LevelPlayInterstitialAd(_adSettings.InterstitialAdUnitId);
+
+        SubscribeEvents();
     }
 
     public void LoadInterstitialAd()
     {
-        //Load or reload InterstitialAd 	
         _interstitialAd.LoadAd();
+        Debug.LogWarning("Interstitial ad loaded");
     }
 
-    void ShowInterstitialAd()
+    private void ShowInterstitialAd()
     {
-        //Show InterstitialAd, check if the ad is ready before showing
         if (_interstitialAd.IsAdReady())
         {
-            _interstitialAd.ShowAd();
+            Debug.LogWarning("Interstitial ad is ready");
+            _interstitialAd.ShowAd(placementName: "Game_Screen");
         }
     }
 
-    void DestroyInterstitialAd()
+    private void DestroyInterstitialAd()
     {
-        //Destroy InterstitialAd 
         _interstitialAd.DestroyAd();
-    }
-
-    //Implement InterstitialAd events
-    void InterstitialOnAdLoadedEvent(LevelPlayAdInfo adInfo)
-    {
-    }
-
-    void InterstitialOnAdLoadFailedEvent(LevelPlayAdError ironSourceError)
-    {
-    }
-
-    void InterstitialOnAdClickedEvent(LevelPlayAdInfo adInfo)
-    {
-    }
-
-    void InterstitialOnAdDisplayedEvent(LevelPlayAdInfo adInfo)
-    {
-    }
-
-    void InterstitialOnAdDisplayFailedEvent(LevelPlayAdDisplayInfoError adInfoError)
-    {
-    }
-
-    void InterstitialOnAdClosedEvent(LevelPlayAdInfo adInfo)
-    {
-    }
-
-    void InterstitialOnAdInfoChangedEvent(LevelPlayAdInfo adInfo)
-    {
     }
 
     public void Dispose()
     {
+        UnsubscribeEvents();
         DestroyInterstitialAd();
-        
+
         Debug.LogWarning("Interstitial ad disposed");
     }
 }

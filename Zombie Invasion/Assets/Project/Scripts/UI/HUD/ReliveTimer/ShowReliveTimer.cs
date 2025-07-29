@@ -39,6 +39,7 @@ public class ShowReliveTimer : ITimer
             .OnComplete(() =>
             {
                 IsOpened = true;
+                _timer.interactable = true;
                 Debug.LogWarning("Is opened: " + IsOpened);
             });
     }
@@ -46,6 +47,8 @@ public class ShowReliveTimer : ITimer
     private void HideTimer()
     {
         _timer.alpha = 0;
+        _timer.interactable = false;
+        
         IsOpened = false;
     }
 }

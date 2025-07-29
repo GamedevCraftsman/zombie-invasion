@@ -9,20 +9,19 @@ public class RewardedAdService : IRewardedAdService, IDisposable
     private LevelPlayRewardedAd _rewardedAd;
 
     public event Action OnGiveReward;
-    
+
     [Inject]
     public RewardedAdService(AdSettings adSettings)
     {
         _adSettings = adSettings;
-        
+
         CreateRewardedAd();
     }
-    
+
     private void CreateRewardedAd()
     {
-        //Create RewardedAd instance
         _rewardedAd = new LevelPlayRewardedAd(_adSettings.RewardedAdUnitId);
-        
+
         SubscribeRewardedMethods();
     }
 
@@ -32,7 +31,7 @@ public class RewardedAdService : IRewardedAdService, IDisposable
         _rewardedAd.OnAdLoadFailed += RewardedOnAdLoadFailedEvent;
         _rewardedAd.OnAdRewarded += RewardedOnAdRewarded;
     }
-    
+
     private void UnsubscribeRewardedMethods()
     {
         _rewardedAd.OnAdLoaded -= RewardedOnAdLoadedEvent;
@@ -57,8 +56,7 @@ public class RewardedAdService : IRewardedAdService, IDisposable
     {
         _rewardedAd.DestroyAd();
     }
-    
-    //Implement RewardedAd events
+
     void RewardedOnAdLoadedEvent(LevelPlayAdInfo adInfo)
     {
         Debug.LogWarning("Rewarded ad loaded");
@@ -80,7 +78,7 @@ public class RewardedAdService : IRewardedAdService, IDisposable
     {
         UnsubscribeRewardedMethods();
         DestroyRewardedAd();
-        
+
         Debug.LogWarning("Rewarded ad destroyed");
     }
 }

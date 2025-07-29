@@ -17,5 +17,7 @@ public class AdInstaller : MonoInstaller
         //Settings
         Container.Bind<AdSettings>().FromInstance(adSettings).AsSingle();
     
+        //Additional
+        Container.BindInterfacesTo<InterstitialAdCaller>().AsSingle();
     }
 }

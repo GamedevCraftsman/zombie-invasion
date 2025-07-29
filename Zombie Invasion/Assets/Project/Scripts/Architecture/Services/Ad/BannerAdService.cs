@@ -12,15 +12,15 @@ public class BannerAdService : IBannerAdService, IDisposable
     public BannerAdService(AdSettings adSettings)
     {
         _adSettings = adSettings;
-        
+
         CreateBannerAd();
     }
 
     private void CreateBannerAd()
     {
-       CreateInstance(_adSettings.BannerUnitId);
+        CreateInstance(_adSettings.BannerUnitId);
 
-       SubscribeEvents();
+        SubscribeEvents();
     }
 
     private void CreateInstance(string bannerAdPath)
@@ -29,7 +29,7 @@ public class BannerAdService : IBannerAdService, IDisposable
             adUnitId: bannerAdPath,
             placementName: "Game_Screen");
     }
-    
+
     public void LoadBannerAd()
     {
         _bannerAd.LoadAd();
@@ -39,7 +39,7 @@ public class BannerAdService : IBannerAdService, IDisposable
     {
         _bannerAd.DestroyAd();
     }
-    
+
     #region Events
 
     private void SubscribeEvents()
@@ -47,17 +47,17 @@ public class BannerAdService : IBannerAdService, IDisposable
         _bannerAd.OnAdLoaded += BannerOnAdLoadedEvent;
         _bannerAd.OnAdLoadFailed += BannerOnAdLoadFailedEvent;
     }
-    
+
     private void UnsubscribeEvents()
     {
         _bannerAd.OnAdLoaded += BannerOnAdLoadedEvent;
         _bannerAd.OnAdLoadFailed += BannerOnAdLoadFailedEvent;
     }
-    
+
     private void BannerOnAdLoadedEvent(LevelPlayAdInfo adInfo)
     {
         Debug.LogWarning($"Banner ad loaded!");
-        
+
         _bannerAd.ShowAd();
     }
 
@@ -68,12 +68,11 @@ public class BannerAdService : IBannerAdService, IDisposable
 
     #endregion
 
-
     public void Dispose()
     {
         UnsubscribeEvents();
         DestroyBannerAd();
-        
+
         Debug.LogWarning("Banner ad destroyed!");
     }
 }
