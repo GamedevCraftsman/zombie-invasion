@@ -62,6 +62,8 @@ public class UIController : BaseController
 
     private void OnGameOver(GameOverEvent gameOverEvent)
     {
+        if (!gameOverEvent.IsShowAd) return;
+        
         OpenEndGamePanel(restartGameLabel, restartGameButton, losePanel);
     }
 

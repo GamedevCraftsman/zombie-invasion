@@ -134,7 +134,7 @@ public class GameManager : BaseManager, IGameManager
         if (victory)
             EventBus.Fire(new CarReachedEndEvent());
         else
-            EventBus.Fire(new GameOverEvent());
+            EventBus.Fire(new GameOverEvent(true));
     }
 
     public void RestartGame()

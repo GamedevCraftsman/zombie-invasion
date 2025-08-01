@@ -58,11 +58,13 @@ public class CarManager : BaseManager
     private void OnReachedEndGame(CarReachedEndEvent carReachedEndEvent)
     {
         _carController.StopMovement();
+        EventBus.Fire(new HidePauseButtonEvent());
     }
 
     private void OnGameOver(GameOverEvent gameOverEvent)
     {
         _carController.StopMovement();
+        EventBus.Fire(new HidePauseButtonEvent());
     }
 
     private void OnContinueGame(ContinueGameEvent continueEvent)

@@ -74,6 +74,8 @@ public class ReliveController : BaseController
 
     private void OnGameOver(GameOverEvent gameOverEvent)
     {
+        if(!gameOverEvent.IsShowAd) return;
+        
         _timeCounter.ResetCounter(timerText, bar);
         _showTimer.ShowTimerPanel();
 

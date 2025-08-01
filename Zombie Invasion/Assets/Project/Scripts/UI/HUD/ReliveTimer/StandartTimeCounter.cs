@@ -8,29 +8,6 @@ public class StandartTimeCounter : ITimeCounter
 
     private readonly int _timeToCountDown;
     private int _currentTime;
-    // private bool _isTimeStarted;
-    //
-    // public TimeCounter()
-    // {
-    //     _isTimeStarted = false;
-    // }
-    
-    /*public void FixedTick()
-    {
-        if(!_isTimeStarted) return;
-        
-        CountDownTimer();
-    }
-
-    private void StartTimer()
-    {
-        _isTimeStarted = true;
-    }
-
-    private void StopTimer()
-    {
-        
-    }*/
 
     public StandartTimeCounter(int timeToCountDown)
     {

@@ -14,6 +14,7 @@ public class CarHPUIController : BaseController, ICarHPUIController
     [Header("Visual Settings")] 
     [SerializeField] private float animationSpeed = 5f;
 
+    private Tween _showHpTween;
     private GameplayUISettings _gameplayUISettings;
     private float _targetFillAmount;
     private float _currentFillAmount;
@@ -46,11 +47,13 @@ public class CarHPUIController : BaseController, ICarHPUIController
 
     public void ShowHpBar()
     {
-        hpBarGroup.DOFade(_gameplayUISettings.HpBarEndFadeLvl, _gameplayUISettings.HpBarShowDuration);
+        _showHpTween = hpBarGroup.DOFade(_gameplayUISettings.HpBarEndFadeLvl, _gameplayUISettings.HpBarShowDuration);
     }
 
     public void HideHpBar()
     {
+        _showHpTween.Kill();
+        
         hpBarGroup.alpha = 0;
     }
 

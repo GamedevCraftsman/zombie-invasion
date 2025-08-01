@@ -18,6 +18,13 @@ public class UISettings : ScriptableObject
 
     [Header("Relive Panel")] 
     [SerializeField] private int timeToRelive = 20;
+    
+    [Header("Pause")]
+    [SerializeField] private float showPauseButtonTime = 0.5f;
+    [SerializeField] private Ease showPauseButtonEase = Ease.OutQuad;
+    [SerializeField] private float showContinueButtonTime = 0.5f;
+    [SerializeField] private float showMainMenuButtonTime = 0.5f;
+    [SerializeField] private Ease showPauseButtonsEase;
 
     #region Public values
 
@@ -33,5 +40,12 @@ public class UISettings : ScriptableObject
 
     //Relive Panel
     public int TimeToRelive => timeToRelive;
+    
+    //Pause
+    public float ShowPauseButtonTime => showPauseButtonTime;
+    public float ShowContinueButtonTime => showContinueButtonTime;
+    public float ShowMainMenuButtonTime => showMainMenuButtonTime;
+    public Ease ShowPauseButtonEase => showPauseButtonEase;
+    public Ease ShowPauseButtonsEase => showPauseButtonsEase;
     #endregion
 }

@@ -19,3 +19,8 @@ MonoBehaviour:
   buttonStartPos: -200
   buttonEndPos: 190
   timeToRelive: 10
+  showPauseButtonTime: 0.5
+  showPauseButtonEase: 34
+  showContinueButtonTime: 0.25
+  showMainMenuButtonTime: 0.25
+  showPauseButtonsEase: 6
