@@ -36,6 +36,7 @@ public class EnemyController : BaseController
     private IEnemyAttack _enemyAttack;
 
     private IEnemyHealthBarService _enemyHealthBarService;
+    private IPool<EnemyDeathEffectsService> _deathEffectsServicePool;
 
     #endregion
 
@@ -49,12 +50,13 @@ public class EnemyController : BaseController
 
     [Inject]
     private void Construct(EnemySettings enemySettings, ICarController carController, IEnemyAttack enemyAttack,
-        IEnemyHealthBarService enemyHealthBarService)
+        IEnemyHealthBarService enemyHealthBarService, IPool<EnemyDeathEffectsService> deathEffectsServicePool)
     {
         _data = enemySettings;
         _carController = carController;
         _enemyAttack = enemyAttack;
         _enemyHealthBarService = enemyHealthBarService;
+        _deathEffectsServicePool = deathEffectsServicePool;
         
         _waitForFixedUpdate = new WaitForFixedUpdate();
     }
@@ -133,11 +135,8 @@ public class EnemyController : BaseController
     private void PlayDeathAnimationAndDie()
     {
         ManageColliders(false);
-
-        Debug.Log("Start dead animation");
-
-        //PlayDeathAnimation();
-        OnDeath();
+        
+        Die();
     }
 
     #endregion
@@ -147,19 +146,10 @@ public class EnemyController : BaseController
     private void PlayIdleAnimation() => enemyAnimator.SetTrigger(EnemyAnimations.Idle.ToString());
 
     private void PlayRunAnimation() => enemyAnimator.SetTrigger(EnemyAnimations.Run.ToString());
-
-    //private void PlayDeathAnimation() => enemyAnimator.SetTrigger(EnemyAnimations.Death.ToString());
-
+    
     #endregion
 
     #region Death methods
-
-    public void OnDeath()
-    {
-        Debug.Log("Start Dead");
-
-        Die();
-    }
 
     private void Die()
     {
@@ -173,6 +163,7 @@ public class EnemyController : BaseController
             healthBarCanvas.gameObject.SetActive(false);
 
         Debug.Log("Dead");
+        PlayDeathEffects();
         OnEnemyDied?.Invoke(this);
     }
 
@@ -193,6 +184,20 @@ public class EnemyController : BaseController
         PlayIdleAnimation();
     }
 
+    private void PlayDeathEffects()
+    {
+        var effect =_deathEffectsServicePool.Get();
+        
+        effect.Init(_deathEffectsServicePool);
+        effect.transform.position = new Vector3(transform.position.x, EnemyModelMiddle(), transform.position.z);
+        effect.PlayParticles();
+    }
+
+    private float EnemyModelMiddle()
+    {
+        return transform.localPosition.y + (transform.localScale.y / 2);
+    }
+    
     #endregion
 
     public void TakeDamage(int damageAmount)

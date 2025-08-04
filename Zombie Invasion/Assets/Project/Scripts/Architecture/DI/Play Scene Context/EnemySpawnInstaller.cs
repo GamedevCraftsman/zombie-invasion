@@ -12,8 +12,9 @@ public class EnemySpawnInstaller : MonoInstaller
     [Header("Controllers")] 
     [SerializeField] private EnemySpawnController enemySpawnController;
 
-    [Header("Pool Parent")] 
+    [Header("Pools Parents")] 
     [SerializeField] private Transform enemyPoolParent;
+    [SerializeField] private Transform effectsPoolParent;
 
     public override void InstallBindings()
     {
@@ -28,6 +29,9 @@ public class EnemySpawnInstaller : MonoInstaller
         Container.Bind<EnemySpawnController>().FromInstance(enemySpawnController).AsSingle().NonLazy();
 
         // Pool System
+
+        #region Enemy Pool
+
         Container.Bind<IPoolable<EnemyController>>()
             .To<EnemyPoolHandler>()
             .AsSingle();
@@ -36,6 +40,19 @@ public class EnemySpawnInstaller : MonoInstaller
             .FromMethod(CreateEnemyPool)
             .AsSingle();
 
+        #endregion
+
+        #region Effects Pool
+
+        Container.Bind<IPoolable<EnemyDeathEffectsService>>()
+            .To<EnemyDeathEffectPoolHandler>()
+            .AsSingle().NonLazy();
+
+        Container.Bind<IPool<EnemyDeathEffectsService>>()
+            .FromMethod(CreateDeathEffectsPool)
+            .AsSingle().NonLazy();
+        
+        #endregion
         //Services
         Container.Bind<ISpawnPointValidator>()
             .To<SpawnPointValidator>()
@@ -64,5 +81,20 @@ public class EnemySpawnInstaller : MonoInstaller
         }
 
         return new Pool<EnemyController>(poolable, settings.EnemyPoolInitialSize, parent);
+    }
+
+    private IPool<EnemyDeathEffectsService> CreateDeathEffectsPool(InjectContext context)
+    {
+        var poolable = context.Container.Resolve<IPoolable<EnemyDeathEffectsService>>();
+        var settings = context.Container.Resolve<EnemySpawnSettings>();
+        Transform parent = effectsPoolParent;
+
+        if (parent == null)
+        {
+            var poolRoot = new GameObject("Effects Pool");
+            parent = poolRoot.transform;
+        }
+
+        return new Pool<EnemyDeathEffectsService>(poolable, settings.EffectsPoolSize, parent);
     }
 }

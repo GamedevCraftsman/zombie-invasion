@@ -465,6 +465,7 @@ MonoBehaviour:
   enemyManager: {fileID: 2020676611}
   enemySpawnController: {fileID: 597822991}
   enemyPoolParent: {fileID: 1526281317}
+  effectsPoolParent: {fileID: 780319590}
 --- !u!1 &81411465
 GameObject:
   m_ObjectHideFlags: 0
@@ -2998,6 +2999,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 768547219}
   m_CullTransparentMesh: 1
+--- !u!1 &780319589
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 780319590}
+  m_Layer: 0
+  m_Name: DeathEffects
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &780319590
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 780319589}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1841853596}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &787355297
 GameObject:
   m_ObjectHideFlags: 0
@@ -6087,6 +6119,7 @@ Transform:
   - {fileID: 2020676610}
   - {fileID: 597822990}
   - {fileID: 1526281317}
+  - {fileID: 780319590}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1927977917

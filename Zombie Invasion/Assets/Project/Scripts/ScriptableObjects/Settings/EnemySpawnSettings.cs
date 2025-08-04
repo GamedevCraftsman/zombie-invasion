@@ -14,6 +14,10 @@ public class EnemySpawnSettings : ScriptableObject
     [SerializeField, Min(0)] private int spawnPointCount = 100;
     [SerializeField, Min(1)] private int enemyPoolInitialSize = 60;
 
+    [Header("Enemy effects pool")]
+    [SerializeField] private GameObject deathEffectPrefab;
+    [SerializeField] private int effectsPoolSize = 10; 
+
     [Header("Spawn Area Settings")] 
     [SerializeField, Range(0, 1)] private float sideXOffsetRange = 1f;
 
@@ -34,7 +38,9 @@ public class EnemySpawnSettings : ScriptableObject
     public float SideXOffsetRange => sideXOffsetRange;
     public float SideZOffsetRange => sideZOffsetRange;
     public float MinSpawnDistance => minSpawnDistance;
-
+    public int EffectsPoolSize => effectsPoolSize;
+    public GameObject DeathEffectPrefab => deathEffectPrefab;
+    
     #endregion
 
     #region Public Methods
