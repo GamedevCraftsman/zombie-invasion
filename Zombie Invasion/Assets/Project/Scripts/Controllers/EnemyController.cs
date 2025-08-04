@@ -136,7 +136,8 @@ public class EnemyController : BaseController
 
         Debug.Log("Start dead animation");
 
-        PlayDeathAnimation();
+        //PlayDeathAnimation();
+        OnDeath();
     }
 
     #endregion
@@ -147,7 +148,7 @@ public class EnemyController : BaseController
 
     private void PlayRunAnimation() => enemyAnimator.SetTrigger(EnemyAnimations.Run.ToString());
 
-    private void PlayDeathAnimation() => enemyAnimator.SetTrigger(EnemyAnimations.Death.ToString());
+    //private void PlayDeathAnimation() => enemyAnimator.SetTrigger(EnemyAnimations.Death.ToString());
 
     #endregion
 
