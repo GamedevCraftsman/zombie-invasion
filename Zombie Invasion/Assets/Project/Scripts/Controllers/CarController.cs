@@ -6,8 +6,10 @@ using Zenject;
 
 public class CarController : BaseController, ICarController
 {
-    [Header("References")] [SerializeField]
-    private GameObject car;
+    [Header("References")] 
+    [SerializeField] private GameObject car;
+    [Header("Additional")]
+    [SerializeField] private WheelRotator wheelRotator;
 
     // Dependencies
     private CarSettings _carSettings;
@@ -66,6 +68,7 @@ public class CarController : BaseController, ICarController
     public void StartMovement()
     {
         _lvlLength = _gameSettings.LvlLenghtCalculation(car.transform);
+        wheelRotator.StartRotating(_carSettings.Speed);
         
         _isMoving = true;
         _isGameActive = true;
@@ -74,6 +77,8 @@ public class CarController : BaseController, ICarController
 
     public void StopMovement()
     {
+        wheelRotator.StopRotating();
+        
         _isMoving = false;
         _isGameActive = false;
         _currentSpeed = 0f;
@@ -101,10 +106,10 @@ public class CarController : BaseController, ICarController
     }
     
     public void ResetPosition()
-         {
-             car.transform.position = _carSettings.CarStartPosition;
-             ResetCarState();
-         }
+    {
+        car.transform.position = _carSettings.CarStartPosition;
+        ResetCarState();
+    }
     #endregion
 
     private void CheckLevelCompletion()
