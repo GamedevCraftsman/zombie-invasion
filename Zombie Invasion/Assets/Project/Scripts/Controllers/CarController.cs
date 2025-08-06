@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Zenject;
 
 public class CarController : BaseController, ICarController
