@@ -59,14 +59,14 @@ public class CameraManager : BaseManager
     private void SubscribeToEvents()
     {
         EventBus.Subscribe<ReadyGameEvent>(OnReady);
-        EventBus.Subscribe<GameOverEvent>(OnGameEnd);
+        EventBus.Subscribe<RestarGameEvent>(OnGameRestart);
         EventBus.Subscribe<CarReachedEndEvent>(OnReachedGameEnd);
     }
 
     private void UnsubscribeFromEvents()
     {
         EventBus?.Unsubscribe<ReadyGameEvent>(OnReady);
-        EventBus?.Unsubscribe<GameOverEvent>(OnGameEnd);
+        EventBus?.Unsubscribe<RestarGameEvent>(OnGameRestart);
         EventBus?.Unsubscribe<CarReachedEndEvent>(OnReachedGameEnd);
     }
 
@@ -78,7 +78,7 @@ public class CameraManager : BaseManager
         }
     }
 
-    private void OnGameEnd(GameOverEvent gameOverEvent)
+    private void OnGameRestart(RestarGameEvent restartGameEvent)
     {
         SwitchToCamera(MenuCameraType);
     }

@@ -13,17 +13,8 @@ public class AdService : IDisposable, IAdService
     {
         _bannerAdService = bannerAdService;
         _rewardedAdService = rewardedAdService;
-        
-        InitializeAd(adSettings);
-    }
-
-    private void InitializeAd(AdSettings adSettings)
-    {
+     
         SubscribeEvents();
-        LevelPlay.ValidateIntegration();
-        LevelPlay.Init(adSettings.AppKey);
-
-        Debug.LogWarning("AdService constructed");
     }
 
     public void ShowRewardedAd(Action onRewarded)

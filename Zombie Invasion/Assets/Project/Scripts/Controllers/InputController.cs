@@ -45,14 +45,13 @@ namespace Project.Scripts.Controllers
 
         private void SubscribeToEvents()
         {
-            EventBus.Subscribe<GameOverEvent>(OnGameOver);
-            EventBus.Subscribe<CarReachedEndEvent>(OnCarReached);
+            EventBus.Subscribe<AllowStartGameEvent>(OnAllowStartGame);
         }
 
         private void UnsubscribeFromEvents()
         {
-            EventBus?.Unsubscribe<GameOverEvent>(OnGameOver);
-            EventBus?.Unsubscribe<CarReachedEndEvent>(OnCarReached);
+
+            EventBus?.Unsubscribe<AllowStartGameEvent>(OnAllowStartGame);
         }
 
         private void StartGame()
@@ -61,18 +60,12 @@ namespace Project.Scripts.Controllers
             StopToCheckInput();
         }
 
-        private void OnGameOver(GameOverEvent gameOverEvent)
+        private void OnAllowStartGame(AllowStartGameEvent allowStartGameEvent)
         {
             ResetInputState();
             StartToCheckInput();
         }
-
-        private void OnCarReached(CarReachedEndEvent carReachedEndEvent)
-        {
-            ResetInputState();
-            StartToCheckInput();
-        }
-
+        
         #endregion
 
         #region Input Checking

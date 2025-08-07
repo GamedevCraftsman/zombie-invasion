@@ -1,17 +1,30 @@
 using System;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 public class UIManager : BaseManager, IUIManager
 {
-    [Header("General")] [SerializeField] private Button respawnButton;
+    [Header("General")] 
+    [SerializeField] private Button respawnButton;
+    [SerializeField] private TMP_Text respawnButtonText;
     [SerializeField] private Button restartButton;
     [SerializeField] private Button continueButton;
-    [Header("Pause")] [SerializeField] private Button pauseButton;
+    
+    [Header("Pause")] 
+    [SerializeField] private Button pauseButton;
     [SerializeField] private Button unpauseButton;
     [SerializeField] private Button mainMenuButton;
 
+    private ITransitionService _transitionService;
+    [Inject]
+    public void Construct(ITransitionService transitionService)
+    {
+        _transitionService = transitionService;
+    }
+    
     protected override Task Initialize()
     {
         try
@@ -25,7 +38,7 @@ public class UIManager : BaseManager, IUIManager
 
         return Task.CompletedTask;
     }
-
+    
     private void SetButtonsEvents()
     {
         respawnButton.onClick.AddListener(ShowRewardedAd);
@@ -45,11 +58,12 @@ public class UIManager : BaseManager, IUIManager
         if (victory)
         {
             EventBus.Fire(new ContinueGameEvent());
+            EventBus.Fire(new AllowStartGameEvent());
         }
         else
         {
             Debug.LogWarning("Restart");
-            EventBus.Fire(new RestarGameEvent());
+            _transitionService.ChangeEvent(() => EventBus.Fire(new RestarGameEvent()));
         }
     }
 
@@ -60,7 +74,8 @@ public class UIManager : BaseManager, IUIManager
     private void ShowRewardedAd()
     {
         respawnButton.interactable = false;
-
+        respawnButtonText.text = "Loading...";
+        
         EventBus.Fire(new ShowReliveAdEvent());
     }
 
@@ -80,7 +95,7 @@ public class UIManager : BaseManager, IUIManager
 
     private void MainMenu()
     {
-        EventBus.Fire(new ToMainMenuEvent());
+        _transitionService.ChangeEvent(() => EventBus.Fire(new ToMainMenuEvent()));
     }
 
     #endregion

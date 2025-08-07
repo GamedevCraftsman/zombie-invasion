@@ -1,9 +1,11 @@
 using System;
 using System.Threading.Tasks;
+using Cinemachine;
 using UnityEngine;
 
 public class CrashCarActivator : BaseController
 {
+   [SerializeField] private CinemachineImpulseSource impulseSource;
    [SerializeField] private GameObject playerCar;
    [SerializeField] private GameObject crashCar;
    [SerializeField] private GameObject crashEffect;
@@ -18,7 +20,7 @@ public class CrashCarActivator : BaseController
       {
          Debug.LogException(e);
       }
-      
+
       return Task.CompletedTask;
    }
 
@@ -36,8 +38,9 @@ public class CrashCarActivator : BaseController
 
    private void OnGameOver(GameOverEvent gameOverEvent)
    {
-      if(!gameOverEvent.IsShowAd) return;
-      
+      if (!gameOverEvent.IsShowAd) return;
+
+      impulseSource.GenerateImpulse();
       Crash();
    }
 
@@ -45,19 +48,19 @@ public class CrashCarActivator : BaseController
    {
       Hide();
    }
-   
+
    private void Crash()
    {
       playerCar.SetActive(false);
       crashCar.SetActive(true);
-      
+
       crashEffect.SetActive(true);
    }
 
    private void Hide()
    {
       playerCar.SetActive(true);
-      
+
       crashCar.SetActive(false);
       crashEffect.SetActive(false);
    }

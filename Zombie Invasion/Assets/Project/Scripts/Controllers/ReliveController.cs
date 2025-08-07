@@ -12,6 +12,7 @@ public class ReliveController : BaseController
     [SerializeField] private GameObject backDarkPanel;
     [SerializeField] private CanvasGroup timer;
     [SerializeField] private Button reliveButton;
+    [SerializeField] private TMP_Text reliveBurronText;
     
     [Header("Timer")] 
     [SerializeField] private TMP_Text timerText;
@@ -70,6 +71,7 @@ public class ReliveController : BaseController
         _showTimer.HideTimerPanel();
         
         reliveButton.interactable = true;
+        reliveBurronText.text = "Relive";
     }
 
     private void OnGameOver(GameOverEvent gameOverEvent)

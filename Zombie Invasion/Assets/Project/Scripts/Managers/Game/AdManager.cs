@@ -6,11 +6,13 @@ using Zenject;
 public class AdManager : BaseManager
 {
     private IAdService _adService;
+    private ITransitionService _transitionService;
 
     [Inject]
-    public void Construct(IAdService adService)
+    public void Construct(IAdService adService, ITransitionService transitionService)
     {
         _adService = adService;
+        _transitionService = transitionService;
     }
 
     protected override Task Initialize()
@@ -46,10 +48,15 @@ public class AdManager : BaseManager
     private void GiveReward()
     {
         //Here you can add Reward (function, event, coins or smth. else)
+        _transitionService.ChangeEvent(PlayEvents);
+    }
+
+    private void PlayEvents()
+    {
         EventBus.Fire(new RestarGameEvent());
         EventBus.Fire(new EndReliveAdEvent());
     }
-
+    
     private void OnDestroy()
     {
         UnsubscribeEvents();
