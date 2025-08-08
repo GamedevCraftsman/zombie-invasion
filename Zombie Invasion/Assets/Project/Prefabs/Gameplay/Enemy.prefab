@@ -179,7 +179,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5462939312331746073}
-  - component: {fileID: 2216940270351934882}
   - component: {fileID: 3893248616047847542}
   - component: {fileID: 5019402636688869222}
   m_Layer: 9
@@ -204,27 +203,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8822903700427644740}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!135 &2216940270351934882
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5631354778836943713}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.2
-  m_Center: {x: 0, y: 0.75, z: 0}
 --- !u!136 &3893248616047847542
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -244,10 +222,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.1
-  m_Height: 0.57
+  m_Radius: 0.16740675
+  m_Height: 1.2434566
   m_Direction: 1
-  m_Center: {x: 0, y: 0.25, z: 0}
+  m_Center: {x: -0.0016599894, y: 0.58672845, z: -0}
 --- !u!114 &5019402636688869222
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -483,7 +461,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
+  m_LocalScale: {x: 0.175, y: 0.175, z: 0.175}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 925629803742567909}
@@ -536,7 +514,6 @@ MonoBehaviour:
   healthBarCanvas: {fileID: 9115771477033793516}
   healthBarFill: {fileID: 1751248948961868532}
   allColliders:
-  - {fileID: 2216940270351934882}
   - {fileID: 3893248616047847542}
   - {fileID: 5646375856342403607}
 --- !u!1001 &8123630437297568660

@@ -7,7 +7,7 @@ public class FireController : BaseController, IFireController
 {
     [Header("References")] 
     [SerializeField] private Transform turretTransform;
-
+    [SerializeField] private ParticleSystem fireParticles;
     [SerializeField] private Transform firePoint;
     [SerializeField] private BulletPool bulletPool;
     
@@ -62,7 +62,8 @@ public class FireController : BaseController, IFireController
         if (bulletController == null) return;
         
         bulletController.SetFirePoint(firePoint);
-
+        fireParticles.Play();
+        
         bulletController.Initialize(
             _weaponSettings.BulletSpeed,
             _weaponSettings.BulletDamage,
