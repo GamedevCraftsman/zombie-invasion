@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
 public class CarController : BaseController, ICarController
@@ -9,6 +10,7 @@ public class CarController : BaseController, ICarController
     [SerializeField] private GameObject car;
     [Header("Additional")]
     [SerializeField] private WheelRotator wheelRotator;
+    [FormerlySerializedAs("particles")] [SerializeField] private ParticleSystem wheelDust;
 
     // Dependencies
     private CarSettings _carSettings;
@@ -68,6 +70,7 @@ public class CarController : BaseController, ICarController
     {
         _lvlLength = _gameSettings.LvlLenghtCalculation(car.transform);
         wheelRotator.StartRotating(_carSettings.Speed);
+        wheelDust.Play();
         
         _isMoving = true;
         _isGameActive = true;
@@ -77,6 +80,7 @@ public class CarController : BaseController, ICarController
     public void StopMovement()
     {
         wheelRotator.StopRotating();
+        wheelDust.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         
         _isMoving = false;
         _isGameActive = false;
