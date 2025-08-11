@@ -11,7 +11,6 @@ public class EnemySpawnSettings : ScriptableObject
 
     [SerializeField, Min(0)] private int totalEnemyCount = 50;
 
-    [SerializeField, Min(0)] private int spawnPointCount = 100;
     [SerializeField, Min(1)] private int enemyPoolInitialSize = 60;
 
     [Header("Enemy effects pool")]
@@ -33,7 +32,7 @@ public class EnemySpawnSettings : ScriptableObject
 
     public GameObject EnemyPrefab => enemyPrefab;
     public int TotalEnemyCount => totalEnemyCount;
-    public int SpawnPointCount => spawnPointCount;
+    //public int SpawnPointCount => spawnPointCount;
     public int EnemyPoolInitialSize => enemyPoolInitialSize;
     public float SideXOffsetRange => sideXOffsetRange;
     public float SideZOffsetRange => sideZOffsetRange;
@@ -45,7 +44,7 @@ public class EnemySpawnSettings : ScriptableObject
 
     #region Public Methods
 
-    public int CountIgnoreTiles()
+    int CountIgnoreTiles()
     {
         int count = 0;
 
@@ -74,8 +73,6 @@ public class EnemySpawnSettings : ScriptableObject
     {
         MakePoolLessTotalEnemyCount();
         SetMinPoolSize();
-
-        spawnPointCount = totalEnemyCount;
     }
 
     #region Private Methods
@@ -90,15 +87,15 @@ public class EnemySpawnSettings : ScriptableObject
 
     private void SetMinPoolSize()
     {
-        if (enemyPoolInitialSize < EnemiesForTwoTiles())
+        if (enemyPoolInitialSize < MinPoolSize(totalEnemyCount, 0))
         {
-            enemyPoolInitialSize = EnemiesForTwoTiles();
+            enemyPoolInitialSize = MinPoolSize(totalEnemyCount, 0);
         }
     }
 
-    private int EnemiesForTwoTiles()
+    public int MinPoolSize(int enemyCount, int mapIncrease)
     {
-        return Mathf.CeilToInt((float)spawnPointCount / (gameSettings.MapLength - CountIgnoreTiles())) * 2;
+        return Mathf.CeilToInt((float)enemyCount / ((gameSettings.MapLength + mapIncrease) - CountIgnoreTiles())) * 2;
     }
 
     #endregion

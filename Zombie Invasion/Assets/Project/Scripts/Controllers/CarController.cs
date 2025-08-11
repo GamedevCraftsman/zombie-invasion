@@ -16,6 +16,7 @@ public class CarController : BaseController, ICarController
     private CarSettings _carSettings;
     private GameSettings _gameSettings;
     private IGameManager _gameManager;
+    IProgressIncreaseService _progressIncreaseService;
 
     // State
     private bool _isMoving;
@@ -25,11 +26,12 @@ public class CarController : BaseController, ICarController
 
     public GameObject Car => car;
     [Inject]
-    public void Construct(CarSettings carSettings, GameSettings gameSettings, IGameManager gameManager)
+    public void Construct(CarSettings carSettings, GameSettings gameSettings, IGameManager gameManager, IProgressIncreaseService progressIncreaseService)
     {
         _carSettings = carSettings;
         _gameSettings = gameSettings;
         _gameManager = gameManager;
+        _progressIncreaseService = progressIncreaseService;
     }
     
     protected override async Task Initialize()
@@ -68,7 +70,7 @@ public class CarController : BaseController, ICarController
 
     public void StartMovement()
     {
-        _lvlLength = _gameSettings.LvlLenghtCalculation(car.transform);
+        _lvlLength = LvlLenghtCalculation();
         wheelRotator.StartRotating(_carSettings.Speed);
         wheelDust.Play();
         
@@ -77,6 +79,16 @@ public class CarController : BaseController, ICarController
         _currentSpeed = 0f;
     }
 
+    private float LvlLenghtCalculation()
+    {
+        //Round to the nearest tenth.
+        float lvlLenght = Mathf.Round((car.transform.position.z 
+                                       + (_gameSettings.MapLength + _progressIncreaseService.MapIncrease - 1) 
+                                       * _gameSettings.DistanceBetweenTiles) * 10f) / 10f; 
+        
+        return lvlLenght;
+    }
+    
     public void StopMovement()
     {
         wheelRotator.StopRotating();

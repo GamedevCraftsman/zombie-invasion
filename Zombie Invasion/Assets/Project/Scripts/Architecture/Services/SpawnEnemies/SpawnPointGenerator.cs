@@ -5,47 +5,53 @@ using System.Linq;
 
 public class SpawnPointGenerator : ISpawnPointGenerator
 {
+    private readonly IProgressIncreaseService _progressIncreaseService;
     private readonly int _attemptsMultiplier = 3;
     private readonly ISpawnPointValidator _validator;
-
+    private readonly EnemySpawnSettings _spawnSettings;
+    
+    private int _spawnEnemyCount;
     [Inject]
-    public SpawnPointGenerator(ISpawnPointValidator validator)
+    public SpawnPointGenerator(ISpawnPointValidator validator, IProgressIncreaseService progressIncreaseService, EnemySpawnSettings spawnSettings)
     {
         _validator = validator;
+        _spawnSettings = spawnSettings;
+        _progressIncreaseService = progressIncreaseService;
     }
 
-    public List<Vector3> GeneratePoints(List<GameObject> tiles, EnemySpawnSettings settings)
+    public List<Vector3> GeneratePoints(List<GameObject> tiles)
     {
+        _spawnEnemyCount = _spawnSettings.TotalEnemyCount + _progressIncreaseService.EnemiesIncrease;
         var uniquePoints = new HashSet<Vector3>();
-        var validTiles = GetValidTiles(tiles, settings).ToList();
-        int pointsPerTile = CalculatePointsPerTile(validTiles.Count, settings);
+        var validTiles = GetValidTiles(tiles).ToList();
+        int pointsPerTile = CalculatePointsPerTile(validTiles.Count);
 
         foreach (var tile in validTiles)
         {
-            if (HasReachedSpawnLimit(uniquePoints.Count, settings.SpawnPointCount))
+            if (HasReachedSpawnLimit(uniquePoints.Count, _spawnEnemyCount))
                 break;
 
-            GeneratePointsForTile(tile, pointsPerTile, uniquePoints, settings);
+            GeneratePointsForTile(tile, pointsPerTile, uniquePoints);
         }
 
         return ConvertToList(uniquePoints);
     }
 
-    private IEnumerable<GameObject> GetValidTiles(List<GameObject> tiles, EnemySpawnSettings settings)
+    private IEnumerable<GameObject> GetValidTiles(List<GameObject> tiles)
     {
-        return tiles.Skip(settings.StartTile())
-            .Take(GetTileRangeCount(tiles.Count, settings))
+        return tiles.Skip(_spawnSettings.StartTile())
+            .Take(GetTileRangeCount(tiles.Count))
             .Where(tile => tile != null);
     }
 
-    private int GetTileRangeCount(int totalTiles, EnemySpawnSettings settings)
+    private int GetTileRangeCount(int totalTiles)
     {
-        return settings.TilesWithoutLast(totalTiles) - settings.StartTile();
+        return _spawnSettings.TilesWithoutLast(totalTiles) - _spawnSettings.StartTile();
     }
 
-    private int CalculatePointsPerTile(int validTileCount, EnemySpawnSettings settings)
+    private int CalculatePointsPerTile(int validTileCount)
     {
-        return Mathf.CeilToInt((float)settings.SpawnPointCount / validTileCount);
+        return Mathf.CeilToInt((float)_spawnEnemyCount / validTileCount);
     }
 
     private bool HasReachedSpawnLimit(int currentCount, int maxCount)
@@ -53,14 +59,13 @@ public class SpawnPointGenerator : ISpawnPointGenerator
         return currentCount >= maxCount;
     }
 
-    private void GeneratePointsForTile(GameObject tile, int pointsPerTile, HashSet<Vector3> uniquePoints,
-        EnemySpawnSettings settings)
+    private void GeneratePointsForTile(GameObject tile, int pointsPerTile, HashSet<Vector3> uniquePoints)
     {
         var center = tile.transform.position;
         var maxAttempts = CalculateMaxAttempts(pointsPerTile);
-        var targetPoints = CalculateTargetPointsForTile(pointsPerTile, uniquePoints.Count, settings.SpawnPointCount);
+        var targetPoints = CalculateTargetPointsForTile(pointsPerTile, uniquePoints.Count, _spawnEnemyCount);
 
-        TryGeneratePointsWithAttempts(center, targetPoints, maxAttempts, uniquePoints, settings);
+        TryGeneratePointsWithAttempts(center, targetPoints, maxAttempts, uniquePoints);
     }
 
     private int CalculateMaxAttempts(int pointsPerTile)
@@ -74,17 +79,17 @@ public class SpawnPointGenerator : ISpawnPointGenerator
     }
 
     private void TryGeneratePointsWithAttempts(Vector3 center, int targetPoints, int maxAttempts,
-        HashSet<Vector3> uniquePoints, EnemySpawnSettings settings)
+        HashSet<Vector3> uniquePoints)
     {
         int spawned = 0;
         int attempts = 0;
 
         while (ShouldContinueGenerating(spawned, targetPoints, attempts, maxAttempts, uniquePoints.Count,
-                   settings.SpawnPointCount))
+                   _spawnEnemyCount))
         {
-            var point = RandomPointOnTile(center, settings);
+            var point = RandomPointOnTile(center);
 
-            if (TryAddValidPoint(point, uniquePoints, settings))
+            if (TryAddValidPoint(point, uniquePoints))
             {
                 spawned++;
             }
@@ -101,9 +106,9 @@ public class SpawnPointGenerator : ISpawnPointGenerator
                totalPoints < spawnLimit;
     }
 
-    private bool TryAddValidPoint(Vector3 point, HashSet<Vector3> uniquePoints, EnemySpawnSettings settings)
+    private bool TryAddValidPoint(Vector3 point, HashSet<Vector3> uniquePoints)
     {
-        if (_validator.IsValid(point, uniquePoints, settings.MinSpawnDistance))
+        if (_validator.IsValid(point, uniquePoints, _spawnSettings.MinSpawnDistance))
         {
             uniquePoints.Add(point);
             return true;
@@ -117,10 +122,10 @@ public class SpawnPointGenerator : ISpawnPointGenerator
         return new List<Vector3>(uniquePoints);
     }
     
-    private Vector3 RandomPointOnTile(Vector3 center, EnemySpawnSettings settings)
+    private Vector3 RandomPointOnTile(Vector3 center)
     {
-        float offsetX = Random.Range(-settings.SideXOffsetRange, settings.SideXOffsetRange);
-        float offsetZ = Random.Range(-settings.SideZOffsetRange, settings.SideZOffsetRange);
+        float offsetX = Random.Range(-_spawnSettings.SideXOffsetRange, _spawnSettings.SideXOffsetRange);
+        float offsetZ = Random.Range(-_spawnSettings.SideZOffsetRange, _spawnSettings.SideZOffsetRange);
         return new Vector3(
             Mathf.Round((center.x + offsetX) * 100f) / 100f,
             center.y,

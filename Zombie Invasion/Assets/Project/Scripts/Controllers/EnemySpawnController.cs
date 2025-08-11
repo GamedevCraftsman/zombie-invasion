@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class EnemySpawnController : BaseController
 {
+    private IProgressIncreaseService _progressService;
     private ISpawnPointGenerator _generator;
     private IEnemySpawner _spawner;
     private EnemySpawnSettings _settings;
@@ -13,26 +14,29 @@ public class EnemySpawnController : BaseController
 
     private List<Vector3> _spawnPoints;
     public List<Vector3> AllSpawnPoints => _spawnPoints;
-
+    private int _spawnEnemyCount;
+    
     public void Inject(
         SpawnMapManager mapManager,
         EnemySpawnSettings settings,
         IPool<EnemyController> pool,
         ISpawnPointGenerator generator,
-        IEnemySpawner spawner)
+        IEnemySpawner spawner,
+        IProgressIncreaseService progressService)
     {
         _mapManager = mapManager;
         _settings = settings;
         _pool = pool;
         _generator = generator;
         _spawner = spawner;
+        _progressService = progressService;
     }
 
     protected override Task Initialize()
     {
         try
         {
-            _spawnPoints = new List<Vector3>(capacity: _settings.SpawnPointCount);
+            _spawnPoints = new List<Vector3>(capacity: _spawnEnemyCount);
             SubscribeToEvents();
             GenerateSpawnPoints();
         }
@@ -79,15 +83,27 @@ public class EnemySpawnController : BaseController
 
     private void GenerateSpawnPoints()
     {
+        _spawnEnemyCount = _settings.TotalEnemyCount + _progressService.EnemiesIncrease;
+        
         var tiles = _mapManager.GroundTiles;
-        _spawnPoints = _generator.GeneratePoints(tiles, _settings);
+        _spawnPoints = _generator.GeneratePoints(tiles);
     }
 
     private void SpawnEnemies()
     {
-        _spawner.SpawnEnemies(_spawnPoints, _pool, _settings.TotalEnemyCount, _settings.EnemyPoolInitialSize);
+        _spawner.SpawnEnemies(_spawnPoints, _pool, _spawnEnemyCount, SetMinPoolSize());
     }
 
+    public int SetMinPoolSize()
+    {
+        if (_settings.EnemyPoolInitialSize < _settings.MinPoolSize(_spawnEnemyCount, _progressService.MapIncrease))
+        {
+            return _settings.MinPoolSize(_spawnEnemyCount, _progressService.MapIncrease);
+        }
+
+        return _settings.EnemyPoolInitialSize;
+    }
+    
     public void OnDestroy()
     {
         UnsubscribeFromEvents();

@@ -1576,8 +1576,9 @@ MonoBehaviour:
   - {fileID: 1064786728}
   - {fileID: 872377969}
   - {fileID: 1461644245}
-  - {fileID: 1204528620}
   - {fileID: 694583716}
+  - {fileID: 1204528620}
+  - {fileID: 1551588943}
   _installerPrefabs: []
   _autoRun: 1
   OnPreInstall:
@@ -2559,6 +2560,7 @@ Transform:
   - {fileID: 1461644244}
   - {fileID: 1204528619}
   - {fileID: 694583715}
+  - {fileID: 1551588942}
   m_Father: {fileID: 366213553}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &639500219
@@ -5128,6 +5130,51 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
+--- !u!1 &1551588941
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1551588942}
+  - component: {fileID: 1551588943}
+  m_Layer: 0
+  m_Name: Progress System Installer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1551588942
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1551588941}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 625133201}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1551588943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1551588941}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd4fd809777c4ce096c730f15b73e0f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  progressSettings: {fileID: 11400000, guid: 6da4b794be01a36429816e87c92083b0, type: 2}
 --- !u!1 &1554959966
 GameObject:
   m_ObjectHideFlags: 0

@@ -111,6 +111,7 @@ public class EnemyController : BaseController
 
     private IEnumerator ChasePlayer()
     {
+        Debug.Log($"Start Chasing: {transform.position}. Player: {_playerTransform.position}");
         while (true)
         {
             if (rb == null) break;
@@ -127,7 +128,8 @@ public class EnemyController : BaseController
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRot,
                     _data.RotationSpeed * Time.deltaTime);
             }
-
+            
+            Debug.Log($"Chasing: {transform.position}. Player: {_playerTransform.position}, Direction: {direction}, Speed: {_data.MoveSpeed}, Rigidbody: {rb.position}");
             yield return _waitForFixedUpdate;
         }
     }

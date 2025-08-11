@@ -47,11 +47,13 @@ public class Pool<T> : IPool<T> where T : Component
             {
                 item.transform.SetParent(_parentTransform);
             }
-
+            
             _allItems.Add(item);
         }
 
+        _poolable.OnRelease(item);
         _poolable.OnGet(item);
+        
         return item;
     }
 

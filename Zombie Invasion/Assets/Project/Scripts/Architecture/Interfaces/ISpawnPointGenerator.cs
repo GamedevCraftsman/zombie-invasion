@@ -3,5 +3,5 @@ using UnityEngine;
 
 public interface ISpawnPointGenerator
 {
-    List<Vector3> GeneratePoints(List<GameObject> tiles, EnemySpawnSettings settings);
+    List<Vector3> GeneratePoints(List<GameObject> tiles);
 }

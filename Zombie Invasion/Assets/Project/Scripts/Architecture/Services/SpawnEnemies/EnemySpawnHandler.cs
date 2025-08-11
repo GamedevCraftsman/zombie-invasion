@@ -10,13 +10,15 @@ public class EnemySpawnEventHandler : IInitializable
     private readonly EnemySpawnSettings _settings;
     private readonly IPool<EnemyController> _pool;
     private readonly SpawnMapManager _mapManager;
+    private readonly IProgressIncreaseService _progressIncreaseService;
 
     [Inject]
     public EnemySpawnEventHandler(EnemySpawnController controller, SpawnMapManager mapManager,
         EnemySpawnSettings settings,
         IPool<EnemyController> pool,
         ISpawnPointGenerator generator,
-        IEnemySpawner spawner)
+        IEnemySpawner spawner,
+        IProgressIncreaseService progressService)
     {
         _controller = controller;
         
@@ -25,11 +27,12 @@ public class EnemySpawnEventHandler : IInitializable
         _pool = pool;
         _generator = generator;
         _spawner = spawner;
+        _progressIncreaseService = progressService;
     }
 
     public void Initialize()
     {
         Debug.Log("Initialize EnemySpawnController");
-        _controller.Inject(_mapManager, _settings, _pool, _generator, _spawner);
+        _controller.Inject(_mapManager, _settings, _pool, _generator, _spawner, _progressIncreaseService);
     }
 }

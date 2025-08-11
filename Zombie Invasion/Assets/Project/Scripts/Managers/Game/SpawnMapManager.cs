@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
@@ -12,14 +11,15 @@ public class SpawnMapManager : BaseManager
     private readonly List<GameObject> _groundTiles = new();
     private readonly Vector3 _startPosition = Vector3.zero;
     private GameSettings _gameSettings;
+    private IProgressIncreaseService _progressIncreaseService;
     
     // Public access to ground tiles for enemy spawn system
     public List<GameObject> GroundTiles => _groundTiles;
-
     [Inject]
-    private void Construct(GameSettings gameSettings)
+    private void Construct(GameSettings gameSettings, IProgressIncreaseService progressIncreaseService)
     {
         _gameSettings = gameSettings;
+        _progressIncreaseService = progressIncreaseService;
     }
 
     protected override Task Initialize()
@@ -27,7 +27,7 @@ public class SpawnMapManager : BaseManager
         try
         {
             SubscribeToEvents();
-            ManageGroundTiles(_gameSettings.MapLength, false);
+            ManageGroundTiles(false);
         }
         catch (Exception e)
         {
@@ -53,12 +53,12 @@ public class SpawnMapManager : BaseManager
 
     private void OnContinueGame(ContinueGameEvent continueGameEvent)
     {
-        ManageGroundTiles(_gameSettings.MapLength, false);
+        ManageGroundTiles(false);
     }
 
     private void OnGameRestart(RestarGameEvent restartGameEvent)
     {
-        ManageGroundTiles(_gameSettings.MapLength, true);
+        ManageGroundTiles(true);
     }
     
     private void OnDestroy()
@@ -68,12 +68,12 @@ public class SpawnMapManager : BaseManager
 
     #endregion
 
-    private void ManageGroundTiles(int requiredCount, bool isRestart)
+    private void ManageGroundTiles(bool isRestart)
     {
         //Remove nulls
         _groundTiles.RemoveAll(tile => tile == null);
 
-        SpawnMissingTiles(requiredCount);
+        SpawnMissingTiles(_gameSettings.MapLength + _progressIncreaseService.MapIncrease);
 
         RepositionAllTiles(isRestart);
     }
