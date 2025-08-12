@@ -1,6 +1,7 @@
 using System;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 [CreateAssetMenu(fileName = "UISettings", menuName = "UI/UI Settings")]
@@ -25,6 +26,15 @@ public class UISettings : ScriptableObject
     [SerializeField] private float showContinueButtonTime = 0.5f;
     [SerializeField] private float showMainMenuButtonTime = 0.5f;
     [SerializeField] private Ease showPauseButtonsEase;
+    
+    [Header("Main Screen")]
+    [Header("   - Progress UI")]
+    [SerializeField] private float showHideProgressUITime = 0.2f;
+    [FormerlySerializedAs("positionOffset")]
+    [Header("   - TapToPlay UI")]
+    [SerializeField] private float tapToPlayPositionOffset = 50f;
+    [SerializeField] private float timeToMoveTapToPlay = 1f;
+    [SerializeField] private LoopType tapToPlayLoop = LoopType.Yoyo;
 
     #region Public values
 
@@ -47,5 +57,11 @@ public class UISettings : ScriptableObject
     public float ShowMainMenuButtonTime => showMainMenuButtonTime;
     public Ease ShowPauseButtonEase => showPauseButtonEase;
     public Ease ShowPauseButtonsEase => showPauseButtonsEase;
+    
+    //Main menu
+    public float TapToPlayPositionOffset => tapToPlayPositionOffset;
+    public float TimeToMoveTapToPlay => timeToMoveTapToPlay;
+    public LoopType TapToPlayLoop => tapToPlayLoop;
+    public float ShowHideProgressUITime => showHideProgressUITime;
     #endregion
 }

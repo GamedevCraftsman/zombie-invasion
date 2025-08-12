@@ -3,6 +3,10 @@ using Zenject;
 
 public class UIInstaller : MonoInstaller
 {
+    [Header("Canvas groups")]
+    [SerializeField] private CanvasGroup mainMenuCanvasGroup;
+    
+    [Header("Settings")]
     [SerializeField] private GameplayUISettings gameplayUISettings;
     [SerializeField] private UISettings uiSettings;
 
@@ -14,5 +18,9 @@ public class UIInstaller : MonoInstaller
 
         //Managers
         Container.Bind<IUIManager>().To<UIManager>().AsSingle();
+        
+        //Services
+        Container.BindInterfacesTo<MainScreenUIChanger>().AsSingle().WithArguments(mainMenuCanvasGroup);
+        Container.BindInterfacesTo<MainScreenEventSubscriber>().AsSingle().NonLazy();
     }
 }

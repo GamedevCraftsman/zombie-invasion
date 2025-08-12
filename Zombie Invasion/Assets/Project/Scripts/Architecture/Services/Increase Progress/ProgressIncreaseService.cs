@@ -5,8 +5,9 @@ using Zenject;
 public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
 {
     private readonly IEventBus _eventBus;
+    private readonly IProgressUIUpdateService _progressUIUpdateService;
     private readonly ProgressSettings _progressSettings;
-    
+
     private MapLenghtIncrease _mapLenghtIncrease;
     private EnemiesCountIncrease _enemiesCountIncrease;
     private int _mapIncrease;
@@ -15,12 +16,15 @@ public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
 
     public int MapIncrease => _mapIncrease;
     public int EnemiesIncrease => _enemiesIncrease;
+
     [Inject]
-    public ProgressIncreaseService(IEventBus eventBus, ProgressSettings progressSettings)
+    public ProgressIncreaseService(IEventBus eventBus, ProgressSettings progressSettings,
+        IProgressUIUpdateService progressUIUpdateService)
     {
         _eventBus = eventBus;
         _progressSettings = progressSettings;
-        
+        _progressUIUpdateService = progressUIUpdateService;
+
         Subscribe();
         Init();
     }
@@ -29,8 +33,12 @@ public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
     {
         _mapLenghtIncrease = new MapLenghtIncrease(_progressSettings);
         _enemiesCountIncrease = new EnemiesCountIncrease(_progressSettings);
+
+        _progressUIUpdateService.ChangeLevelText(_lvl.ToString());
     }
-    
+
+    #region Events
+
     private void Subscribe()
     {
         _eventBus.Subscribe<ContinueGameEvent>(OnGameContinue);
@@ -43,8 +51,16 @@ public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
 
     private void OnGameContinue(ContinueGameEvent gameEvent)
     {
+        IncreaseLvlProperties();
+    }
+
+    #endregion
+
+    private void IncreaseLvlProperties()
+    {
         _lvl++;
-        
+
+        _progressUIUpdateService.ChangeLevelText(_lvl.ToString());
         IncreaseMapLenght();
         _enemiesCountIncrease.EnemiesIncrease(ref _enemiesIncrease);
     }
@@ -56,11 +72,11 @@ public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
             _mapLenghtIncrease.IncreaseMapLenght(ref _mapIncrease);
         }
     }
-    
+
     public void Dispose()
     {
         Unsubscribe();
-    
+
         Debug.LogWarning("Progress service: Unsubscribe called");
     }
 }

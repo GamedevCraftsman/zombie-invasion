@@ -24,3 +24,7 @@ MonoBehaviour:
   showContinueButtonTime: 0.25
   showMainMenuButtonTime: 0.25
   showPauseButtonsEase: 6
+  showHideProgressUITime: 0.2
+  tapToPlayPositionOffset: 50
+  timeToMoveTapToPlay: 1
+  tapToPlayLoop: 1
