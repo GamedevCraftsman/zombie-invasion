@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b694dcc2517ce94996313f982d7dd5c, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: 
-  mapTilePrefab: {fileID: 3525867083758726857, guid: 236665f03a54a7f44a6b566f3cf17d5b,
+  mapTilePrefab: {fileID: 762423042961595843, guid: de53f90f8455981489435c048091ae5b,
     type: 3}
   mapLength: 4
-  distanceBetweenTiles: 4.2
+  distanceBetweenTiles: 4

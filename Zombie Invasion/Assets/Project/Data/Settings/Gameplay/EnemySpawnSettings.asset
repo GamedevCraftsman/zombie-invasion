@@ -16,12 +16,12 @@ MonoBehaviour:
     type: 3}
   gameSettings: {fileID: 11400000, guid: 04b3fb0ed5ba0b5469daf9e159925d87, type: 2}
   totalEnemyCount: 10
-  enemyPoolInitialSize: 5
+  enemyPoolInitialSize: 10
   deathEffectPrefab: {fileID: 8972183387159339082, guid: 9e050e616a601d645baa7c5197f9d245,
     type: 3}
   effectsPoolSize: 5
-  sideXOffsetRange: 0.3
+  sideXOffsetRange: 0.165
   sideZOffsetRange: 2
-  minSpawnDistance: 0.2
+  minSpawnDistance: 0.1
   ignoreFirstTile: 1
   ignoreLastTile: 1
