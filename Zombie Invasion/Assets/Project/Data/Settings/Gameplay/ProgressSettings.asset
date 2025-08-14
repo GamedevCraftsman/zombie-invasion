@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: ProgressSettings
   m_EditorClassIdentifier: 
   mapLenghtIncrease: 1
-  enemiesIncrease: 3
+  enemiesIncrease: 2
