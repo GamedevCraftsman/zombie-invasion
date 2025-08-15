@@ -16,22 +16,26 @@ public class CarController : BaseController, ICarController
     private CarSettings _carSettings;
     private GameSettings _gameSettings;
     private IGameManager _gameManager;
-    IProgressIncreaseService _progressIncreaseService;
-
+    private IProgressIncreaseService _progressIncreaseService;
+    private ICheckpointTileService _checkpointTileService;
+    
     // State
     private bool _isMoving;
     private bool _isGameActive;
     private float _currentSpeed;
     private float _lvlLength;
+    private float _distanceToMoveCheckpoint;
 
     public GameObject Car => car;
     [Inject]
-    public void Construct(CarSettings carSettings, GameSettings gameSettings, IGameManager gameManager, IProgressIncreaseService progressIncreaseService)
+    public void Construct(CarSettings carSettings, GameSettings gameSettings, IGameManager gameManager, IProgressIncreaseService progressIncreaseService
+    , ICheckpointTileService checkpointTileService)
     {
         _carSettings = carSettings;
         _gameSettings = gameSettings;
         _gameManager = gameManager;
         _progressIncreaseService = progressIncreaseService;
+        _checkpointTileService = checkpointTileService;
     }
     
     protected override async Task Initialize()
@@ -56,6 +60,7 @@ public class CarController : BaseController, ICarController
         {
             UpdateNormalMovement();
             CheckLevelCompletion();
+            CheckMoveCheckpoint();
         }
     }
    
@@ -71,6 +76,8 @@ public class CarController : BaseController, ICarController
     public void StartMovement()
     {
         _lvlLength = LvlLenghtCalculation();
+        _distanceToMoveCheckpoint = DistanceToMoveCheckpointCalculation();
+        
         wheelRotator.StartRotating(_carSettings.Speed);
         wheelDust.Play();
         
@@ -83,10 +90,17 @@ public class CarController : BaseController, ICarController
     {
         //Round to the nearest tenth.
         float lvlLenght = Mathf.Round((car.transform.position.z 
-                                       + (_gameSettings.MapLength + _progressIncreaseService.MapIncrease - 1) 
+                                       + (_gameSettings.MapLength + 2 + _progressIncreaseService.MapIncrease - 1) 
                                        * _gameSettings.DistanceBetweenTiles) * 10f) / 10f; 
         
         return lvlLenght;
+    }
+
+    private float DistanceToMoveCheckpointCalculation()
+    {
+        float distance = Mathf.Round((car.transform.position.z 
+                                      + _gameSettings.DistanceBetweenTiles) * 10f) / 10f; 
+        return distance;
     }
     
     public void StopMovement()
@@ -136,6 +150,15 @@ public class CarController : BaseController, ICarController
         }
     }
 
+    private void CheckMoveCheckpoint()
+    {
+        if (car.transform.position.z >= _distanceToMoveCheckpoint)
+        {
+            Vector3 pos = car.transform.position;
+            _checkpointTileService.MoveTile(new Vector3(pos.x, pos.y, _lvlLength));
+        }
+    }
+    
     private void SetCorrectPosition()
     {
         Vector3 pos = car.transform.position;

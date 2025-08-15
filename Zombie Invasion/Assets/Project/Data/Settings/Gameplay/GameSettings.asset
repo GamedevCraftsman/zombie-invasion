@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b694dcc2517ce94996313f982d7dd5c, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: 
-  mapTilePrefab: {fileID: 762423042961595843, guid: de53f90f8455981489435c048091ae5b,
+  mapTilePrefab: {fileID: 762423042961595843, guid: b254ede8fd8288d4480858f1bdf59599,
     type: 3}
-  mapLength: 4
+  checkpointTilePrefab: {fileID: 762423042961595843, guid: ea7782fd7360dcd4cad420da1ba7f01a,
+    type: 3}
+  mapLength: 2
   distanceBetweenTiles: 4

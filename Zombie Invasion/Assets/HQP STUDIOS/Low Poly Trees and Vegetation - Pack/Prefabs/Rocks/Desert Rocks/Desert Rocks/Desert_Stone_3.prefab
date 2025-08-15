@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 8424056082993904349}
   - component: {fileID: 4848012619918800248}
   - component: {fileID: 7251761335372743090}
-  - component: {fileID: 7388820586990622725}
   - component: {fileID: 5659227567573617188}
   m_Layer: 0
   m_Name: Desert_Stone_3
@@ -85,28 +84,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &7388820586990622725
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9197356438012403815}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 1546502241467608535, guid: f2e11ec59bff64f4d8235def8309f14e, type: 3}
 --- !u!205 &5659227567573617188
 LODGroup:
   m_ObjectHideFlags: 0

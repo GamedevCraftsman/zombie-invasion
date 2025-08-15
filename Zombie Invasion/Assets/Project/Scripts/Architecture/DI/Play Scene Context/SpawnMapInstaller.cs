@@ -16,5 +16,8 @@ public class SpawnMapInstaller : MonoInstaller
         
         //Managers
         Container.Bind<SpawnMapManager>().FromInstance(spawnMapManager).AsSingle();
+        
+        //Services
+        Container.BindInterfacesTo<CheckpointTileService>().AsSingle();
     }
 }

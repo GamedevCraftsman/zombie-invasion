@@ -21,7 +21,7 @@ MonoBehaviour:
     type: 3}
   effectsPoolSize: 5
   sideXOffsetRange: 0.165
-  sideZOffsetRange: 2
+  sideZOffsetRange: 1.8
   minSpawnDistance: 0.1
-  ignoreFirstTile: 1
-  ignoreLastTile: 1
+  ignoreFirstTile: 0
+  ignoreLastTile: 0

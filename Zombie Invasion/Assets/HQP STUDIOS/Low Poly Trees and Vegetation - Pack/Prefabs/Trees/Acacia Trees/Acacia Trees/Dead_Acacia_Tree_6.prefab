@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 7156545704248252136}
   - component: {fileID: 6124600772276492621}
   - component: {fileID: 8293946860743126407}
-  - component: {fileID: 8714025614989473468}
   - component: {fileID: -1128000236541672996}
   m_Layer: 0
   m_Name: Dead_Acacia_Tree_6
@@ -85,28 +84,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &8714025614989473468
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7501581676647074898}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 6513723764604545902, guid: 3f9ff8c83b726cd4f8340be8c34bd697, type: 3}
 --- !u!205 &-1128000236541672996
 LODGroup:
   m_ObjectHideFlags: 0

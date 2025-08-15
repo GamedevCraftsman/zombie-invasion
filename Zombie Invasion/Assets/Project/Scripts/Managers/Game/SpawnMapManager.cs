@@ -7,19 +7,25 @@ using Zenject;
 public class SpawnMapManager : BaseManager
 {
     [SerializeField] private GameObject groundTilesContainer;
-    
+
     private readonly List<GameObject> _groundTiles = new();
-    private readonly Vector3 _startPosition = Vector3.zero;
+    private Vector3 _startPosition;
     private GameSettings _gameSettings;
     private IProgressIncreaseService _progressIncreaseService;
-    
+    private ICheckpointTileService _checkpointTileService;
+
     // Public access to ground tiles for enemy spawn system
     public List<GameObject> GroundTiles => _groundTiles;
+
     [Inject]
-    private void Construct(GameSettings gameSettings, IProgressIncreaseService progressIncreaseService)
+    private void Construct(GameSettings gameSettings, IProgressIncreaseService progressIncreaseService,
+        ICheckpointTileService checkpointTileService)
     {
         _gameSettings = gameSettings;
         _progressIncreaseService = progressIncreaseService;
+        _checkpointTileService = checkpointTileService;
+
+        _startPosition = new Vector3(0, 0, 0);
     }
 
     protected override Task Initialize()
@@ -27,6 +33,8 @@ public class SpawnMapManager : BaseManager
         try
         {
             SubscribeToEvents();
+            _checkpointTileService.SpawnTile(groundTilesContainer.transform);
+            _checkpointTileService.MoveTile(_startPosition);
             ManageGroundTiles(false);
         }
         catch (Exception e)
@@ -60,7 +68,7 @@ public class SpawnMapManager : BaseManager
     {
         ManageGroundTiles(true);
     }
-    
+
     private void OnDestroy()
     {
         UnsubscribeFromEvents();
@@ -99,12 +107,15 @@ public class SpawnMapManager : BaseManager
         Vector3 repositionStartPosition = GetRepositionStartPositionAdvanced(isRestart);
         
         // Move to new positions
+        //_checkpointTileService.MoveTile(repositionStartPosition);
+        //repositionStartPosition +=  Vector3.forward * _gameSettings.DistanceBetweenTiles;
+        
         for (int i = 0; i < _groundTiles.Count; i++)
         {
             if (_groundTiles[i] != null)
             {
                 Vector3 newTilePosition =
-                    repositionStartPosition + Vector3.forward * (i * _gameSettings.DistanceBetweenTiles);
+                    repositionStartPosition + Vector3.forward * ((i + 1) * _gameSettings.DistanceBetweenTiles);
                 _groundTiles[i].transform.localPosition = newTilePosition;
             }
         }
@@ -112,7 +123,7 @@ public class SpawnMapManager : BaseManager
 
     private Vector3 GetRepositionStartPositionAdvanced(bool isRestart)
     {
-        float maxZ = float.MinValue;
+        float maxZ = _checkpointTileService.CheckPointTile.transform.position.z;
         bool foundAnyTile = false;
 
         foreach (GameObject tile in _groundTiles)
@@ -128,10 +139,11 @@ public class SpawnMapManager : BaseManager
         }
 
         if (foundAnyTile && !isRestart)
-        {
+        {        
             return new Vector3(_startPosition.x, _startPosition.y, maxZ); //return last tile position
         }
 
+        _checkpointTileService.MoveTile(_startPosition);
         return _startPosition;
     }
 }
