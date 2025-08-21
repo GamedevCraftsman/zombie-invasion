@@ -599,6 +599,7 @@ MonoBehaviour:
   enemyAnimator: {fileID: 1795229086802086552}
   healthBarCanvas: {fileID: 9115771477033793516}
   healthBarFill: {fileID: 1751248948961868532}
+  agroCollider: {fileID: 5646375856342403607}
   allColliders:
   - {fileID: 3893248616047847542}
   - {fileID: 5646375856342403607}

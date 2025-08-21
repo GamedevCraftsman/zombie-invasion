@@ -7,19 +7,20 @@ public class CheckpointTileService : ICheckpointTileService
     private readonly DiContainer _container;
 
     private GameObject _checkpointTile;
+    private StartGameFromCheckpointTileService _startGameFromCheckpointTileService;
 
     public GameObject CheckPointTile => _checkpointTile;
     [Inject]
-    public CheckpointTileService(GameSettings gameSettings)
+    public CheckpointTileService(GameSettings gameSettings, DiContainer container)
     {
         _gameSettings = gameSettings;
+        _container = container;
     }
 
     public void SpawnTile(Transform container)
     {
-        _checkpointTile =
-            Object.Instantiate(_gameSettings.CheckpointTilePrefab,
-                container); /*_container.InstantiatePrefab(_gameSettings.CheckpointTilePrefab, container);*/
+        _checkpointTile = _container.InstantiatePrefab(_gameSettings.CheckpointTilePrefab, container);
+        _startGameFromCheckpointTileService = _checkpointTile.GetComponent<StartGameFromCheckpointTileService>();
     }
 
     public void MoveTile(Vector3 position)
@@ -31,6 +32,6 @@ public class CheckpointTileService : ICheckpointTileService
 
     private void ResetTile()
     {
-        //Reset tile state.
+        _startGameFromCheckpointTileService.GatesController.ResetGates();
     }
 }

@@ -12,6 +12,7 @@ public class EnemyController : BaseController
     [SerializeField] private Animator enemyAnimator;
     [SerializeField] private Canvas healthBarCanvas;
     [SerializeField] private UnityEngine.UI.Image healthBarFill;
+    [SerializeField] private SphereCollider agroCollider;
     [SerializeField] private Collider[] allColliders;
 
     private Transform _playerTransform;
@@ -29,7 +30,7 @@ public class EnemyController : BaseController
 
     #region Injections
 
-    private EnemySettings _data;
+    private EnemySettings _enemySettings;
 
     private ICarController _carController;
 
@@ -52,7 +53,7 @@ public class EnemyController : BaseController
     private void Construct(EnemySettings enemySettings, ICarController carController, IEnemyAttack enemyAttack,
         IEnemyHealthBarService enemyHealthBarService, IPool<EnemyDeathEffectsService> deathEffectsServicePool)
     {
-        _data = enemySettings;
+        _enemySettings = enemySettings;
         _carController = carController;
         _enemyAttack = enemyAttack;
         _enemyHealthBarService = enemyHealthBarService;
@@ -82,8 +83,11 @@ public class EnemyController : BaseController
         // Assign player
         _playerTransform = _carController.Car.transform;
 
+        // Set agro radius
+        agroCollider.radius = _enemySettings.AggroRadius;
+        
         // Initialize health
-        _currentHealth = _data.MaxHealth;
+        _currentHealth = _enemySettings.MaxHealth;
 
         // Hide health bar initially
         ManageHealthBar(false, healthBarCanvas);
@@ -118,14 +122,14 @@ public class EnemyController : BaseController
             Vector3 direction = (_playerTransform.position - transform.position).normalized;
             direction.y = 0;
 
-            Vector3 movement = direction * (_data.MoveSpeed * Time.deltaTime);
+            Vector3 movement = direction * (_enemySettings.MoveSpeed * Time.deltaTime);
             rb.MovePosition(transform.position + movement);
 
             if (direction != Vector3.zero)
             {
                 Quaternion targetRot = Quaternion.LookRotation(direction);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRot,
-                    _data.RotationSpeed * Time.deltaTime);
+                    _enemySettings.RotationSpeed * Time.deltaTime);
             }
             
             yield return _waitForFixedUpdate;
@@ -170,7 +174,7 @@ public class EnemyController : BaseController
     public void ResetForPooling()
     {
         ManageColliders(true);
-        _currentHealth = _data.MaxHealth;
+        _currentHealth = _enemySettings.MaxHealth;
 
         if (rb != null)
         {
@@ -206,7 +210,7 @@ public class EnemyController : BaseController
         _currentHealth = Mathf.Max(0, _currentHealth);
 
         ManageHealthBar(true, healthBarCanvas);
-        _enemyHealthBarService.UpdateHealthBar(healthBarFill, _currentHealth, _data.MaxHealth);
+        _enemyHealthBarService.UpdateHealthBar(healthBarFill, _currentHealth, _enemySettings.MaxHealth);
 
         if (_currentHealth <= 0)
         {
