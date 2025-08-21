@@ -4,6 +4,9 @@ using UnityEngine.Serialization;
 [CreateAssetMenu(fileName = "ProgressSettings", menuName = "Game/Progress Settings")]
 public class ProgressSettings : ScriptableObject
 {
+    [Header("General")] 
+    [SerializeField] private int actionInterval = 5;
+    
     [Header("Map")] 
     [SerializeField] private int mapLenghtIncrease = 1;
 
@@ -15,8 +18,6 @@ public class ProgressSettings : ScriptableObject
 
     public int MapLenghtIncrease => mapLenghtIncrease;
     public int EnemiesIncrease => enemiesIncrease;
-
+    public int ActionInterval => actionInterval;
     #endregion
-
-
 }

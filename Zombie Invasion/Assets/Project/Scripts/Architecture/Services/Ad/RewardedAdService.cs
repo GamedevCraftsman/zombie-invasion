@@ -9,6 +9,7 @@ public class RewardedAdService : IRewardedAdService, IDisposable
     private LevelPlayRewardedAd _rewardedAd;
 
     public event Action OnGiveReward;
+    public event Action OnFailedLoadAd;
 
     [Inject]
     public RewardedAdService(AdSettings adSettings)
@@ -49,6 +50,7 @@ public class RewardedAdService : IRewardedAdService, IDisposable
         if (_rewardedAd.IsAdReady())
         {
             _rewardedAd.ShowAd("Game_Screen");
+            ;
         }
     }
 
@@ -57,21 +59,30 @@ public class RewardedAdService : IRewardedAdService, IDisposable
         _rewardedAd.DestroyAd();
     }
 
-    void RewardedOnAdLoadedEvent(LevelPlayAdInfo adInfo)
+    private void RewardedOnAdLoadedEvent(LevelPlayAdInfo adInfo)
     {
         Debug.LogWarning("Rewarded ad loaded");
         ShowRewardedAd();
     }
 
-    void RewardedOnAdLoadFailedEvent(LevelPlayAdError ironSourceError)
+    private void RewardedOnAdLoadFailedEvent(LevelPlayAdError ironSourceError)
     {
         Debug.LogWarning($"Rewarded ad load failed. {ironSourceError.ErrorCode}: {ironSourceError.ErrorMessage}");
+        OnFailedLoadAd?.Invoke();
+        CleanActions();
     }
 
-    void RewardedOnAdRewarded(LevelPlayAdInfo adInfo, LevelPlayReward adReward)
+    private void RewardedOnAdRewarded(LevelPlayAdInfo adInfo, LevelPlayReward adReward)
     {
         //Give reward
         OnGiveReward?.Invoke();
+        CleanActions();
+    }
+
+    private void CleanActions()
+    {
+        OnFailedLoadAd = null;
+        OnGiveReward = null;
     }
 
     public void Dispose()

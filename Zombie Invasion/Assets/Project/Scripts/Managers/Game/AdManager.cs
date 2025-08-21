@@ -42,7 +42,7 @@ public class AdManager : BaseManager
     private void OnShowReliveAd(ShowReliveAdEvent showReliveAdEvent)
     {
         Debug.LogWarning("ShowReliveAdEvent");
-        _adService.ShowRewardedAd(GiveReward);
+        _adService.ShowRewardedAd(GiveReward, FailedLoadRewardAd);
     }
 
     private void GiveReward()
@@ -56,9 +56,14 @@ public class AdManager : BaseManager
         EventBus.Fire(new RestarGameEvent());
         EventBus.Fire(new EndReliveAdEvent());
     }
-    
+
+    private void FailedLoadRewardAd()
+    {
+        EventBus.Fire(new EndReliveAdEvent());
+    }
+
     private void OnDestroy()
     {
         UnsubscribeEvents();
-    } 
+    }
 }

@@ -11,7 +11,6 @@ public class StartGameFromCheckpointTileService : MonoBehaviour
     public void Construct(IEventBus eventBus)
     {
         _eventBus = eventBus;
-        Debug.LogWarning("StartGameFromCheckpointTileService Injected");
         Init();
     }
 

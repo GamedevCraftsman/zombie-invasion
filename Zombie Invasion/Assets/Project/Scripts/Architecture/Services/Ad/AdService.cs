@@ -17,9 +17,10 @@ public class AdService : IDisposable, IAdService
         SubscribeEvents();
     }
 
-    public void ShowRewardedAd(Action onRewarded)
+    public void ShowRewardedAd(Action onRewarded, Action onFailedLoadAd)
     {
         _rewardedAdService.OnGiveReward += onRewarded;
+        _rewardedAdService.OnFailedLoadAd += onFailedLoadAd;
         _rewardedAdService.LoadRewardedAd();
     }
 

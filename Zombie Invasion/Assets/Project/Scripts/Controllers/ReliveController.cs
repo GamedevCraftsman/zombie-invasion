@@ -8,14 +8,12 @@ using Zenject;
 
 public class ReliveController : BaseController
 {
-    [Header("General")] 
-    [SerializeField] private GameObject backDarkPanel;
+    [Header("General")] [SerializeField] private GameObject backDarkPanel;
     [SerializeField] private CanvasGroup timer;
     [SerializeField] private Button reliveButton;
     [SerializeField] private TMP_Text reliveBurronText;
-    
-    [Header("Timer")] 
-    [SerializeField] private TMP_Text timerText;
+
+    [Header("Timer")] [SerializeField] private TMP_Text timerText;
     [SerializeField] private Image bar;
 
     private Coroutine _timerCoroutine;
@@ -69,15 +67,15 @@ public class ReliveController : BaseController
     {
         StopCoroutine(_timerCoroutine);
         _showTimer.HideTimerPanel();
-        
+
         reliveButton.interactable = true;
         reliveBurronText.text = "Relive";
     }
 
     private void OnGameOver(GameOverEvent gameOverEvent)
     {
-        if(!gameOverEvent.IsShowAd) return;
-        
+        if (!gameOverEvent.IsShowAd) return;
+
         _timeCounter.ResetCounter(timerText, bar);
         _showTimer.ShowTimerPanel();
 

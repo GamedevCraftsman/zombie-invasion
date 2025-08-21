@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 using Zenject;
 
 public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
@@ -67,7 +66,7 @@ public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
 
     private void IncreaseMapLenght()
     {
-        if (_lvl % 5 == 0)
+        if (_lvl % _progressSettings.ActionInterval == 0)
         {
             _mapLenghtIncrease.IncreaseMapLenght(ref _mapIncrease);
         }
@@ -76,7 +75,5 @@ public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
     public void Dispose()
     {
         Unsubscribe();
-
-        Debug.LogWarning("Progress service: Unsubscribe called");
     }
 }
