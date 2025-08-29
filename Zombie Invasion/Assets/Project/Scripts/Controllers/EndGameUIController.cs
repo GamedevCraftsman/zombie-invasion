@@ -5,7 +5,7 @@ using UnityEngine;
 using Zenject;
 using Sequence = DG.Tweening.Sequence;
 
-public class UIController : BaseController
+public class EndGameUIController : BaseController
 {
     [Header("LosePanel")] 
     [SerializeField] private CanvasGroup losePanel;

@@ -76,5 +76,6 @@ crashlytics-build.properties
 
 #File with Secrets
 google-services.json
+google-services-desktop.json
 *.key
 *.env
