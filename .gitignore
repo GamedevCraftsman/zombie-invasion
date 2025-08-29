@@ -79,3 +79,4 @@ google-services.json
 google-services-desktop.json
 *.key
 *.env
+/Zombie Invasion/Assets/Project/Data/Settings/Firebase
