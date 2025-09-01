@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using Cinemachine;
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class CrashCarActivator : BaseController

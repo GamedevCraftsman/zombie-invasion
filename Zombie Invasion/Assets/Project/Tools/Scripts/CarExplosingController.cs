@@ -62,7 +62,7 @@ public class CarExplosionController : MonoBehaviour
         {
             var rb = _parts[i];
             rb.isKinematic = true;
-            rb.velocity = Vector3.zero;
+            rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
 
             var t = rb.transform;

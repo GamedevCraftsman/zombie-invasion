@@ -159,7 +159,7 @@ public class EnemyController : BaseController
     {
         if (rb != null)
         {
-            rb.velocity = Vector3.zero;
+            rb.linearVelocity = Vector3.zero;
             rb.isKinematic = true;
         }
 
@@ -179,7 +179,7 @@ public class EnemyController : BaseController
         if (rb != null)
         {
             rb.isKinematic = false;
-            rb.velocity = Vector3.zero;
+            rb.linearVelocity = Vector3.zero;
         }
 
         if (healthBarCanvas != null)

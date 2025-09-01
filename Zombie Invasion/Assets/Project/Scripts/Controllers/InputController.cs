@@ -9,8 +9,9 @@ namespace Project.Scripts.Controllers
 {
     public class InputController : BaseController, IInputController
     {
-        [Header("Input Settings")]
-        [SerializeField] private bool enableMouseInput = true;
+        [Header("Input Settings")] [SerializeField]
+        private bool enableMouseInput = true;
+
         [SerializeField] private bool enableTouchInput = true;
 
         // State
@@ -32,6 +33,9 @@ namespace Project.Scripts.Controllers
             {
                 SubscribeToEvents();
                 ResetInputState();
+#if UNITY_EDITOR
+                StartToCheckInput();
+#endif
             }
             catch (Exception e)
             {
@@ -71,7 +75,7 @@ namespace Project.Scripts.Controllers
         {
             StartToCheckInput();
         }
-        
+
         #endregion
 
         #region Input Checking
