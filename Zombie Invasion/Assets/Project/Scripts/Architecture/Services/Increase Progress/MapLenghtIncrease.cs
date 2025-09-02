@@ -2,7 +2,6 @@ using Zenject;
 
 public class MapLenghtIncrease
 {
-    private readonly GameSettings _gameSettings;
     private readonly ProgressSettings _progressSettings;
     
     [Inject]

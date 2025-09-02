@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class AuthPanelUIController : BaseController
@@ -27,7 +28,15 @@ public class AuthPanelUIController : BaseController
 
     private void AddListeners()
     {
-        signInButton.onClick.AddListener(() => EventBus.Fire(new SignInWithGoogleEvent()));
+        signInButton.onClick.AddListener(() =>
+        {
+ #if UNITY_EDITOR
+        SceneManager.LoadScene(1);
+        return;
+ #endif
+            EventBus.Fire(new SignInWithGoogleEvent());
+        });
+        
     }
 
     private void Subscribe()
@@ -42,8 +51,8 @@ public class AuthPanelUIController : BaseController
 
     private void OnSignedIn(SignedInEvent signedInEvent)
     {
-        authPanel.SetActive(false);
-        Debug.LogWarning("Close auth panel");
+        //authPanel.SetActive(false);
+        SceneManager.LoadScene(1);
     }
 
     private void OnDestroy()

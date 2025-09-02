@@ -3,7 +3,7 @@ using Zenject;
 
 public class EnemySpawnInstaller : MonoInstaller
 {
-    [Header("Settings")] 
+    // [Header("Settings")] 
     [SerializeField] private EnemySpawnSettings enemySpawnSettings;
 
     [Header("Managers")] 

@@ -32,9 +32,7 @@ namespace Project.Scripts.Controllers
             {
                 SubscribeToEvents();
                 ResetInputState();
-#if UNITY_EDITOR
                 StartToCheckInput();
-#endif
             }
             catch (Exception e)
             {
@@ -49,13 +47,11 @@ namespace Project.Scripts.Controllers
         private void SubscribeToEvents()
         {
             EventBus.Subscribe<AllowStartGameEvent>(OnAllowStartGame);
-            EventBus.Subscribe<SignedInEvent>(OnSignedIn);
         }
 
         private void UnsubscribeFromEvents()
         {
             EventBus?.Unsubscribe<AllowStartGameEvent>(OnAllowStartGame);
-            EventBus?.Unsubscribe<SignedInEvent>(OnSignedIn);
         }
 
         private void StartGame()
@@ -67,11 +63,6 @@ namespace Project.Scripts.Controllers
         private void OnAllowStartGame(AllowStartGameEvent allowStartGameEvent)
         {
             ResetInputState();
-            StartToCheckInput();
-        }
-
-        private void OnSignedIn(SignedInEvent signedInEvent)
-        {
             StartToCheckInput();
         }
 

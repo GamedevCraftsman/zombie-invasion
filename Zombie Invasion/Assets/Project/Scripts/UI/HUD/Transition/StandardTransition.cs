@@ -1,22 +1,32 @@
 using System;
 using DG.Tweening;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 public class StandardTransition : ITransitionService
 {
-    private readonly CanvasGroup _transitionPanel;
+    private CanvasGroup _transitionPanel;
     private readonly IEventBus _eventBus;
     private readonly TransitionPanelSettings _transitionPanelSettings;
 
     private const int Open = 1;
     private const int Close = 0;
-    public StandardTransition(CanvasGroup transitionPanel, IEventBus eventBus, TransitionPanelSettings transitionPanelSettings)
+    public StandardTransition(GameObject transitionPanelPrefab, IEventBus eventBus, TransitionPanelSettings transitionPanelSettings)
     {
-        _transitionPanel = transitionPanel;
+        MakeTransitionPanel(transitionPanelPrefab);
         _eventBus = eventBus;
         _transitionPanelSettings = transitionPanelSettings;
     }
 
+    private void MakeTransitionPanel(GameObject transitionPanelPrefab)
+    {
+        var transitionPanel = Object.Instantiate(transitionPanelPrefab); 
+         _transitionPanel =  transitionPanel.GetComponentInChildren<CanvasGroup>();
+        Object.DontDestroyOnLoad(transitionPanel);
+        
+        _transitionPanel.gameObject.SetActive(false);
+    }
+    
     public void ChangeEvent(Action eventAction)
     {
         Sequence transition = DOTween.Sequence();

@@ -11,6 +11,9 @@ GameObject:
   - component: {fileID: 2467543796956165642}
   - component: {fileID: 1674107380092796230}
   - component: {fileID: 6894707773199398684}
+  - component: {fileID: 8727526423406566616}
+  - component: {fileID: 1292210775425716051}
+  - component: {fileID: 410719174572071766}
   m_Layer: 0
   m_Name: ProjectContext
   m_TagString: Untagged
@@ -48,6 +51,9 @@ MonoBehaviour:
   _scriptableObjectInstallers: []
   _monoInstallers:
   - {fileID: 6894707773199398684}
+  - {fileID: 8727526423406566616}
+  - {fileID: 1292210775425716051}
+  - {fileID: 410719174572071766}
   _installerPrefabs: []
   _parentNewObjectsUnderContext: 1
   _editorReflectionBakingCoverageMode: 0
@@ -74,3 +80,46 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13e5f4640aaca7847bce7c10abeaaa02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8727526423406566616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5834234733099082807}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad778141b5684c04be8a30cb3aa80bd1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  firebaseSettings: {fileID: 11400000, guid: d67091063be2bf54bbcffadb6ccdbb43, type: 2}
+  progressSettings: {fileID: 11400000, guid: 6da4b794be01a36429816e87c92083b0, type: 2}
+--- !u!114 &1292210775425716051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5834234733099082807}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ae71cadcca649a6a4d7410a7e2d0770, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  adSettings: {fileID: 11400000, guid: 1a8663545d47739448c1416868242803, type: 2}
+--- !u!114 &410719174572071766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5834234733099082807}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fe720ebaef148159d93630592a5ae44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  transitionPanel: {fileID: 2925111141134570294, guid: 0334c0a9cf5df37429abd844de95e0cb,
+    type: 3}
+  transitionPanelSettings: {fileID: 11400000, guid: 4ac33d6296898d2488121456a9eb8c7e,
+    type: 2}

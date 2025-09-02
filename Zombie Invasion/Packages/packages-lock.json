@@ -22,6 +22,14 @@
         "com.google.firebase.app": "13.1.0"
       }
     },
+    "com.google.firebase.firestore": {
+      "version": "file:Firebase/com.google.firebase.firestore-13.1.0.tgz",
+      "depth": 0,
+      "source": "local-tarball",
+      "dependencies": {
+        "com.google.firebase.app": "13.1.0"
+      }
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,

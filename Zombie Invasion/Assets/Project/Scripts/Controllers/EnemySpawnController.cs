@@ -84,7 +84,7 @@ public class EnemySpawnController : BaseController
     private void GenerateSpawnPoints()
     {
         _spawnEnemyCount = _settings.TotalEnemyCount + _progressService.EnemiesIncrease;
-        
+        Debug.LogWarning($"Spawn enemy count: {_spawnEnemyCount} = {_settings.TotalEnemyCount} + {_progressService.EnemiesIncrease}");
         var tiles = _mapManager.GroundTiles;
         _spawnPoints = _generator.GeneratePoints(tiles);
     }

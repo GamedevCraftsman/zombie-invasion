@@ -12,6 +12,7 @@ public class AdManager : BaseManager
     public void Construct(IAdService adService, ITransitionService transitionService)
     {
         _adService = adService;
+        DontDestroyOnLoad(this);
         _transitionService = transitionService;
     }
 
@@ -48,7 +49,7 @@ public class AdManager : BaseManager
     private void GiveReward()
     {
         //Here you can add Reward (function, event, coins or smth. else)
-        _transitionService.ChangeEvent(PlayEvents);
+         _transitionService.ChangeEvent(PlayEvents);
     }
 
     private void PlayEvents()

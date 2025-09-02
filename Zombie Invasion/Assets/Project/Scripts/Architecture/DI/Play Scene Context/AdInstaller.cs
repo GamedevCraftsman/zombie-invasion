@@ -9,15 +9,15 @@ public class AdInstaller : MonoInstaller
     public override void InstallBindings()
     {
         //Services
-        Container.BindInterfacesTo<AdService>().AsSingle();
-        Container.BindInterfacesTo<BannerAdService>().AsSingle();
-        Container.BindInterfacesTo<RewardedAdService>().AsSingle();
-        Container.BindInterfacesTo<InterstitialAdService>().AsSingle();
+        Container.BindInterfacesTo<AdService>().AsSingle().NonLazy();
+        Container.BindInterfacesTo<BannerAdService>().AsSingle().NonLazy();
+        Container.BindInterfacesTo<RewardedAdService>().AsSingle().NonLazy();
+        Container.BindInterfacesTo<InterstitialAdService>().AsSingle().NonLazy();
     
         //Settings
-        Container.Bind<AdSettings>().FromInstance(adSettings).AsSingle();
+        Container.Bind<AdSettings>().FromInstance(adSettings).AsSingle().NonLazy();
     
         //Additional
-        Container.BindInterfacesTo<InterstitialAdCaller>().AsSingle();
+        Container.BindInterfacesTo<InterstitialAdCaller>().AsSingle().NonLazy();
     }
 }

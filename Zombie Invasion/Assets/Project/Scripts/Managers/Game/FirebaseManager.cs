@@ -19,6 +19,7 @@ public class FirebaseManager: BaseManager
         {
             Subscribe();
             EventBus.Fire(new SignInWithGoogleEvent());
+            DontDestroyOnLoad(this);
         }
         catch (Exception e)
         {

@@ -6,6 +6,7 @@ public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
     private readonly IEventBus _eventBus;
     private readonly IProgressUIUpdateService _progressUIUpdateService;
     private readonly ProgressSettings _progressSettings;
+    private readonly DataManageService _dataManageService;
 
     private MapLenghtIncrease _mapLenghtIncrease;
     private EnemiesCountIncrease _enemiesCountIncrease;
@@ -18,21 +19,28 @@ public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
 
     [Inject]
     public ProgressIncreaseService(IEventBus eventBus, ProgressSettings progressSettings,
-        IProgressUIUpdateService progressUIUpdateService)
+        IProgressUIUpdateService progressUIUpdateService, DataManageService dataManageService)
     {
         _eventBus = eventBus;
         _progressSettings = progressSettings;
         _progressUIUpdateService = progressUIUpdateService;
-
+        _dataManageService = dataManageService;
+        
         Subscribe();
         Init();
     }
 
     private void Init()
     {
+        //Set _mapIncrease & _enemiesIncrease from LocalLvlDB (DataMangeService)
+        _mapIncrease = _dataManageService.LocalLvlDB.LvlLenghtIncrease;
+        _enemiesIncrease = _dataManageService.LocalLvlDB.EnemyCountIncrease;
+        
         _mapLenghtIncrease = new MapLenghtIncrease(_progressSettings);
         _enemiesCountIncrease = new EnemiesCountIncrease(_progressSettings);
 
+        //Set lvl. _lvl = LocalLvlDB.lvl;
+        //_lvl = _dataManageService.LocalLvlDB.LvlNumber;
         _progressUIUpdateService.ChangeLevelText(_lvl.ToString());
     }
 
@@ -62,6 +70,7 @@ public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
         _progressUIUpdateService.ChangeLevelText(_lvl.ToString());
         IncreaseMapLenght();
         _enemiesCountIncrease.EnemiesIncrease(ref _enemiesIncrease);
+        // Save enemy increase.
     }
 
     private void IncreaseMapLenght()
@@ -69,9 +78,15 @@ public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
         if (_lvl % _progressSettings.ActionInterval == 0)
         {
             _mapLenghtIncrease.IncreaseMapLenght(ref _mapIncrease);
+            //Save _mapiIncrease
         }
     }
 
+    private void SaveChanges()
+    {
+        
+    }
+    
     public void Dispose()
     {
         Unsubscribe();
