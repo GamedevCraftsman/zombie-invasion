@@ -227,7 +227,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -1886,7 +1886,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
@@ -4489,7 +4489,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -471}
+  m_AnchoredPosition: {x: 184, y: -407}
   m_SizeDelta: {x: 780, y: 720}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!4 &1212637538 stripped
@@ -5441,7 +5441,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd4fd809777c4ce096c730f15b73e0f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  progressSettings: {fileID: 11400000, guid: 6da4b794be01a36429816e87c92083b0, type: 2}
   progressText: {fileID: 954182044}
 --- !u!1 &1554959966
 GameObject:
@@ -5863,7 +5862,7 @@ MonoBehaviour:
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
-  m_ActiveFontFeatures: 00000000
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1

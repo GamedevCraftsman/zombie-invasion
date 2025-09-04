@@ -1520,6 +1520,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   authPanel: {fileID: 4131761608186119260}
   signInButton: {fileID: 1736535680969644425}
+  signInButtonText: {fileID: 7257840110471550358}
 --- !u!222 &8384873440921056210
 CanvasRenderer:
   m_ObjectHideFlags: 0

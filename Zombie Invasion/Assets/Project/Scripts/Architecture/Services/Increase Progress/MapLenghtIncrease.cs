@@ -10,8 +10,9 @@ public class MapLenghtIncrease
         _progressSettings = progressSettings;
     }
 
-    public void IncreaseMapLenght(ref int currentIncrease)
+    public int IncreaseMapLenght(int currentIncrease)
     {
        currentIncrease += _progressSettings.MapLenghtIncrease;
+       return currentIncrease;
     }
 }

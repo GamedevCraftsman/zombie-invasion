@@ -80,3 +80,4 @@ google-services-desktop.json
 *.key
 *.env
 /Zombie Invasion/Assets/Project/Data/Settings/Firebase
+/Zombie Invasion/Assets/StreamingAssets

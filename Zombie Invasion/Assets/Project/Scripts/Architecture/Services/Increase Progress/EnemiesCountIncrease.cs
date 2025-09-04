@@ -10,8 +10,9 @@ public class EnemiesCountIncrease
         _progressSettings = progressSettings;
     }
 
-    public void EnemiesIncrease(ref int enemiesCount)
+    public int EnemiesIncrease(int enemiesCount)
     {
         enemiesCount += _progressSettings.EnemiesIncrease;
+        return enemiesCount;
     }
 }

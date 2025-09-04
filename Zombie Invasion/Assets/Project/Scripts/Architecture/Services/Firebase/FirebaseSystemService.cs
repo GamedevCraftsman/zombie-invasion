@@ -1,20 +1,19 @@
 using System;
 using System.Threading.Tasks;
+using Firebase.Auth;
 using UnityEngine;
 using Zenject;
 
 public class FirebaseSystemService : IFirebaseSystemService
 {
     private readonly FirebaseSettings _firebaseSettings;
-    private readonly IEventBus _eventBus;
     private IGoogleSignInService _googleSignInService;
     private IFirebaseAuthService _firebaseAuthService;
 
     [Inject]
-    public FirebaseSystemService(FirebaseSettings firebaseSettings, IEventBus eventBus)
+    public FirebaseSystemService(FirebaseSettings firebaseSettings)
     {
         _firebaseSettings = firebaseSettings;
-        _eventBus = eventBus;
 
         SetUpFirebaseAuthService();
     }
@@ -33,22 +32,20 @@ public class FirebaseSystemService : IFirebaseSystemService
          _firebaseAuthService = new FirebaseAuthService();
     }
     
-    public async Task SignInWithGoogle()
+    public async Task<FirebaseUser> SignInWithGoogle()
     {
         try
         {
             var googleUser = await _googleSignInService.SignInAsync();
-            var firebaseUser = await _firebaseAuthService.SignInWithGoogleAsync(googleUser);
+            if (googleUser == null) return null;
             
-            if (firebaseUser != null)
-            {
-                _eventBus.Fire(new SignedInEvent());
-            }
+            var firebaseUser = await _firebaseAuthService.SignInWithGoogleAsync(googleUser);
+            return firebaseUser;
         }
         catch (Exception e)
         {
-            Debug.LogError($"Sign-in failed: {e}");
-            throw;
+            Debug.LogError($"Sign-in failed (firebase system service): {e}");
+            return null;
         }
     }
 }

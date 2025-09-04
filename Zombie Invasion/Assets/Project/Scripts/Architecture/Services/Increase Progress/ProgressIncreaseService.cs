@@ -1,4 +1,6 @@
 using System;
+using System.Threading.Tasks;
+using UnityEngine;
 using Zenject;
 
 public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
@@ -40,7 +42,7 @@ public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
         _enemiesCountIncrease = new EnemiesCountIncrease(_progressSettings);
 
         //Set lvl. _lvl = LocalLvlDB.lvl;
-        //_lvl = _dataManageService.LocalLvlDB.LvlNumber;
+        _lvl = _dataManageService.LocalLvlDB.LvlNumber;
         _progressUIUpdateService.ChangeLevelText(_lvl.ToString());
     }
 
@@ -56,35 +58,42 @@ public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
         _eventBus?.Unsubscribe<ContinueGameEvent>(OnGameContinue);
     }
 
-    private void OnGameContinue(ContinueGameEvent gameEvent)
+    private async void OnGameContinue(ContinueGameEvent gameEvent)
     {
-        IncreaseLvlProperties();
+        try
+        {
+            await IncreaseLvlProperties();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"IncreaseLvlProperties error: {e.Message}");
+        }
     }
 
     #endregion
 
-    private void IncreaseLvlProperties()
+    private async Task IncreaseLvlProperties()
     {
         _lvl++;
 
         _progressUIUpdateService.ChangeLevelText(_lvl.ToString());
-        IncreaseMapLenght();
-        _enemiesCountIncrease.EnemiesIncrease(ref _enemiesIncrease);
-        // Save enemy increase.
+        _enemiesIncrease = _enemiesCountIncrease.EnemiesIncrease(_enemiesIncrease);
+        await IncreaseMapLenght();
+        
+        //Save lvl & enemy increase
+        await _dataManageService.SaveData(lvl: _lvl,
+            enemyIncrease: _enemiesIncrease);
     }
 
-    private void IncreaseMapLenght()
+    private async Task IncreaseMapLenght()
     {
         if (_lvl % _progressSettings.ActionInterval == 0)
         {
-            _mapLenghtIncrease.IncreaseMapLenght(ref _mapIncrease);
+            _mapIncrease = _mapLenghtIncrease.IncreaseMapLenght(_mapIncrease);
+            
             //Save _mapiIncrease
+            await _dataManageService.SaveData(lvlLengthIncrease: _mapIncrease);
         }
-    }
-
-    private void SaveChanges()
-    {
-        
     }
     
     public void Dispose()

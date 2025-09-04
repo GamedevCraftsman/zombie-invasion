@@ -1,16 +1,19 @@
 using System;
 using System.Threading.Tasks;
+using Firebase.Auth;
 using UnityEngine;
 using Zenject;
 
 public class FirebaseManager: BaseManager
 {
     private IFirebaseSystemService _firebaseSystemService;
+    private DataManageService _dataManageService;
 
     [Inject]
-    public void Construct(IFirebaseSystemService firebaseSystemService)
+    public void Construct(IFirebaseSystemService firebaseSystemService, DataManageService dataManageService)
     {
         _firebaseSystemService = firebaseSystemService;
+        _dataManageService = dataManageService;
     }
     
     protected override Task Initialize()
@@ -18,7 +21,6 @@ public class FirebaseManager: BaseManager
         try
         {
             Subscribe();
-            EventBus.Fire(new SignInWithGoogleEvent());
             DontDestroyOnLoad(this);
         }
         catch (Exception e)
@@ -27,6 +29,11 @@ public class FirebaseManager: BaseManager
         }
         
         return Task.CompletedTask;
+    }
+
+    private void Start()
+    {
+        EventBus.Fire(new SignInWithGoogleEvent());
     }
 
     private void Subscribe()
@@ -43,11 +50,18 @@ public class FirebaseManager: BaseManager
     {
         try
         {
-            await _firebaseSystemService.SignInWithGoogle();
+            FirebaseUser user = await _firebaseSystemService.SignInWithGoogle();
+            if (user != null)
+            {
+                await _dataManageService.InitialLoad(user);
+                EventBus.Fire(new SignedInEvent());
+            }
+            else 
+               EventBus.Fire(new CanceledSignInWithGoogleEvent());
         }
         catch (Exception e)
         {
-            Debug.LogError($"Sign-in event failed: {e}");
+            Debug.LogError($"Sign-in event failed (firebase manager): {e}");
         }
     }
     
