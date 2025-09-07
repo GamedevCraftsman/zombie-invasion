@@ -1,13 +1,13 @@
 public class HPChangedEvent
 {
-    public int CurrentHP { get; }
-    public int MaxHP { get; }
-    public float HPPercentage { get; }
+    public int CurrentHp { get; }
+    public int MaxHp { get; }
+    public float HpPercentage { get; }
 
-    public HPChangedEvent(int currentHP, int maxHP)
+    public HPChangedEvent(int currentHp, int maxHp)
     {
-        CurrentHP = currentHP;
-        MaxHP = maxHP;
-        HPPercentage = maxHP > 0 ? (float)currentHP / maxHP : 0f;
+        CurrentHp = currentHp;
+        MaxHp = maxHp; 
+        HpPercentage = maxHp > 0 ? (float)currentHp / maxHp : 0f;
     }
 }

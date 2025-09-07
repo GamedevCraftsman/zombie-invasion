@@ -11,16 +11,17 @@ public class WeaponSettings : ScriptableObject
     [SerializeField] private float bulletLifetime = 5f;
     [SerializeField] private GameObject bulletPrefab;
 
-    [Header("Bullet Pool")] [SerializeField, Range(5, 20)]
-    private int poolSize = 10;
+    [Header("Bullet Pool")] 
+    [SerializeField, Range(5, 20)] private int poolSize = 10;
 
-    [Header("Turret Rotation")] [SerializeField, Range(30f, 180f)]
-    private float maxRotationAngle = 90f;
+    [Header("Turret Rotation")] 
+    [SerializeField, Range(30f, 180f)] private float maxRotationAngle = 90f;
 
-    [SerializeField, Range(50, 150)] private float rotationSpeed = 50f;
+    [SerializeField, Range(0, 5)] private float rotationSpeed = 50f;
 
-    [Header("Input Sensitivity")] [SerializeField, Range(0.1f, 10f)]
-    private float inputSensitivity = 1f;
+    [Header("Input Sensitivity")]
+    [SerializeField, Range(0.5f, 5f)] private float inputSensitivity = 1f;
+    [SerializeField] private float baseScreenSize = 1080f;
 
     #region Public Values
 
@@ -36,6 +37,7 @@ public class WeaponSettings : ScriptableObject
     public float RotationSpeed => rotationSpeed;
 
     public float InputSensitivity => inputSensitivity;
+    public float BaseScreenSize => baseScreenSize;
 
     #endregion
 }

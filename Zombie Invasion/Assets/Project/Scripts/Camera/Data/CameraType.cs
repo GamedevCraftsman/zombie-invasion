@@ -1,5 +1,6 @@
 public enum CameraType
 {
     Start,
-    Dynamic
+    Dynamic,
+    None
 }

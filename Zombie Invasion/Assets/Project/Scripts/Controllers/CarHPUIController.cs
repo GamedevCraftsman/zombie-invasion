@@ -1,139 +1,110 @@
+using System;
+using System.Collections;
 using System.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
-public class CarHPUIController : BaseController
+public class CarHPUIController : BaseController, ICarHPUIController
 {
-    [Header("UI References")] [SerializeField]
-    private Image hpFillImage;
-
+    [Header("UI References")] 
+    [SerializeField] private Image hpFillImage;
     [SerializeField] private CanvasGroup hpBarGroup;
+    [Header("Visual Settings")] 
+    [SerializeField] private float animationSpeed = 5f;
 
-    [Header("Visual Settings")] [SerializeField]
-    private float animationSpeed = 5f;
+    private Tween _showHpTween;
+    private GameplayUISettings _gameplayUISettings;
+    private float _targetFillAmount;
+    private float _currentFillAmount;
+    private bool _isUpdateHpRunning;
 
-    [SerializeField] private bool useSmoothing = true;
-
-    // State
-    private float targetFillAmount = 1f;
-    private float currentFillAmount = 1f;
+    [Inject]
+    public void Construct(GameplayUISettings gameplayUISettings)
+    {
+        _gameplayUISettings = gameplayUISettings;
+    }
 
     protected override Task Initialize()
     {
-        if (hpFillImage == null)
+        try
         {
-            Debug.LogError("HPUIController: HP Fill Image is missing!");
-            return Task.CompletedTask;
-        }
+            if (hpFillImage == null)
+            {
+                Debug.LogError("HpUIController: HP Fill Image is missing!");
+            }
 
-        ResetUI();
-        SubscribeToEvents();
+            ResetUI();
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
 
         return Task.CompletedTask;
     }
 
-    private void SubscribeToEvents()
+    public void ShowHpBar()
     {
-        EventBus.Subscribe<HPChangedEvent>(OnHPChanged);
-        EventBus.Subscribe<StartGameEvent>(OnGameStarted);
-        EventBus.Subscribe<GameOverEvent>(OnGameEnd);
-        EventBus.Subscribe<CarReachedEndEvent>(OnGameEnd);
+        _showHpTween = hpBarGroup.DOFade(_gameplayUISettings.HpBarEndFadeLvl, _gameplayUISettings.HpBarShowDuration);
     }
 
-    private void UnsubscribeFromEvents()
+    public void HideHpBar()
     {
-        EventBus.Unsubscribe<GameOverEvent>(OnGameEnd);
-        EventBus.Unsubscribe<CarReachedEndEvent>(OnGameEnd);
-        EventBus?.Unsubscribe<HPChangedEvent>(OnHPChanged);
-        EventBus?.Unsubscribe<StartGameEvent>(OnGameStarted);
-    }
-
-    private void OnGameStarted(StartGameEvent startEvent)
-    {
-        ResetUI();
-        ShowHPBar();
-    }
-
-    private void OnGameEnd(GameOverEvent gameOverEvent)
-    {
-        HideHPBar();
-    }
-
-    private void OnGameEnd(CarReachedEndEvent carReachedEndEvent)
-    {
-        HideHPBar();
-    }
-
-    private void ShowHPBar()
-    {
-        hpBarGroup.DOFade(1, 2);
-    }
-
-    private void HideHPBar()
-    {
+        _showHpTween.Kill();
+        
         hpBarGroup.alpha = 0;
     }
 
-    private void OnHPChanged(HPChangedEvent hpEvent)
+    public void ResetUI()
     {
-        UpdateHP(hpEvent.HPPercentage, hpEvent.CurrentHP, hpEvent.MaxHP);
-    }
-
-    private void ResetUI()
-    {
-        targetFillAmount = 1f;
-        currentFillAmount = 1f;
+        _targetFillAmount = _gameplayUISettings.TargetFillAmount;
+        _currentFillAmount = _gameplayUISettings.TargetFillAmount;
 
         if (hpFillImage != null)
         {
-            hpFillImage.fillAmount = 1f;
+            hpFillImage.fillAmount = _gameplayUISettings.TargetFillAmount;
         }
     }
 
-    private void UpdateHP(float hpPercentage, int currentHP, int maxHP)
+    public void UpdateHp(float hpPercentage, int currentHp, int maxHp)
     {
-        targetFillAmount = Mathf.Clamp01(hpPercentage);
+        _targetFillAmount = Mathf.Clamp01(hpPercentage);
 
-        if (!useSmoothing)
+        if (_isUpdateHpRunning) return;
+        StartCoroutine(SmoothDecrease());
+
+        Debug.Log($"HP UI оновлено: {currentHp}/{maxHp} ({{hpPercentage:P0}})");
+    }
+
+    private IEnumerator SmoothDecrease()
+    {
+        _isUpdateHpRunning = true;
+
+        while (Mathf.Abs(_currentFillAmount - _targetFillAmount) > 0.01f)
         {
-            currentFillAmount = targetFillAmount;
+            Decrease();
             ApplyVisualChanges();
+            yield return null;
         }
 
-        Debug.Log($"HP UI оновлено: {currentHP}/{maxHP} ({hpPercentage:P0})");
+        _isUpdateHpRunning = false;
     }
 
-    private void Update()
+    private void Decrease()
     {
-        if (!useSmoothing) return;
-
-        SmoothDecrease();
-    }
-
-    private void SmoothDecrease()
-    {
-        if (Mathf.Abs(currentFillAmount - targetFillAmount) > 0.01f)
-        {
-            currentFillAmount = Mathf.MoveTowards(
-                currentFillAmount,
-                targetFillAmount,
-                animationSpeed * Time.deltaTime
-            );
-
-            ApplyVisualChanges();
-        }
+        _currentFillAmount = Mathf.MoveTowards(
+            _currentFillAmount,
+            _targetFillAmount,
+            animationSpeed * Time.deltaTime
+        );
     }
 
     private void ApplyVisualChanges()
     {
         if (hpFillImage == null) return;
 
-        hpFillImage.fillAmount = currentFillAmount;
-    }
-
-    private void OnDestroy()
-    {
-        UnsubscribeFromEvents();
+        hpFillImage.fillAmount = _currentFillAmount;
     }
 }

@@ -1,81 +1,44 @@
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Rendering;
 using Zenject;
 
-public class EnemyManager : BaseManager
+public class EnemyManager : MonoBehaviour, IEnemyManager
 {
-    [Inject] private EnemySpawnSettings _settings;
-    [Inject] private IPool<EnemyController> _enemyPool;
-    [Inject] private EnemySpawnController _spawnController;
+    private IProgressIncreaseService _progressService;
+    private EnemySpawnSettings _settings;
+    private IPool<EnemyController> _enemyPool;
+    private EnemySpawnController _spawnController;
 
-    private Queue<int> _availableSpawnIndices = new Queue<int>();
-    private HashSet<EnemyController> _activeEnemies = new HashSet<EnemyController>();
+    private int _nextSpawnIndex = 0;
+    private int _enemiesLeft;
 
-    protected override Task Initialize()
+    [Inject]
+    public void Construct(EnemySpawnSettings settings, IPool<EnemyController> enemyPool,
+        EnemySpawnController spawnController, IProgressIncreaseService progressIncreaseService)
     {
-        try
-        {
-            InitializeSpawnQueue();
-            SubscribeToEvents();
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-        }
-
-        return Task.CompletedTask;
+        _settings = settings;
+        _enemyPool = enemyPool;
+        _spawnController = spawnController;
+        _progressService = progressIncreaseService;
     }
 
-    private void InitializeSpawnQueue()
-    {
-        _availableSpawnIndices.Clear();
+    #region For events
 
-        for (int i = _settings.TotalEnemyCount; i < _settings.SpawnPointCount; i++)
+    public void CountEnemiesLeft()
+    {
+        _enemiesLeft = (_settings.TotalEnemyCount + _progressService.EnemiesIncrease) - _spawnController.SetMinPoolSize();
+
+        if (_enemiesLeft != 0)
         {
-            _availableSpawnIndices.Enqueue(i);
+            _nextSpawnIndex = _spawnController.SetMinPoolSize();
         }
     }
+    
+    #endregion
 
-    private void SubscribeToEvents()
+    public void HandleEnemyDeath(EnemyController deadEnemy)
     {
-        EventBus.Subscribe<StartGameEvent>(OnGameStart);
-        EventBus.Subscribe<GameOverEvent>(OnGameOver);
-        EventBus?.Subscribe<CarReachedEndEvent>(OnReachedEndOfGame);
-    }
-
-    private void UnsubscribeFromEvents()
-    {
-        EventBus?.Unsubscribe<CarReachedEndEvent>(OnReachedEndOfGame);
-        EventBus?.Unsubscribe<StartGameEvent>(OnGameStart);
-        EventBus?.Unsubscribe<GameOverEvent>(OnGameOver);
-    }
-
-
-    private void OnGameStart(StartGameEvent startEvent)
-    {
-        SubscribeToActiveEnemies();
-    }
-
-    private void SubscribeToActiveEnemies()
-    {
-        var activeEnemies = FindObjectsOfType<EnemyController>();
-
-        foreach (var enemy in activeEnemies)
-        {
-            if (enemy.gameObject.activeSelf)
-            {
-                enemy.OnEnemyDied += HandleEnemyDeath;
-                _activeEnemies.Add(enemy);
-            }
-        }
-    }
-
-    private void HandleEnemyDeath(EnemyController deadEnemy)
-    {
-        if (_availableSpawnIndices.Count > 0)
+        if (_enemiesLeft > 0)
         {
             RespawnEnemy(deadEnemy);
         }
@@ -85,19 +48,18 @@ public class EnemyManager : BaseManager
         }
     }
 
-    private async void RespawnEnemy(EnemyController enemy)
+    private void RespawnEnemy(EnemyController enemy)
     {
-        int nextSpawnIndex = _availableSpawnIndices.Dequeue();
-        var spawnPoints = _spawnController.AllSpawnPoints;
+        List<Vector3> spawnPoints = _spawnController.AllSpawnPoints;
+        
+        Debug.LogWarning($"Points count: {_spawnController.AllSpawnPoints.Count}\nNext spawn index: {_nextSpawnIndex}\nEnemies Left: {_enemiesLeft}");
 
-        if (nextSpawnIndex < spawnPoints.Count && enemy != null)
+        if (_nextSpawnIndex < spawnPoints.Count && enemy != null)
         {
-            enemy.transform.position = spawnPoints[nextSpawnIndex];
-            enemy.ResetForPooling();
+            Respawn(enemy, spawnPoints);
 
-            await enemy.InitializeAsync();
-
-            Debug.Log($"Respawned enemy at spawn point {nextSpawnIndex}");
+            Debug.Log($"Respawned enemy at spawn point {_nextSpawnIndex}");
+            _nextSpawnIndex++;
         }
         else
         {
@@ -105,49 +67,18 @@ public class EnemyManager : BaseManager
         }
     }
 
+    private void Respawn(EnemyController enemy, List<Vector3> spawnPoints)
+    {
+        enemy.ResetForPooling();
+        _enemyPool.Release(enemy);
+        
+        var enemyGet = _enemyPool.Get();
+        enemyGet.transform.position = spawnPoints[_nextSpawnIndex];
+    }
+
     private void DeactivateEnemy(EnemyController enemy)
     {
         enemy.OnEnemyDied -= HandleEnemyDeath;
-        _activeEnemies.Remove(enemy);
         _enemyPool.Release(enemy);
-    }
-
-    private void OnGameOver(GameOverEvent gameOverEvent)
-    {
-        OnGameEnd();
-    }
-
-    private void OnReachedEndOfGame(CarReachedEndEvent carReachedEndEvent)
-    {
-        OnGameEnd();
-    }
-
-    private void OnGameEnd()
-    {
-        _enemyPool.ReleaseAll();
-
-        foreach (var enemy in _activeEnemies)
-        {
-            if (enemy != null)
-            {
-                enemy.OnEnemyDied -= HandleEnemyDeath;
-            }
-        }
-
-        _activeEnemies.Clear();
-        _availableSpawnIndices.Clear();
-    }
-
-    private void OnDestroy()
-    {
-        UnsubscribeFromEvents();
-
-        foreach (var enemy in _activeEnemies)
-        {
-            if (enemy != null)
-            {
-                enemy.OnEnemyDied -= HandleEnemyDeath;
-            }
-        }
     }
 }

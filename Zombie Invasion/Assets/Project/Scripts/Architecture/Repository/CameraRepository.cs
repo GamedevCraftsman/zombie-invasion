@@ -10,6 +10,11 @@ public class CameraRepository : ICameraRepository
         _cameraMap = new Dictionary<CameraType, CameraConfig>();
         _cameraNameMap = new Dictionary<string, CameraConfig>();
 
+        SetCameras(configs);
+    }
+
+    private void SetCameras(CameraConfig[] configs)
+    {
         foreach (var config in configs)
         {
             if (config.Camera != null)

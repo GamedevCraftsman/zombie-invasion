@@ -2,22 +2,24 @@ using System;
 using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
-using Cinemachine;
-using Zenject;
 
-public class CameraManager : BaseManager, ICameraManager
+public class CameraManager : BaseManager
 {
-    [Inject] private IGameManager _gameManager;
-
     [SerializeField] private CameraConfig[] cameraConfigs;
     [SerializeField] private int basePriority = 10;
     [SerializeField] private int activePriority = 20;
+    [SerializeField] private float waitToStartLvlTime = 0.5f;
 
     private ICameraRepository _cameraRepository;
     private ICameraPriorityManager _priorityManager;
     private CameraSwitchingService _switchingService;
+    private WaitForSeconds _waitToReady;
 
-    protected override async Task Initialize()
+    //Camera States
+    private const CameraType MenuCameraType = CameraType.Start;
+    private const CameraType PlayCameraType = CameraType.Dynamic;
+
+    protected override Task Initialize()
     {
         try
         {
@@ -30,25 +32,11 @@ public class CameraManager : BaseManager, ICameraManager
             Debug.LogException(e);
         }
 
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 
-    //Events management
-    private void SubscribeToEvents()
-    {
-        EventBus.Subscribe<ReadyGameEvent>(OnReady);
-        EventBus.Subscribe<GameOverEvent>(OnGameEnd);
-        EventBus.Subscribe<CarReachedEndEvent>(OnReachedGameEnd);
-    }
+    #region Initialization
 
-    private void UnsubscribeFromEvents()
-    {
-        EventBus?.Unsubscribe<ReadyGameEvent>(OnReady);
-        EventBus?.Unsubscribe<GameOverEvent>(OnGameEnd);
-        EventBus?.Unsubscribe<CarReachedEndEvent>(OnReachedGameEnd);
-    }
-
-    //Initialize
     private void InitializeServices()
     {
         _cameraRepository = new CameraRepository();
@@ -56,99 +44,67 @@ public class CameraManager : BaseManager, ICameraManager
 
         _priorityManager = new CameraPriorityService(_cameraRepository, basePriority);
         _switchingService = new CameraSwitchingService(_cameraRepository, _priorityManager, activePriority);
+        _waitToReady = new WaitForSeconds(waitToStartLvlTime);
     }
 
     private void SetInitialCamera()
     {
-        if (CanSwitchToCamera(CameraType.Start))
-        {
-            SwitchToCamera(CameraType.Start);
-        }
-        else if (cameraConfigs.Length > 0)
-        {
-            SwitchToCamera(cameraConfigs[0].Type);
-        }
+        SwitchToCamera(MenuCameraType);
     }
 
-    public void Initialize(CameraConfig[] configs, int basePriority = 10, int activePriority = 20)
+    #endregion
+
+    #region Events
+
+    private void SubscribeToEvents()
     {
-        this.basePriority = basePriority;
-        this.activePriority = activePriority;
-        cameraConfigs = configs;
-        InitializeServices();
+        EventBus.Subscribe<ReadyGameEvent>(OnReady);
+        EventBus.Subscribe<RestarGameEvent>(OnGameRestart);
+        EventBus.Subscribe<CarReachedEndEvent>(OnReachedGameEnd);
     }
 
-    //For events
+    private void UnsubscribeFromEvents()
+    {
+        EventBus?.Unsubscribe<ReadyGameEvent>(OnReady);
+        EventBus?.Unsubscribe<RestarGameEvent>(OnGameRestart);
+        EventBus?.Unsubscribe<CarReachedEndEvent>(OnReachedGameEnd);
+    }
+
     private void OnReady(ReadyGameEvent readyGameEvent)
     {
-        if (CanSwitchToCamera(CameraType.Dynamic))
+        if (CanSwitchToCamera(PlayCameraType))
         {
-            StartCoroutine(WaitSwitchToCamera(CameraType.Dynamic));
+            StartCoroutine(WaitSwitchToCamera(PlayCameraType));
         }
     }
 
-    private IEnumerator WaitSwitchToCamera(CameraType cameraType)
+    private void OnGameRestart(RestarGameEvent restartGameEvent)
     {
-        SwitchToCamera(cameraType);
-        yield return new WaitForSeconds(0.5f);
-        EventBus.Fire(new StartGameEvent());
-    }
-
-    private void OnGameEnd(GameOverEvent gameOverEvent)
-    {
-        if (CanSwitchToCamera(CameraType.Start))
-        {
-            SwitchToCamera(CameraType.Start);
-        }
+        SwitchToCamera(MenuCameraType);
     }
 
     private void OnReachedGameEnd(CarReachedEndEvent recordedEndEvent)
     {
-        if (CanSwitchToCamera(CameraType.Start))
-        {
-            SwitchToCamera(CameraType.Start);
-        }
+        SwitchToCamera(MenuCameraType);
     }
 
-    // ICameraStateProvider Implementation
-    public CinemachineVirtualCamera GetCurrentCamera()
+    #endregion
+
+    private IEnumerator WaitSwitchToCamera(CameraType cameraType)
     {
-        if (_cameraRepository.TryGetCameraByType(GetCurrentCameraType(), out var config))
-        {
-            return config.Camera;
-        }
-
-        return null;
+        SwitchToCamera(cameraType);
+        yield return _waitToReady;
+        EventBus.Fire(new StartGameEvent());
     }
 
-    public CameraType GetCurrentCameraType()
-    {
-        return _switchingService.CurrentCameraType;
-    }
+    #region CameraSwitcher Implementation
 
-    public CameraConfig GetCameraConfig(CameraType cameraType)
-    {
-        _cameraRepository.TryGetCameraByType(cameraType, out var config);
-        return config;
-    }
-
-    public CameraConfig GetCameraConfig(string cameraName)
-    {
-        _cameraRepository.TryGetCameraByName(cameraName, out var config);
-        return config;
-    }
-
-    // ICameraSwitcher Implementation
     public bool CanSwitchToCamera(CameraType targetType) => _switchingService.CanSwitchToCamera(targetType);
     public bool CanSwitchToCamera(string cameraName) => _switchingService.CanSwitchToCamera(cameraName);
     public void SwitchToCamera(CameraType targetType) => _switchingService.SwitchToCamera(targetType);
     public void SwitchToCamera(string cameraName) => _switchingService.SwitchToCamera(cameraName);
 
-    // ICameraPriorityManager Implementation
-    public void SetCameraPriority(CameraType cameraType, int priority) =>
-        _priorityManager.SetCameraPriority(cameraType, priority);
-
-    public void ResetAllCameraPriorities() => _priorityManager.ResetAllCameraPriorities();
+    #endregion
 
     private void OnDestroy()
     {

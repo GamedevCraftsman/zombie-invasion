@@ -1,10 +1,20 @@
 using UnityEngine;
+using Zenject;
 
 public class FindCamera : MonoBehaviour
 {
-    [SerializeField] private Canvas canvas;
-    private void Start()
+    [SerializeField] private Canvas canvas; 
+    
+    private Camera _mainCamera;
+
+    [Inject]
+    public void Construct(Camera mainCamera)
     {
-        canvas.worldCamera = Camera.main;
+        _mainCamera = mainCamera;
+    }
+
+    private void SetMainCamera()
+    {
+        canvas.worldCamera = _mainCamera;
     }
 }

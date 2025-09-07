@@ -14,7 +14,7 @@ public class EnemyPoolHandler : IPoolable<EnemyController>
     
     public EnemyController OnCreate()
     {
-        var enemyObject = Object.Instantiate(_settings.EnemyPrefab);
+        var enemyObject = _container.InstantiatePrefab(_settings.EnemyPrefab);
         var enemyController = enemyObject.GetComponent<EnemyController>();
         
         if (enemyController == null)
@@ -22,8 +22,6 @@ public class EnemyPoolHandler : IPoolable<EnemyController>
             Debug.LogError("EnemyPrefab must have EnemyController component!");
             return null;
         }
-        
-        _container.Inject(enemyController);
         
         return enemyController;
     }

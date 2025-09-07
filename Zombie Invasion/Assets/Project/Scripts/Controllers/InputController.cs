@@ -1,110 +1,155 @@
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
-public class InputController : BaseController, IInputController
+namespace Project.Scripts.Controllers
 {
-    [Inject] private IGameManager _gameManager;
-
-    [Header("Input Settings")] [SerializeField]
-    private bool enableKeyboardInput = true;
-
-    [SerializeField] private bool enableMouseInput = true;
-    [SerializeField] private bool enableTouchInput = true;
-    [SerializeField] private KeyCode startGameKey = KeyCode.Space;
-
-    // State
-    private InputType lastInputType = InputType.None;
-
-    public InputType LastInputType => lastInputType;
-
-    protected override Task Initialize()
+    public class InputController : BaseController, IInputController
     {
-        try
+        [Header("Input Settings")] [SerializeField]
+        private bool enableMouseInput = true;
+
+        [SerializeField] private bool enableTouchInput = true;
+
+        // State
+        private InputType _lastInputType = InputType.None;
+        public InputType LastInputType => _lastInputType;
+
+        private Coroutine _checkStartGameCoroutine;
+        private IGameManager _gameManager;
+
+        [Inject]
+        public void Construct(IGameManager gameManager)
         {
-            SubscribeToEvents();
-            ResetInputState();
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-            throw;
+            _gameManager = gameManager;
         }
 
-        return Task.CompletedTask;
-    }
-
-    private void SubscribeToEvents()
-    {
-        EventBus.Subscribe<GameOverEvent>(OnGameOver);
-    }
-
-    private void UnsubscribeFromEvents()
-    {
-        EventBus?.Unsubscribe<GameOverEvent>(OnGameOver);
-    }
-
-    private void ResetInputState()
-    {
-        lastInputType = InputType.None;
-    }
-
-    private void OnGameOver(GameOverEvent gameOverEvent)
-    {
-        ResetInputState();
-    }
-
-    private void Update()
-    {
-        InputType detectedInput = DetectInput();
-
-        if (detectedInput != InputType.None && _gameManager.CurrentState == GameState.Menu)
+        protected override Task Initialize()
         {
-            lastInputType = detectedInput;
-            StartGame();
-        }
-    }
-
-    private InputType DetectInput()
-    {
-        // Check Keyboard input
-        if (enableKeyboardInput && Input.GetKeyDown(startGameKey))
-        {
-            return InputType.Keyboard;
-        }
-
-        // Check Mouse input
-        if (enableMouseInput && Input.GetMouseButtonDown(0))
-        {
-            return InputType.Mouse;
-        }
-
-        // Check Mobile input (Tap)
-        if (enableTouchInput && Input.touchCount > 0)
-        {
-            Touch touch = Input.GetTouch(0);
-            if (touch.phase == TouchPhase.Began)
+            try
             {
-                return InputType.Touch;
+                SubscribeToEvents();
+                ResetInputState();
+                StartToCheckInput();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        #region Events
+
+        private void SubscribeToEvents()
+        {
+            EventBus.Subscribe<AllowStartGameEvent>(OnAllowStartGame);
+        }
+
+        private void UnsubscribeFromEvents()
+        {
+            EventBus?.Unsubscribe<AllowStartGameEvent>(OnAllowStartGame);
+        }
+
+        private void StartGame()
+        {
+            EventBus.Fire(new ReadyGameEvent());
+            StopToCheckInput();
+        }
+
+        private void OnAllowStartGame(AllowStartGameEvent allowStartGameEvent)
+        {
+            ResetInputState();
+            StartToCheckInput();
+        }
+
+        #endregion
+
+        #region Input Checking
+
+        private void StartToCheckInput()
+        {
+            _checkStartGameCoroutine = StartCoroutine(CheckStartGame());
+
+            Debug.LogWarning("StartToCheckInput");
+        }
+
+        private void StopToCheckInput()
+        {
+            StopCoroutine(_checkStartGameCoroutine);
+
+            Debug.LogWarning("StopToCheckInput");
+        }
+
+        private IEnumerator CheckStartGame()
+        {
+            while (true)
+            {
+                InputType detectedInput = DetectInput();
+
+                if (detectedInput != InputType.None && _gameManager.CurrentState == GameState.Menu)
+                {
+                    _lastInputType = detectedInput;
+                    StartGame();
+                    yield break;
+                }
+
+                yield return null;
             }
         }
 
-        return InputType.None;
-    }
+        #endregion
 
-    private void StartGame()
-    {
-        EventBus.Fire(new ReadyGameEvent());
-    }
+        #region Input Detection
 
-    public void ResetForNewGame()
-    {
-        ResetInputState();
-    }
+        private InputType DetectInput()
+        {
+            InputType detectedInput = InputType.None;
 
-    private void OnDestroy()
-    {
-        UnsubscribeFromEvents();
+            CheckMouseInput(ref detectedInput);
+            CheckMobileInput(ref detectedInput);
+
+            return detectedInput;
+        }
+
+        private void CheckMouseInput(ref InputType detectInputType)
+        {
+            if (enableMouseInput && Input.GetMouseButtonDown(0))
+            {
+                detectInputType = InputType.Mouse;
+            }
+        }
+
+        private void CheckMobileInput(ref InputType detectInputType)
+        {
+            if (enableTouchInput && Input.touchCount > 0)
+            {
+                Touch touch = Input.GetTouch(0);
+                if (touch.phase == TouchPhase.Began)
+                {
+                    detectInputType = InputType.Touch;
+                }
+            }
+        }
+
+        #endregion
+
+        public void ResetForNewGame()
+        {
+            ResetInputState();
+        }
+
+        private void ResetInputState()
+        {
+            _lastInputType = InputType.None;
+        }
+
+        private void OnDestroy()
+        {
+            UnsubscribeFromEvents();
+        }
     }
 }

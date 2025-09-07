@@ -1,110 +1,55 @@
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
-public class CarController : BaseController
+public class CarController : BaseController, ICarController
 {
-    [Header("References")] [SerializeField]
-    private Transform carTransform;
+    [Header("References")] 
+    [SerializeField] private GameObject car;
+    [Header("Additional")]
+    [SerializeField] private WheelRotator wheelRotator;
+    [FormerlySerializedAs("particles")] [SerializeField] private ParticleSystem wheelDust;
 
     // Dependencies
-    [Inject] private CarSettings _carSettings;
-    [Inject] private GameSettings _gameSettings;
-    [Inject] private IGameManager _gameManager;
-
+    private CarSettings _carSettings;
+    private GameSettings _gameSettings;
+    private IGameManager _gameManager;
+    private IProgressIncreaseService _progressIncreaseService;
+    private ICheckpointTileService _checkpointTileService;
+    
     // State
-    private bool _isMoving = false;
-    private bool _isGameActive = false;
-    private float _currentSpeed = 0f;
-    private float _lvlLength = 0;
+    private bool _isMoving;
+    private bool _isGameActive;
+    private float _currentSpeed;
+    private float _lvlLength;
+    private float _distanceToMoveCheckpoint;
 
-    // Properties for external access
-    public float CurrentSpeed => _currentSpeed;
-    public Vector3 Position => carTransform.position;
-
+    public GameObject Car => car;
+    [Inject]
+    public void Construct(CarSettings carSettings, GameSettings gameSettings, IGameManager gameManager, IProgressIncreaseService progressIncreaseService
+    , ICheckpointTileService checkpointTileService)
+    {
+        _carSettings = carSettings;
+        _gameSettings = gameSettings;
+        _gameManager = gameManager;
+        _progressIncreaseService = progressIncreaseService;
+        _checkpointTileService = checkpointTileService;
+    }
+    
     protected override async Task Initialize()
     {
-        if (carTransform == null)
-            carTransform = transform;
-
-        SubscribeToEvents();
-        ResetCarState();
+        try
+        {
+            ResetCarState();
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
 
         await Task.CompletedTask;
-    }
-
-    private void SubscribeToEvents()
-    {
-        EventBus.Subscribe<StartGameEvent>(OnGameStarted);
-        EventBus.Subscribe<GameOverEvent>(OnGameOver);
-        EventBus.Subscribe<CarReachedEndEvent>(OnReachedEndGame);
-        EventBus.Subscribe<ContinueGameEvent>(OnContinueGame);
-        EventBus.Subscribe<RestarGameEvent>(OnRestartGame);
-    }
-
-    private void UnsubscribeFromEvents()
-    {
-        EventBus?.Unsubscribe<StartGameEvent>(OnGameStarted);
-        EventBus?.Unsubscribe<GameOverEvent>(OnGameOver);
-        EventBus?.Unsubscribe<CarReachedEndEvent>(OnReachedEndGame);
-        EventBus?.Unsubscribe<ContinueGameEvent>(OnContinueGame);
-        EventBus?.Unsubscribe<RestarGameEvent>(OnRestartGame);
-    }
-
-    private void ResetCarState()
-    {
-        _lvlLength = 0f;
-        _currentSpeed = 0f;
-        _isMoving = false;
-        _isGameActive = false;
-    }
-
-    private void OnGameStarted(StartGameEvent startEvent)
-    {
-        StartMovement();
-        LvlLenghtCalculation();
-    }
-
-    private void OnRestartGame(RestarGameEvent restartEvent)
-    {
-        ResetPosition();
-    }
-
-    private void OnReachedEndGame(CarReachedEndEvent carReachedEndEvent)
-    {
-        UpdateWinDeceleration();
-        _isGameActive = false;
-    }
-
-    private void OnGameOver(GameOverEvent gameOverEvent)
-    {
-        StopMovement();
-        _isGameActive = false;
-    }
-
-    private void OnContinueGame(ContinueGameEvent continueEvent)
-    {
-        ResetCarState();
-    }
-
-    private void LvlLenghtCalculation()
-    {
-        _lvlLength = Mathf.Round((carTransform.position.z +
-                                  (_gameSettings.MapLength - 1) * _gameSettings.DistanceBetweenTiles) *
-                                 10f) / 10f; 
-    }
-
-    private void StartMovement()
-    {
-        _isMoving = true;
-        _isGameActive = true;
-        _currentSpeed = 0f;
-    }
-
-    private void StopMovement()
-    {
-        _isMoving = false;
-        _currentSpeed = 0f;
     }
 
     private void FixedUpdate()
@@ -115,58 +60,108 @@ public class CarController : BaseController
         {
             UpdateNormalMovement();
             CheckLevelCompletion();
+            CheckMoveCheckpoint();
         }
     }
+   
+    #region States
+    public void ResetCarState()
+    {
+        _lvlLength = 0f;
+        _currentSpeed = 0f;
+        _isMoving = false;
+        _isGameActive = false;
+    }
 
+    public void StartMovement()
+    {
+        _lvlLength = LvlLenghtCalculation();
+        _distanceToMoveCheckpoint = DistanceToMoveCheckpointCalculation();
+        
+        wheelRotator.StartRotating(_carSettings.Speed);
+        wheelDust.Play();
+        
+        _isMoving = true;
+        _isGameActive = true;
+        _currentSpeed = 0f;
+    }
+
+    private float LvlLenghtCalculation()
+    {
+        //Round to the nearest tenth.
+        float lvlLenght = Mathf.Round((car.transform.position.z 
+                                       + (_gameSettings.MapLength + 2 + _progressIncreaseService.MapIncrease - 1) 
+                                       * _gameSettings.DistanceBetweenTiles) * 10f) / 10f; 
+        
+        return lvlLenght;
+    }
+
+    private float DistanceToMoveCheckpointCalculation()
+    {
+        float distance = Mathf.Round((car.transform.position.z 
+                                      + _gameSettings.DistanceBetweenTiles) * 10f) / 10f; 
+        return distance;
+    }
+    
+    public void StopMovement()
+    {
+        wheelRotator.StopRotating();
+        wheelDust.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        
+        _isMoving = false;
+        _isGameActive = false;
+        _currentSpeed = 0f;
+    }
+    #endregion
+    #region Movement
     private void UpdateNormalMovement()
     {
-        _currentSpeed = Mathf.MoveTowards(
-            _currentSpeed,
-            _carSettings.Speed,
-            _carSettings.Acceleration * Time.fixedDeltaTime
-        );
+        if (!Mathf.Approximately(_currentSpeed, _carSettings.Speed))
+        {
+            _currentSpeed = Mathf.MoveTowards(
+                _currentSpeed,
+                _carSettings.Speed,
+                _carSettings.Acceleration * Time.fixedDeltaTime
+            );
+        }
 
         Move();
     }
 
     private void Move()
     {
-        Vector3 movement = Vector3.forward * _currentSpeed * Time.fixedDeltaTime;
-        carTransform.position += movement;
+        Vector3 movement = Vector3.forward * (_currentSpeed * Time.fixedDeltaTime);
+        car.transform.position += movement;
     }
-
-    private void UpdateWinDeceleration()
+    
+    public void ResetPosition()
     {
-        _currentSpeed = Mathf.MoveTowards(
-            _currentSpeed,
-            0f,
-            _carSettings.Deceleration * Time.fixedDeltaTime
-        );
-
-        Move();
-
-        if (_currentSpeed <= 0f)
-        {
-            StopMovement();
-        }
+        car.transform.position = _carSettings.CarStartPosition;
+        ResetCarState();
     }
+    #endregion
 
     private void CheckLevelCompletion()
     {
-        if (carTransform.position.z >= _lvlLength)
+        if (car.transform.position.z >= _lvlLength)
         {
             _gameManager.EndGame(true);
+            SetCorrectPosition();
         }
     }
 
-    private void ResetPosition()
+    private void CheckMoveCheckpoint()
     {
-        carTransform.position = _carSettings.CarStartPosition;
-        ResetCarState();
+        if (car.transform.position.z >= _distanceToMoveCheckpoint)
+        {
+            Vector3 pos = car.transform.position;
+            _checkpointTileService.MoveTile(new Vector3(pos.x, pos.y, _lvlLength));
+        }
     }
-
-    private void OnDestroy()
+    
+    private void SetCorrectPosition()
     {
-        UnsubscribeFromEvents();
+        Vector3 pos = car.transform.position;
+        car.transform.position = new Vector3(pos.x, pos.y, _lvlLength);
     }
 }

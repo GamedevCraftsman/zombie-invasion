@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
@@ -5,24 +6,40 @@ using Zenject;
 public class HPManager : BaseManager
 {
     // Dependencies
-    [Inject] private CarSettings _carSettings;
-    [Inject] private IGameManager _gameManager;
+    private CarSettings _carSettings;
+    private IGameManager _gameManager;
 
     // State
-    private int _currentHP;
-    private int _maxHP;
-    
-    public bool IsAlive => _currentHP > 0;
+    private int _currentHp;
+    private int _maxHp;
+
+    public bool IsAlive => _currentHp > 0;
+
+    [Inject]
+    public void Construct(CarSettings carSettings, IGameManager gameManager)
+    {
+        _carSettings = carSettings;
+        _gameManager = gameManager;
+    }
 
     protected override Task Initialize()
     {
-        _maxHP = _carSettings.MaxHP;
-        ResetHP();
+        try
+        {
+            _maxHp = _carSettings.MaxHp;
+            ResetHp();
 
-        SubscribeToEvents();
+            SubscribeToEvents();
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
 
         return Task.CompletedTask;
     }
+
+    #region Events
 
     private void SubscribeToEvents()
     {
@@ -42,7 +59,7 @@ public class HPManager : BaseManager
 
     private void OnGameStarted(StartGameEvent startEvent)
     {
-        ResetHP();
+        ResetHp();
     }
 
     private void OnPlayerDamaged(PlayerDamagedEvent damageEvent)
@@ -52,18 +69,25 @@ public class HPManager : BaseManager
 
     private void OnGameRestart(RestarGameEvent restartEvent)
     {
-        ResetHP();
+        ResetHp();
     }
 
     private void OnGameContinue(ContinueGameEvent continueEvent)
     {
-        ResetHP();
+        ResetHp();
     }
 
-    private void ResetHP()
+    private void OnDestroy()
     {
-        _currentHP = _maxHP;
-        FireHPChangedEvent();
+        UnsubscribeFromEvents();
+    }
+
+    #endregion
+
+    private void ResetHp()
+    {
+        _currentHp = _maxHp;
+        FireHpChangedEvent();
     }
 
     private void TakeDamage(int damageAmount)
@@ -74,24 +98,28 @@ public class HPManager : BaseManager
             return;
         }
 
-        int previousHP = _currentHP;
-        _currentHP = Mathf.Max(0, _currentHP - damageAmount);
+        ChangeHp(damageAmount);
+    }
 
-        FireHPChangedEvent();
+    private void ChangeHp(int damageAmount)
+    {
+        int previousHp = _currentHp;
+        _currentHp = Mathf.Max(0, _currentHp - damageAmount);
 
-        if (_currentHP <= 0 && previousHP > 0)
+        FireHpChangedEvent();
+        IsLoseHp(previousHp);
+    }
+
+    private void FireHpChangedEvent()
+    {
+        EventBus.Fire(new HPChangedEvent(_currentHp, _maxHp));
+    }
+
+    private void IsLoseHp(int previousHp)
+    {
+        if (_currentHp <= 0 && previousHp > 0)
         {
             _gameManager.EndGame(false);
         }
-    }
-
-    private void FireHPChangedEvent()
-    {
-        EventBus.Fire(new HPChangedEvent(_currentHP, _maxHP));
-    }
-
-    private void OnDestroy()
-    {
-        UnsubscribeFromEvents();
     }
 }

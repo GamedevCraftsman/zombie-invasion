@@ -1,21 +1,27 @@
 using System;
 using System.Threading.Tasks;
+using Project.Scripts.Controllers;
 using UnityEngine;
 using Zenject;
 
 public class GameManager : BaseManager, IGameManager
 {
     // Dependencies
-    [Inject] private CarController carController;
-    [Inject] private HPManager hpManager;
-    [Inject] private InputController inputController;
-    [Inject] private CarHPUIController hpUIController;
+    private HPManager _hpManager;
+    private IInputController _inputController;
 
     // State
-    private GameState currentState = GameState.Menu;
+    private GameState _currentState = GameState.Menu;
 
     // Properties
-    public GameState CurrentState => currentState;
+    public GameState CurrentState => _currentState;
+
+    [Inject]
+    public void Construct(HPManager hpManager, IInputController inputController)
+    {
+        _hpManager = hpManager;
+        _inputController = inputController;
+    }
 
     protected override Task Initialize()
     {
@@ -31,6 +37,8 @@ public class GameManager : BaseManager, IGameManager
 
         return Task.CompletedTask;
     }
+
+    #region Events
 
     private void SubscribeToEvents()
     {
@@ -54,7 +62,7 @@ public class GameManager : BaseManager, IGameManager
 
     private void OnStartGameEvent(StartGameEvent startEvent)
     {
-        if (currentState == GameState.Menu)
+        if (_currentState == GameState.Menu)
         {
             StartGame();
         }
@@ -62,7 +70,7 @@ public class GameManager : BaseManager, IGameManager
 
     private void OnCarReachedEnd(CarReachedEndEvent carEndEvent)
     {
-        if (hpManager.IsAlive)
+        if (_hpManager.IsAlive)
         {
             EndGame(true);
         }
@@ -80,7 +88,7 @@ public class GameManager : BaseManager, IGameManager
 
     private void OnPlayerDamaged(PlayerDamagedEvent damageEvent)
     {
-        if (!hpManager.IsAlive && currentState == GameState.Playing)
+        if (!_hpManager.IsAlive && _currentState == GameState.Playing)
         {
             EndGame(false);
         }
@@ -88,10 +96,10 @@ public class GameManager : BaseManager, IGameManager
 
     private void ChangeState(GameState newState)
     {
-        if (currentState == newState) return;
+        if (_currentState == newState) return;
 
-        GameState previousState = currentState;
-        currentState = newState;
+        GameState previousState = _currentState;
+        _currentState = newState;
     }
 
     private void OnGameRestart(RestarGameEvent gameRestartEvent)
@@ -99,9 +107,12 @@ public class GameManager : BaseManager, IGameManager
         ChangeState(GameState.Menu);
     }
 
+    #endregion
+
+    #region IGameManager
     public void StartGame()
     {
-        if (currentState != GameState.Menu)
+        if (_currentState != GameState.Menu)
         {
             return;
         }
@@ -113,7 +124,7 @@ public class GameManager : BaseManager, IGameManager
 
     public void EndGame(bool victory)
     {
-        if (currentState != GameState.Playing)
+        if (_currentState != GameState.Playing)
         {
             return;
         }
@@ -123,12 +134,12 @@ public class GameManager : BaseManager, IGameManager
         if (victory)
             EventBus.Fire(new CarReachedEndEvent());
         else
-            EventBus.Fire(new GameOverEvent());
+            EventBus.Fire(new GameOverEvent(true));
     }
 
     public void RestartGame()
     {
-        if (currentState == GameState.Playing)
+        if (_currentState == GameState.Playing)
         {
             return;
         }
@@ -138,9 +149,11 @@ public class GameManager : BaseManager, IGameManager
         ChangeState(GameState.Menu);
     }
 
+    #endregion
+    
     private void ResetGameState()
     {
-        inputController.ResetForNewGame();
+        _inputController.ResetForNewGame();
     }
 
     private void OnDestroy()
