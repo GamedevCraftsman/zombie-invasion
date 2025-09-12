@@ -14,6 +14,7 @@ public class FirebaseInstaller : MonoInstaller
         Container.Bind<IFirebaseSystemService>().To<FirebaseSystemService>().AsSingle().NonLazy();
         Container.Bind<DataManageService>().AsSingle().NonLazy();
         Container.BindInterfacesTo<AnalyticsListener>().AsSingle().NonLazy();
+        Container.BindInterfacesTo<NotificationService>().AsSingle().NonLazy();
         
         //Settings
         Container.Bind<FirebaseSettings>().FromInstance(firebaseSettings).AsSingle().NonLazy();

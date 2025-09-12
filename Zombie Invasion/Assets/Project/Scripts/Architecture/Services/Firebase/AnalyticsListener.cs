@@ -48,6 +48,6 @@ public class AnalyticsListener : IDisposable
     {
         Unsubscribe();
         
-        Debug.Log("AnalyticsListener: Disposed");
+        Debug.LogWarning("AnalyticsListener: Disposed");
     }
 }
