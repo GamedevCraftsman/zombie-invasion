@@ -6,6 +6,14 @@
       "source": "local-tarball",
       "dependencies": {}
     },
+    "com.google.firebase.analytics": {
+      "version": "file:Firebase/com.google.firebase.analytics-13.1.0.tgz",
+      "depth": 0,
+      "source": "local-tarball",
+      "dependencies": {
+        "com.google.firebase.app": "13.1.0"
+      }
+    },
     "com.google.firebase.app": {
       "version": "file:Firebase/com.google.firebase.app-13.1.0.tgz",
       "depth": 0,
