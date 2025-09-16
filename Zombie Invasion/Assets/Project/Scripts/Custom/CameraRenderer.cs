@@ -2,7 +2,7 @@
 
 public class CameraRenderer : MonoBehaviour
 {
-    [SerializeField] private Vector2 defaultResolution = new(1080, 1920);
+    [SerializeField] private Vector2 defaultResolution = new(1920, 1080);
     [SerializeField, Range(0f, 1f)] private float widthOrHeight = 0;
 
     private Camera _componentCamera;
