@@ -8,7 +8,6 @@ public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
     private readonly IEventBus _eventBus;
     private readonly IProgressUIUpdateService _progressUIUpdateService;
     private readonly ProgressSettings _progressSettings;
-    private readonly DataManageService _dataManageService;
 
     private MapLenghtIncrease _mapLenghtIncrease;
     private EnemiesCountIncrease _enemiesCountIncrease;
@@ -21,28 +20,21 @@ public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
 
     [Inject]
     public ProgressIncreaseService(IEventBus eventBus, ProgressSettings progressSettings,
-        IProgressUIUpdateService progressUIUpdateService, DataManageService dataManageService)
+        IProgressUIUpdateService progressUIUpdateService)
     {
         _eventBus = eventBus;
         _progressSettings = progressSettings;
         _progressUIUpdateService = progressUIUpdateService;
-        _dataManageService = dataManageService;
-        
+
         Subscribe();
         Init();
     }
 
     private void Init()
     {
-        //Set _mapIncrease & _enemiesIncrease from LocalLvlDB (DataMangeService)
-        _mapIncrease = _dataManageService.LocalLvlDB.LvlLenghtIncrease;
-        _enemiesIncrease = _dataManageService.LocalLvlDB.EnemyCountIncrease;
-        
         _mapLenghtIncrease = new MapLenghtIncrease(_progressSettings);
         _enemiesCountIncrease = new EnemiesCountIncrease(_progressSettings);
 
-        //Set lvl. _lvl = LocalLvlDB.lvl;
-        _lvl = _dataManageService.LocalLvlDB.LvlNumber;
         _progressUIUpdateService.ChangeLevelText(_lvl.ToString());
     }
 
@@ -58,44 +50,30 @@ public class ProgressIncreaseService : IDisposable, IProgressIncreaseService
         _eventBus?.Unsubscribe<ContinueGameEvent>(OnGameContinue);
     }
 
-    private async void OnGameContinue(ContinueGameEvent gameEvent)
+    private  void OnGameContinue(ContinueGameEvent gameEvent)
     {
-        try
-        {
-            await IncreaseLvlProperties();
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"IncreaseLvlProperties error: {e.Message}");
-        }
+        IncreaseLvlProperties();
     }
 
     #endregion
 
-    private async Task IncreaseLvlProperties()
+    private void IncreaseLvlProperties()
     {
         _lvl++;
 
         _progressUIUpdateService.ChangeLevelText(_lvl.ToString());
         _enemiesIncrease = _enemiesCountIncrease.EnemiesIncrease(_enemiesIncrease);
-        await IncreaseMapLenght();
-        
-        //Save lvl & enemy increase
-        await _dataManageService.SaveData(lvl: _lvl,
-            enemyIncrease: _enemiesIncrease);
+        IncreaseMapLenght();
     }
 
-    private async Task IncreaseMapLenght()
+    private void IncreaseMapLenght()
     {
         if (_lvl % _progressSettings.ActionInterval == 0)
         {
             _mapIncrease = _mapLenghtIncrease.IncreaseMapLenght(_mapIncrease);
-            
-            //Save _mapiIncrease
-            await _dataManageService.SaveData(lvlLengthIncrease: _mapIncrease);
         }
     }
-    
+
     public void Dispose()
     {
         Unsubscribe();

@@ -30,8 +30,7 @@ public class AuthPanelUIController : BaseController
 
     private void AddListeners()
     {
-        signInButton.onClick.AddListener(() => EventBus.Fire(new SignInWithGoogleEvent()));
-        
+        signInButton.onClick.AddListener(() => SceneManager.LoadScene(1));
     }
 
     private void Subscribe()
