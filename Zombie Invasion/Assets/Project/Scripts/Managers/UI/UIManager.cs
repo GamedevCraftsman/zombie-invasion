@@ -41,7 +41,6 @@ public class UIManager : BaseManager, IUIManager
     
     private void SetButtonsEvents()
     {
-        respawnButton.onClick.AddListener(ShowRewardedAd);
         restartButton.onClick.AddListener(() => ShowGameOverUI(false));
         continueButton.onClick.AddListener(() => ShowGameOverUI(true));
 
@@ -65,18 +64,6 @@ public class UIManager : BaseManager, IUIManager
             Debug.LogWarning("Restart");
             _transitionService.ChangeEvent(() => EventBus.Fire(new RestarGameEvent()));
         }
-    }
-
-    #endregion
-
-    #region Show Rewarded Ad
-
-    private void ShowRewardedAd()
-    {
-        respawnButton.interactable = false;
-        respawnButtonText.text = "Loading...";
-        
-        EventBus.Fire(new ShowReliveAdEvent());
     }
 
     #endregion

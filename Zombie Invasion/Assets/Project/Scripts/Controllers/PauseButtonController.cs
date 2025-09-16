@@ -7,7 +7,6 @@ using Zenject;
 public class PauseButtonController : BaseController
 {
     [Header("Pause button")]
-    [SerializeField] private CanvasGroup pauseButtonGroup;
     [SerializeField] private Button pauseButton;
     
     private PauseButtonService _pauseButtonService;

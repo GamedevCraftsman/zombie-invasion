@@ -568,56 +568,6 @@ MonoBehaviour:
   enemySpawnController: {fileID: 597822991}
   enemyPoolParent: {fileID: 1526281317}
   effectsPoolParent: {fileID: 780319590}
---- !u!1 &81411465
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 81411466}
-  - component: {fileID: 81411467}
-  m_Layer: 0
-  m_Name: Relive Timer Controller
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &81411466
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 81411465}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 639500220}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &81411467
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 81411465}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e3266b4e78e40f5838ebdd4d374540f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  backDarkPanel: {fileID: 1216916438}
-  timer: {fileID: 1737881094}
-  reliveButton: {fileID: 1002395536}
-  reliveBurronText: {fileID: 2038354573}
-  timerText: {fileID: 1506937759}
-  bar: {fileID: 1486841509}
 --- !u!1 &98323644
 GameObject:
   m_ObjectHideFlags: 0
@@ -874,7 +824,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 103}
+  m_AnchoredPosition: {x: 0, y: 130}
   m_SizeDelta: {x: -510, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &151620386
@@ -2583,7 +2533,6 @@ Transform:
   - {fileID: 451608774}
   - {fileID: 1466068356}
   - {fileID: 939838250}
-  - {fileID: 81411466}
   - {fileID: 2037316679}
   - {fileID: 2139376470}
   m_Father: {fileID: 0}
@@ -4220,6 +4169,11 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4142178548197886515, guid: afd84a5c9d88a954fb1e764babc4d08c,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: bb9c826b16c20764c8b090eb36d7890c, type: 2}
     - target: {fileID: 4287327625821292686, guid: afd84a5c9d88a954fb1e764babc4d08c,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -4299,6 +4253,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5737046731905869513, guid: afd84a5c9d88a954fb1e764babc4d08c,
+        type: 3}
+      propertyPath: ColorModule.enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5757544925727265665, guid: afd84a5c9d88a954fb1e764babc4d08c,
         type: 3}
@@ -6463,7 +6422,6 @@ MonoBehaviour:
   - {fileID: 2906451356139333688}
   - {fileID: 939838251}
   - {fileID: 2796221199310231234}
-  - {fileID: 81411467}
   - {fileID: 2037316680}
   - {fileID: 2139376471}
   - {fileID: 24136513}
@@ -6600,7 +6558,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6b1a2568037445ead2e94d992b9cab3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pauseButtonGroup: {fileID: 0}
   pauseButton: {fileID: 616484117}
 --- !u!1 &2038354571
 GameObject:
